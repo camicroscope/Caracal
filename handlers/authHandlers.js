@@ -121,22 +121,27 @@ function tokenTrade(check_key, sign_key, UserFunction){
 
 function loginHandler(check_key){
   return function(req,res,next){
-    var THISTOKEN = getToken(req)
-    let jwt_options = {}
-    if (AUD){
-      jwt_options.audience = AUD
-    }
-    if (ISS){
-      jwt_options.issuer = ISS
-    }
-    jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
-      if (err){
-        res.status(401).send(err)
-      } else {
-        req.tokenInfo = token
-        next()
+    if (DISABLE_SEC){
+      req.tokenInfo = {"user":"none", "sub":"none"}
+      next()
+    } else {
+      var THISTOKEN = getToken(req)
+      let jwt_options = {}
+      if (AUD){
+        jwt_options.audience = AUD
       }
-    })
+      if (ISS){
+        jwt_options.issuer = ISS
+      }
+      jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
+        if (err){
+          res.status(401).send(err)
+        } else {
+          req.tokenInfo = token
+          next()
+        }
+      })
+    }
   }
 }
 
