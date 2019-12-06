@@ -61,7 +61,7 @@ function getJwtKid(token) {
     return JSON.parse(jsonPayload).kid;
 };
 
-function jwk_token_trade(jwks_client, sign_key, UserFunction){
+function jwkTokenTrade(jwks_client, sign_key, UserFunction){
   return function(req,res){
     var THISTOKEN = getToken(req)
     if (!THISTOKEN){
@@ -73,14 +73,14 @@ function jwk_token_trade(jwks_client, sign_key, UserFunction){
         res.status(401).send(err)
       } else {
         let use_key = key.publicKey || key.rsaPublicKey
-        token_trade(use_key, sign_key, UserFunction)(req,res)
+        tokenTrade(use_key, sign_key, UserFunction)(req,res)
       }
     })
   }
 }
 
 // curry these calls
-function token_trade(check_key, sign_key, UserFunction){
+function tokenTrade(check_key, sign_key, UserFunction){
   return function(req,res){
     var THISTOKEN = getToken(req)
     let jwt_options = {}
@@ -119,9 +119,31 @@ function token_trade(check_key, sign_key, UserFunction){
   }
 }
 
+function loginHandler(check_key){
+  return function(req,res,next){
+    var THISTOKEN = getToken(req)
+    let jwt_options = {}
+    if (AUD){
+      jwt_options.audience = AUD
+    }
+    if (ISS){
+      jwt_options.issuer = ISS
+    }
+    jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
+      if (err){
+        res.status(401).send(err)
+      } else {
+        req.tokenInfo = token
+        next()
+      }
+    })
+  }
+}
+
 auth = {}
-auth.jwk_token_trade = jwk_token_trade
-auth.token_trade = token_trade
+auth.jwkTokenTrade = jwkTokenTrade
+auth.tokenTrade = tokenTrade
+auth.loginHandler = loginHandler
 auth.CLIENT = CLIENT
 auth.PRIKEY = PRIKEY
 auth.PUBKEY = PUBKEY
