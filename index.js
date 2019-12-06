@@ -46,6 +46,12 @@ app.use("/iip", iipHandler)
 
 // data, mongo
 app.use("/data", auth.loginHandler(auth.PUBKEY))
+// slide
+app.use("/data/slide/find", dataHandlers.Slide.find)
+// render mongo data
+app.use("/data", function(req, res, next){
+  res.send(req.data)
+})
 
 
 app.listen(PORT, () => console.log('listening on ' + PORT))
