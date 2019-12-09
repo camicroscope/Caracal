@@ -11,6 +11,7 @@ const iipHandler = require("./handlers/iipHandler.js")
 const permissionHandler = require("./handlers/permssionHandler.js")
 const filterHandler = require("./handlers/iipHandler.js")
 const dataHandlers = require("./handlers/dataHandlers.js")
+// TODO validation of data
 
 var PORT = process.env.PORT || 8010
 
