@@ -9,7 +9,6 @@ const auth = require("./handlers/authHandlers.js")
 const userFunction = require("./handlers/userFunction.js")
 const iipHandler = require("./handlers/iipHandler.js")
 const permissionHandler = require("./handlers/permssionHandler.js")
-const filterHandler = require("./handlers/iipHandler.js")
 const dataHandlers = require("./handlers/dataHandlers.js")
 // TODO validation of data
 

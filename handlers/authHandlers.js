@@ -142,16 +142,45 @@ function loginHandler(check_key){
           res.status(401).send(err)
         } else {
           req.tokenInfo = token
+          req.userType = token.userType || "Null"
+          req.userFilter = token.userFilter || ["Public"]
           next()
         }
       })
     }
   }
 }
+function filterHandler(data_field, filter_field, attr_field){
+  return function(req, res, next){
+    // do nothing if sec disabled, or if filter contains "**"
+    var filter = req[filter_field]
+    // make filter an array
+    if (!Array.isArray(filter)){
+      filter = [filter]
+    }
+    if (! DISABLE_SEC && filter.indexOf("**")==-1){
+      // filter data in data_field if attr_field in filter_field
+      var data = req[data_field]
+      // is data an array?
+      if (Array.isArray(data)){
+        // remove ones where does not match
+        req[data_field] = data.filter(x=>filter.indexOf(x[attr_field])>=0)
+      } else {
+        if (filter.indexOf(data[attr_field])>=0){
+          req[data_field] = data
+        } else {
+          req[data_field] = {}
+        }
+      }
+    }
+    next()
+  }
+}
 
 auth = {}
 auth.jwkTokenTrade = jwkTokenTrade
 auth.tokenTrade = tokenTrade
+auth.filterHandler = filterHandler
 auth.loginHandler = loginHandler
 auth.CLIENT = CLIENT
 auth.PRIKEY = PRIKEY
