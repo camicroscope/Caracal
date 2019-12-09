@@ -22,6 +22,25 @@ function mongoFind(collection, query){
   })
 }
 
+function mongoDistinct(collection, upon, query){
+  return new Promise(function(res, rej){
+    mongo.MongoClient.connect(MONGO_URI, function(err, db) {
+    if (err){
+      rej(err)
+    } else {
+      var dbo = db.db(MONGO_DB);
+        dbo.collection(collection).distinct(upon, query).toArray(function(err, result) {
+          if (err){
+            rej(err)
+          }
+          res(result)
+          db.close();
+        });
+      }
+    });
+  })
+}
+
 function mongoAdd(collection, data){
   return new Promise(function(res, rej){
     mongo.MongoClient.connect(MONGO_URI, function(err, db) {
@@ -82,7 +101,9 @@ function mongoUpdate(collection, query, newVals){
 
 var Slide = {}
 Slide.find = function(req, res, next){
-  var query = {}
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
   mongoFind("slide", query).then(x=>{
     req.data = x
     next()
@@ -90,22 +111,25 @@ Slide.find = function(req, res, next){
 }
 
 Slide.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("slide", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
+
 Slide.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("slide", query).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Slide.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("slide", query).then(x=>{
     req.data = x
     next()
@@ -114,7 +138,8 @@ Slide.delete = function(req, res, next){
 
 var Mark = {}
 Mark.find = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoFind("mark", query).then(x=>{
     req.data = x
     next()
@@ -122,23 +147,76 @@ Mark.find = function(req, res, next){
 }
 
 Mark.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("mark", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Mark.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("mark", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Mark.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("mark", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+// special routes
+Mark.spatial = function(req, res, next){
+  var query = req.query
+  delete query.token
+  // handle  x0, y0, x1, y1
+  if (req.query.x0 && req.query.x1){
+    query.x = {$gt : req.query.x0, $lt : req.query.x1}
+  }
+  delete query.x0
+  delete query.x1
+  if (req.query.y0 && req.query.y1){
+    query.y = {$gt : req.query.y0, $lt : req.query.y1}
+  }
+  delete query.y0
+  delete query.y1
+  mongoFind("mark", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+Mark.multi = function(req, res, next){
+  var query = req.query
+  delete query.token
+  // handle  x0, y0, x1, y1, footprint
+  if (req.query.x0 && req.query.x1){
+    query.x = {$gt : req.query.x0, $lt : req.query.x1}
+  }
+  delete query.x0
+  delete query.x1
+  if (req.query.y0 && req.query.y1){
+    query.y = {$gt : req.query.y0, $lt : req.query.y1}
+  }
+  delete query.y0
+  delete query.y1
+  if (req.query.footprint){
+    query.footprint = {$lt : req.query.footprint}
+  }
+
+  mongoFind("mark", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+Mark.types = function(req, res, next){
+  var query = req.query
+  delete query.token
+  mongoDistinct("mark", "provenance.analysis", query).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -146,7 +224,9 @@ Mark.delete = function(req, res, next){
 
 var Heatmap = {}
 Heatmap.find = function(req, res, next){
-  var query = {}
+  //slide, name, subject, study
+  var query = req.query
+  delete query.token
   mongoFind("heatmap", query).then(x=>{
     req.data = x
     next()
@@ -154,23 +234,34 @@ Heatmap.find = function(req, res, next){
 }
 
 Heatmap.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("heatmap", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Heatmap.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("heatmap", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Heatmap.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("heatmap", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+Heatmap.types = function(req, res, next){
+  //slide, name, subject, study
+  var query = req.query
+  delete query.token
+  mongoFind("heatmap", "provenance.analysis", query).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -178,7 +269,9 @@ Heatmap.delete = function(req, res, next){
 
 var HeatmapEdit = {}
 HeatmapEdit.find = function(req, res, next){
-  var query = {}
+  //user, slide, name
+  var query = req.query
+  delete query.token
   mongoFind("heatmapEdit", query).then(x=>{
     req.data = x
     next()
@@ -186,22 +279,24 @@ HeatmapEdit.find = function(req, res, next){
 }
 
 HeatmapEdit.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("heatmapEdit", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 HeatmapEdit.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("heatmapEdit", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 HeatmapEdit.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("heatmapEdit", query).then(x=>{
     req.data = x
     next()
@@ -210,7 +305,9 @@ HeatmapEdit.delete = function(req, res, next){
 
 var Template = {}
 Template.find = function(req, res, next){
-  var query = {}
+  // name, type
+  var query = req.query
+  delete query.token
   mongoFind("template", query).then(x=>{
     req.data = x
     next()
@@ -218,22 +315,24 @@ Template.find = function(req, res, next){
 }
 
 Template.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("template", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Template.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("template", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Template.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("template", query).then(x=>{
     req.data = x
     next()
@@ -242,7 +341,9 @@ Template.delete = function(req, res, next){
 
 var Log = {}
 Log.find = function(req, res, next){
-  var query = {}
+  // ?? don't know what fields to use
+  var query = req.query
+  delete query.token
   mongoFind("log", query).then(x=>{
     req.data = x
     next()
@@ -250,22 +351,24 @@ Log.find = function(req, res, next){
 }
 
 Log.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("log", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Log.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("log", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Log.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("log", query).then(x=>{
     req.data = x
     next()
@@ -274,7 +377,8 @@ Log.delete = function(req, res, next){
 
 var Config = {}
 Config.find = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoFind("config", query).then(x=>{
     req.data = x
     next()
@@ -282,22 +386,24 @@ Config.find = function(req, res, next){
 }
 
 Config.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("config", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Config.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("config", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 Config.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("config", query).then(x=>{
     req.data = x
     next()
@@ -306,7 +412,8 @@ Config.delete = function(req, res, next){
 
 var User = {}
 User.find = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoFind("user", query).then(x=>{
     req.data = x
     next()
@@ -314,22 +421,24 @@ User.find = function(req, res, next){
 }
 
 User.add = function(req, res, next){
-  var data = [{}]
+  var data = JSON.parse(req.body)
   mongoAdd("user", data).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 User.update = function(req, res, next){
-  var query = {}
-  var newVals = {$set: {}}
+  var query = req.query
+  delete query.token
+  var newVals = {$set: JSON.parse(req.body)}
   mongoUpdate("user", query, newVals).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
 }
 User.delete = function(req, res, next){
-  var query = {}
+  var query = req.query
+  delete query.token
   mongoDelete("user", query).then(x=>{
     req.data = x
     next()

@@ -29,12 +29,16 @@ try {
 }
 
 
-if (JWK_URL){
+if(DISABLE_SEC && ! JWK_URL){
+  var CLIENT = jwksClient({
+  jwksUri: "https://www.googleapis.com/oauth2/v3/certs" // a default value
+});
+} else if (JWK_URL){
   var CLIENT = jwksClient({
   jwksUri: JWK_URL
 });
 } else {
-  console.error("need JWKS URL")
+  console.error("need JWKS URL (JWK_URL)")
   process.exit(1)
 }
 
