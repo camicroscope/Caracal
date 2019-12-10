@@ -1,12 +1,10 @@
 FROM node:8-alpine
 RUN mkdir /root/src
 RUN apk add git
-
-RUN git clone https://github.com/camicroscope/camicroscope
-
 COPY . /root/src
 WORKDIR /root/src
-
+ARG viewer
+RUN if [ -z ${viewer} ]; then git clone https://github.com/camicroscope/camicroscope.git; else git clone https://github.com/camicroscope/camicroscope.git --branch=$viewer; fi
 
 RUN npm install
 RUN npm install -g forever
