@@ -114,6 +114,7 @@ function tokenTrade(check_key, sign_key, UserFunction){
               data = x
               delete data["exp"]
               // sign using the mounted key
+              console.log("{SET expiresIn} ", EXPIRY)
               var token = jwt.sign(data, sign_key, {algorithm:"RS256", expiresIn: EXPIRY})
               res.send({'token':token})
             }
