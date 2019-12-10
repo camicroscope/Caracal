@@ -8,7 +8,7 @@ var JWK_URL = process.env.JWK_URL
 var DISABLE_SEC = process.env.DISABLE_SEC || false
 var AUD = process.env.AUD || false
 var ISS = process.env.ISS || false
-var EXPIRY = process.env.EXPIRY || "1d"
+var EXPIRY = process.env.EXPIRY || "1 day"
 
 try {
   let prikey_path = "./keys/key"
