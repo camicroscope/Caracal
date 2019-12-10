@@ -131,9 +131,7 @@ Slide.find = function(req, res, next){
 
 Slide.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("slide", query).then(x=>{
+  mongoGet("slide", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -177,9 +175,7 @@ Mark.find = function(req, res, next){
 
 Mark.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("mark", query).then(x=>{
+  mongoGet("mark", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -274,9 +270,7 @@ Heatmap.find = function(req, res, next){
 
 Heatmap.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("heatmap", query).then(x=>{
+  mongoGet("heatmap", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -329,9 +323,7 @@ HeatmapEdit.find = function(req, res, next){
 
 HeatmapEdit.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("heatmapEdit", query).then(x=>{
+  mongoGet("heatmapEdit", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -375,9 +367,7 @@ Template.find = function(req, res, next){
 
 Template.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("template", query).then(x=>{
+  mongoGet("template", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -421,9 +411,7 @@ Log.find = function(req, res, next){
 
 Log.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("log", query).then(x=>{
+  mongoGet("log", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -466,9 +454,7 @@ Config.find = function(req, res, next){
 
 Config.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("config", query).then(x=>{
+  mongoGet("config", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -511,9 +497,7 @@ User.find = function(req, res, next){
 
 User.get = function(req, res, next){
   // slide, specimen, study, location
-  var query = req.query
-  delete query.token
-  mongoGet("user", query).then(x=>{
+  mongoGet("user", req.query.id).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
