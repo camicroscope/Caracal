@@ -63,6 +63,10 @@ function mongoDistinct(collection, upon, query){
 
 function mongoAdd(collection, data){
   return new Promise(function(res, rej){
+    // if data not array, make it one
+    if (!Array.isArray(data)){
+      data = [data]
+    }
     mongo.MongoClient.connect(MONGO_URI, function(err, db) {
     if (err){
       rej(err)
