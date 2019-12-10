@@ -9,7 +9,7 @@ function userFunction(token){
     newToken.sub = token.sub
     newToken.email = token.email
     newToken.name = token.name
-    newtoken.picture = token.picture
+    newToken.picture = token.picture
     res(newToken)
   })
 }
