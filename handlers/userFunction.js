@@ -2,11 +2,15 @@
 
 function userFunction(token){
   return new Promise(function(res, rej){
-    token.userType = "Admin"
+    newToken = {}
+    newToken.userType = "Admin"
     // ** means we are immune to filters
-    token.userFilter = ["**"]
-    delete token.exp
-    res(token)
+    newToken.userFilter = ["**"]
+    newToken.sub = token.sub
+    newToken.email = token.email
+    newToken.name = token.name
+    newtoken.picture = token.picture
+    res(newToken)
   })
 }
 
