@@ -78,7 +78,8 @@ function jwkTokenTrade(jwks_client, sign_key, UserFunction){
     jwks_client.getSigningKey(getJwtKid(THISTOKEN), (err,key)=>{
       console.log(key)
       if(err){
-                res.status(401).send({"err":err})
+        console.error(err)
+        res.status(401).send({"err":err})
       } else {
         let use_key = key.publicKey || key.rsaPublicKey
         tokenTrade(use_key, sign_key, UserFunction)(req,res)
@@ -100,6 +101,7 @@ function tokenTrade(check_key, sign_key, UserFunction){
     }
     jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
       if (err){
+        console.error(err)
         res.status(401).send({"err":err})
       } else {
         if (!(token && (token.email || token.sub))){
@@ -143,6 +145,7 @@ function loginHandler(check_key){
       }
       jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
         if (err){
+          console.error(err)
           res.status(401).send({"err":err})
         } else {
           req.tokenInfo = token
