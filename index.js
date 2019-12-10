@@ -129,10 +129,8 @@ app.use("/data/user/delete", dataHandlers.User.delete)
 app.use("/data/User/update", permissionHandler(["Admin"]))
 app.use("/data/User/update", dataHandlers.User.update)
 
-// TODO "special" routes
-
 // render mongo returns/data
-app.use("/data", function(req, res, next){
+app.use("/data", function(req, res, next) {
   res.send(req.data)
 })
 

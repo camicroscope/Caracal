@@ -24,6 +24,8 @@ DISABLE_SEC -- set truthy to disable permission and login handlers
 
 IIP_PATH -- IIP server location, default http://ca-iip
 
+LOADER_PATH -- loader utility location, default http://ca-load/
+
 MONGO_URI -- mongo connection uri, default mongodb://localhost
 
 MONGO_DB -- mongo db to use, default camic
