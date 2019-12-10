@@ -11,18 +11,22 @@ var ISS = process.env.ISS || false
 var EXPIRY = process.env.EXPIRY || "1d"
 
 try {
-  let prikey_path = "./key/key"
+  let prikey_path = "./keys/key"
   if(fs.existsSync(prikey_path)){
     var PRIKEY = fs.readFileSync(prikey_path, 'utf8')
+  } else {
+    console.error("prikey does not exist")
   }
 } catch (err){
   console.error(err)
 }
 
 try {
-  let pubkey_path = "./key/key.pub"
+  let pubkey_path = "./keys/key.pub"
   if(fs.existsSync(pubkey_path)){
     var PUBKEY = fs.readFileSync(pubkey_path, 'utf8')
+  } else {
+    console.error("pubkey does not exist")
   }
 } catch (err){
   console.error(err)
@@ -139,8 +143,6 @@ function loginHandler(check_key){
       }
       jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
         if (err){
-          console.log(check_key)
-          console.log(err)
           next(err)
         } else {
           req.tokenInfo = token
