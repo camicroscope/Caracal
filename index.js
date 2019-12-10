@@ -39,10 +39,10 @@ app.get("/auth/Token/renew", auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunct
 app.use(express.static('camicroscope'))
 
 // iip, proxy
-app.use("/iip", auth.loginHandler(auth.PUBKEY))
+app.use("/img/IIP/raw/", auth.loginHandler(auth.PUBKEY))
 // just for test
 // app.use("/iip", permissionHandler(["Admin"]))
-app.use("/iip", iipHandler)
+app.use("/img/IIP/raw/", iipHandler)
 
 // data, mongo
 app.use("/data", auth.loginHandler(auth.PUBKEY))
