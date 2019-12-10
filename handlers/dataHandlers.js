@@ -49,7 +49,7 @@ function mongoDistinct(collection, upon, query){
       rej(err)
     } else {
       var dbo = db.db(MONGO_DB);
-        dbo.collection(collection).distinct(upon, query).toArray(function(err, result) {
+        dbo.collection(collection).distinct(upon, query, function(err, result) {
           if (err){
             rej(err)
           }
