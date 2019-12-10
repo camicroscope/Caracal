@@ -29,7 +29,8 @@ function mongoGet(collection, id){
       rej(err)
     } else {
       var dbo = db.db(MONGO_DB);
-        dbo.collection(collection).find({"_id": id}).toArray(function(err, result) {
+      var oid = new mongo.ObjectID(id);
+        dbo.collection(collection).find({_id: oid}).toArray(function(err, result) {
           if (err){
             rej(err)
           }
