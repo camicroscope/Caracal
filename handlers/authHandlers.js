@@ -78,7 +78,7 @@ function jwkTokenTrade(jwks_client, sign_key, UserFunction){
     jwks_client.getSigningKey(getJwtKid(THISTOKEN), (err,key)=>{
       console.log(key)
       if(err){
-        res.status(401).send(err)
+                res.status(401).send({"err":err})
       } else {
         let use_key = key.publicKey || key.rsaPublicKey
         tokenTrade(use_key, sign_key, UserFunction)(req,res)
@@ -100,7 +100,7 @@ function tokenTrade(check_key, sign_key, UserFunction){
     }
     jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
       if (err){
-        res.status(401).send(err)
+        res.status(401).send({"err":err})
       } else {
         if (!(token && (token.email || token.sub))){
           // jwt doesn't say who you are, so bye
@@ -114,7 +114,6 @@ function tokenTrade(check_key, sign_key, UserFunction){
               data = x
               delete data["exp"]
               // sign using the mounted key
-              console.log("{SET expiresIn} ", EXPIRY)
               var token = jwt.sign(data, sign_key, {algorithm:"RS256", expiresIn: EXPIRY})
               res.send({'token':token})
             }
@@ -144,7 +143,7 @@ function loginHandler(check_key){
       }
       jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
         if (err){
-          next(err)
+          res.status(401).send({"err":err})
         } else {
           req.tokenInfo = token
           req.userType = token.userType || "Null"
