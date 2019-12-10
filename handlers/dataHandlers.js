@@ -22,6 +22,25 @@ function mongoFind(collection, query){
   })
 }
 
+function mongoGet(collection, id){
+  return new Promise(function(res, rej){
+    mongo.MongoClient.connect(MONGO_URI, function(err, db) {
+    if (err){
+      rej(err)
+    } else {
+      var dbo = db.db(MONGO_DB);
+        dbo.collection(collection).find({"_id": id}).toArray(function(err, result) {
+          if (err){
+            rej(err)
+          }
+          res(result)
+          db.close();
+        });
+      }
+    });
+  })
+}
+
 function mongoDistinct(collection, upon, query){
   return new Promise(function(res, rej){
     mongo.MongoClient.connect(MONGO_URI, function(err, db) {
@@ -110,6 +129,16 @@ Slide.find = function(req, res, next){
   }).catch(e=>next(e))
 }
 
+Slide.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("slide", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
 Slide.add = function(req, res, next){
   var data = JSON.parse(req.body)
   mongoAdd("slide", data).then(x=>{
@@ -141,6 +170,16 @@ Mark.find = function(req, res, next){
   var query = req.query
   delete query.token
   mongoFind("mark", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
+Mark.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("mark", query).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -233,6 +272,16 @@ Heatmap.find = function(req, res, next){
   }).catch(e=>next(e))
 }
 
+Heatmap.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("heatmap", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
 Heatmap.add = function(req, res, next){
   var data = JSON.parse(req.body)
   mongoAdd("heatmap", data).then(x=>{
@@ -278,6 +327,16 @@ HeatmapEdit.find = function(req, res, next){
   }).catch(e=>next(e))
 }
 
+HeatmapEdit.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("heatmapEdit", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
 HeatmapEdit.add = function(req, res, next){
   var data = JSON.parse(req.body)
   mongoAdd("heatmapEdit", data).then(x=>{
@@ -309,6 +368,16 @@ Template.find = function(req, res, next){
   var query = req.query
   delete query.token
   mongoFind("template", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
+Template.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("template", query).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
@@ -350,6 +419,16 @@ Log.find = function(req, res, next){
   }).catch(e=>next(e))
 }
 
+Log.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("log", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
 Log.add = function(req, res, next){
   var data = JSON.parse(req.body)
   mongoAdd("log", data).then(x=>{
@@ -385,6 +464,16 @@ Config.find = function(req, res, next){
   }).catch(e=>next(e))
 }
 
+Config.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("config", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
 Config.add = function(req, res, next){
   var data = JSON.parse(req.body)
   mongoAdd("config", data).then(x=>{
@@ -415,6 +504,16 @@ User.find = function(req, res, next){
   var query = req.query
   delete query.token
   mongoFind("user", query).then(x=>{
+    req.data = x
+    next()
+  }).catch(e=>next(e))
+}
+
+User.get = function(req, res, next){
+  // slide, specimen, study, location
+  var query = req.query
+  delete query.token
+  mongoGet("user", query).then(x=>{
     req.data = x
     next()
   }).catch(e=>next(e))
