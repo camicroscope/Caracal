@@ -5,7 +5,7 @@ function userFunction(token){
     token.userType = "Admin"
     // ** means we are immune to filters
     token.userFilter = ["**"]
-    delete user.exp
+    delete token.exp
     res(token)
   })
 }
