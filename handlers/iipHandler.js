@@ -35,7 +35,7 @@ iipHandler = function(req, res, next){
     },
     onProxyReq: function(proxyReq, req, res) {
       if (req.method == "POST") {
-        proxyReq.write(req.rawBody);
+        proxyReq.write(req.body);
         proxyReq.end();
       }
     }

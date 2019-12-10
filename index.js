@@ -8,6 +8,7 @@ var cookieParser = require('cookie-parser')
 const auth = require("./handlers/authHandlers.js")
 const userFunction = require("./handlers/userFunction.js")
 const iipHandler = require("./handlers/iipHandler.js")
+const loaderHandler = require("./handlers/loaderHandler.js")
 const permissionHandler = require("./handlers/permssionHandler.js")
 const dataHandlers = require("./handlers/dataHandlers.js")
 // TODO validation of data
@@ -40,9 +41,11 @@ app.use(express.static('camicroscope'))
 
 // iip, proxy
 app.use("/img/IIP/raw/", auth.loginHandler(auth.PUBKEY))
-// just for test
-// app.use("/iip", permissionHandler(["Admin"]))
 app.use("/img/IIP/raw/", iipHandler)
+
+// loader, proxy
+app.use("/loader/", auth.loginHandler(auth.PUBKEY))
+app.use("/loader/", loaderHandler)
 
 // data, mongo
 app.use("/data", auth.loginHandler(auth.PUBKEY))
@@ -114,6 +117,8 @@ app.use("/data/Configuration/delete", permissionHandler(["Admin", "Editor"]))
 app.use("/data/Configuration/delete", dataHandlers.Config.delete)
 app.use("/data/Configuration/update", permissionHandler(["Admin", "Editor"]))
 app.use("/data/Configuration/update", dataHandlers.Config.update)
+// duplicate route to find
+app.use("/data/Configuration/getConfigByName", dataHandlers.Config.find)
 // user
 app.use("/data/User/find", dataHandlers.User.find)
 app.use("/data/User/get", dataHandlers.HeatmapEdit.get)
