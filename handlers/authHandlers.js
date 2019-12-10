@@ -139,7 +139,9 @@ function loginHandler(check_key){
       }
       jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token){
         if (err){
-          res.status(401).send(err)
+          console.log(check_key)
+          console.log(err)
+          next(err)
         } else {
           req.tokenInfo = token
           req.userType = token.userType || "Null"
