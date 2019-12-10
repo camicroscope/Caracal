@@ -26,7 +26,7 @@ app.use(function(req, res, next) {
     data += chunk;
   });
   req.on('end', function() {
-    req.rawBody = data;
+    req.body = data;
     next();
   });
 });
