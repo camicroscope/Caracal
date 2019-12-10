@@ -1,7 +1,9 @@
 FROM node:8-alpine
 RUN mkdir /root/src
+RUN apk add git
 COPY . /root/src
 WORKDIR /root/src
+
 
 RUN git clone https://github.com/camicroscope/camicroscope
 
