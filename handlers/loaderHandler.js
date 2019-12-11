@@ -1,6 +1,6 @@
 var proxy = require('http-proxy-middleware');
 
-var LOADER_PATH = process.env.LOADER_PATH || "http://ca-load/"
+var LOADER_PATH = process.env.LOADER_PATH || "http://ca-load:4000/"
 
 loaderHandler = function(req, res, next) {
   proxy({
