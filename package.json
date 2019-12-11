@@ -23,6 +23,7 @@
     "http-proxy-middleware": "^0.20.0",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.6.0",
-    "mongodb": "^3.3.5"
+    "mongodb": "^3.3.5",
+    "throng": "^4.0.0"
   }
 }
