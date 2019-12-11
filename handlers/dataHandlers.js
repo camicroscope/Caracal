@@ -37,40 +37,6 @@ function mongoFind(collection, query) {
   })
 }
 
-function mongoGet(collection, id) {
-  return new Promise(function(res, rej) {
-    try {
-      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-        if (err) {
-          rej(err)
-        } else {
-          var dbo = db.db(MONGO_DB);
-          var oid = new mongo.ObjectID(id);
-          dbo.collection(collection).find({
-            _id: oid
-          }).toArray(function(err, result) {
-            if (err) {
-              rej(err)
-            }
-            // compatible wiht bindaas odd format
-            result.forEach(x => {
-              x['_id'] = {
-                "$oid": x['_id']
-              }
-            })
-            res(result)
-            db.close();
-          });
-        }
-      });
-    } catch (error) {
-      console.error(error)
-      rej(error)
-    }
-
-  })
-}
-
 function mongoDistinct(collection, upon, query) {
   return new Promise(function(res, rej) {
     try {
@@ -194,7 +160,7 @@ Slide.find = function(req, res, next) {
 
 Slide.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("slide", req.query.id).then(x => {
+  mongoFind("slide", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -231,15 +197,6 @@ Slide.delete = function(req, res, next) {
 var Mark = {}
 Mark.find = function(req, res, next) {
   var query = req.query
-  // remap fields
-  if (query.name) {
-    query["provenance.analysis.execution_id"] = query.slide
-    delete query.name
-  }
-  if (query.slide) {
-    query["provenance.image.slide"] = query.slide
-    delete query.slide
-  }
   delete query.token
   mongoFind("mark", query).then(x => {
     req.data = x
@@ -249,7 +206,7 @@ Mark.find = function(req, res, next) {
 
 Mark.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("mark", req.query.id).then(x => {
+  mongoFind("mark", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -309,15 +266,11 @@ Mark.spatial = function(req, res, next) {
 }
 Mark.multi = function(req, res, next) {
   var query = req.query
-  if (query.slide) {
-    query["provenance.image.slide"] = query.slide
-    delete query.slide
-  }
-  if (query.name) {
+  if (query.nameList) {
     query["provenance.analysis.execution_id"] = {
-      "$in": JSON.parse(query.name)
+      "$in": JSON.parse(query.nameList)
     }
-    delete query.name
+    delete query.nameList
   }
   delete query.token
   // handle  x0, y0, x1, y1, footprint
@@ -349,22 +302,6 @@ Mark.multi = function(req, res, next) {
 }
 Mark.types = function(req, res, next) {
   var query = req.query
-  if (query.name) {
-    query["provenance.analysis.execution_id"] = query.name
-    delete query.name
-  }
-  if (query.slide) {
-    query["provenance.image.slide"] = query.slide
-    delete query.slide
-  }
-  if (query.subject) {
-    query["provenance.image.subject"] = query.subject
-    delete query.subject
-  }
-  if (query.study) {
-    query["provenance.image.study"] = query.study
-    delete query.study
-  }
   delete query.token
   mongoDistinct("mark", "provenance.analysis", query).then(x => {
     req.data = x
@@ -376,22 +313,6 @@ var Heatmap = {}
 Heatmap.find = function(req, res, next) {
   //slide, name, subject, study
   var query = req.query
-  if (query.name) {
-    query["provenance.analysis.execution_id"] = query.slide
-    delete query.name
-  }
-  if (query.slide) {
-    query["provenance.image.slide"] = query.slide
-    delete query.slide
-  }
-  if (query.subject) {
-    query["provenance.image.subject"] = query.subject
-    delete query.subject
-  }
-  if (query.study) {
-    query["provenance.image.study"] = query.study
-    delete query.study
-  }
   delete query.token
   mongoFind("heatmap", query).then(x => {
     req.data = x
@@ -401,7 +322,7 @@ Heatmap.find = function(req, res, next) {
 
 Heatmap.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("heatmap", req.query.id).then(x => {
+  mongoFind("heatmap", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -435,22 +356,6 @@ Heatmap.delete = function(req, res, next) {
 }
 Heatmap.types = function(req, res, next) {
   var query = req.query
-  if (query.name) {
-    query["provenance.analysis.execution_id"] = query.name
-    delete query.name
-  }
-  if (query.slide) {
-    query["provenance.image.slide"] = query.slide
-    delete query.slide
-  }
-  if (query.subject) {
-    query["provenance.image.subject"] = query.subject
-    delete query.subject
-  }
-  if (query.study) {
-    query["provenance.image.study"] = query.study
-    delete query.study
-  }
   delete query.token
   mongoFind("heatmap", query, {
     'data': 0
@@ -464,18 +369,6 @@ Heatmap.types = function(req, res, next) {
 var HeatmapEdit = {}
 HeatmapEdit.find = function(req, res, next) {
   var query = req.query
-  if (query.name) {
-    query["provenance.analysis.execution_id"] = query.slide
-    delete query.name
-  }
-  if (query.slide) {
-    query["provenance.image.slide"] = query.slide
-    delete query.slide
-  }
-  if (query.user) {
-    query["user_id"] = query.study
-    delete query.user
-  }
   delete query.token
   mongoFind("heatmapEdit", query).then(x => {
     req.data = x
@@ -484,7 +377,7 @@ HeatmapEdit.find = function(req, res, next) {
 }
 
 HeatmapEdit.get = function(req, res, next) {
-  mongoGet("heatmapEdit", req.query.id).then(x => {
+  mongoFind("heatmapEdit", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -530,7 +423,7 @@ Template.find = function(req, res, next) {
 
 Template.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("template", req.query.id).then(x => {
+  mongoFind("template", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -576,7 +469,7 @@ Log.find = function(req, res, next) {
 
 Log.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("log", req.query.id).then(x => {
+  mongoFind("log", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -621,7 +514,7 @@ Config.find = function(req, res, next) {
 
 Config.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("config", req.query.id).then(x => {
+  mongoFind("config", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
@@ -666,7 +559,7 @@ User.find = function(req, res, next) {
 
 User.get = function(req, res, next) {
   // slide, specimen, study, location
-  mongoGet("user", req.query.id).then(x => {
+  mongoFind("user", {_id: req.query.id}).then(x => {
     req.data = x
     next()
   }).catch(e => next(e))
