@@ -50,6 +50,7 @@ describe('Slide Lifecycle Step 2', function () {
   });
 })
 
+describe('Slide Lifecycle Step 3', function () {
 it('Deletes a Slide', function (done) {
   this.timeout(5000);
   var deleteProcess = fetch(deleteurl, {
