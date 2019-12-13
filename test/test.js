@@ -3,8 +3,8 @@ const assert = require('assert');
 
 const fetch = require("node-fetch")
 const posturl = "http://localhost:8010/data/Slide/post"
-const findurl = "http://localhost:8010/data/Slide/find?slide=TEST"
-const deleteurl = "http://localhost:8010/data/Slide/delete?slide=TEST"
+const findurl = "http://localhost:8010/data/Slide/find"
+const deleteurl = "http://localhost:8010/data/Slide/delete"
 
 var PORT = 8010
 
