@@ -11,4 +11,6 @@ before_script:
 services:
     - mongodb
 script:
- - node index.js ; sleep 30 && mocha test/*.js --exit
+ - node index.js &
+ - sleep 5
+ - mocha test/*.js --exit
