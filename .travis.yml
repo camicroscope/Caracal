@@ -1,0 +1,15 @@
+sudo: required
+language: node_js
+node_js:
+  - "node"
+env:
+  - DISABLE_SEC=true
+before_script:
+  - npm install
+  - npm install --only=dev
+  - npm install -g mocha
+services:
+    - mongodb
+script:
+ - node index.js &&
+ - mocha test/*.js --exit

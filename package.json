@@ -25,5 +25,9 @@
     "jwks-rsa": "^1.6.0",
     "mongodb": "^3.3.5",
     "throng": "^4.0.0"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "node-fetch": "^2.6.0"
   }
 }
