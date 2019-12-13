@@ -2,17 +2,11 @@
 const assert = require('assert');
 
 const fetch = require("node-fetch")
-const app = require("../index.js")
 const posturl = "http://localhost:8010/data/Slide/post"
 const findurl = "http://localhost:8010/data/Slide/find?provenance.image.slide=TEST"
 const deleteurl = "http://localhost:8010/data/Slide/delete?provenance.image.slide=TEST"
 
 var PORT = 8010
-
-before(function(done){
-  app.listen(PORT, () => {console.log('listening on ' + PORT)
-done()})
-})
 
 describe('Slide Lifecycle Step 1', function () {
 
