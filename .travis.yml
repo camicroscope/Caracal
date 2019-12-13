@@ -11,5 +11,4 @@ before_script:
 services:
     - mongodb
 script:
- - node index.js &&
  - mocha test/*.js --exit

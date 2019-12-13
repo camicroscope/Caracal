@@ -133,3 +133,5 @@ var startApp = function() {
 }
 
 throng(WORKERS, startApp)
+
+module.exports = app
