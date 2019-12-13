@@ -10,8 +10,8 @@ const deleteurl = "http://localhost:8010/data/Slide/delete?provenance.image.slid
 var PORT = 8010
 
 before(function(done){
-  app.listen(PORT, () => {console.log('listening on ' + PORT
-done()}))
+  app.listen(PORT, () => {console.log('listening on ' + PORT)
+done()})
 })
 
 describe('Slide Lifecycle Step 1', function () {
