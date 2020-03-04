@@ -5,7 +5,6 @@ COPY . /root/src
 WORKDIR /root/src
 ARG viewer
 RUN if [ -z ${viewer} ]; then git clone https://github.com/camicroscope/camicroscope.git; else git clone https://github.com/camicroscope/camicroscope.git --branch=$viewer; fi
-
 RUN npm install
 RUN npm install -g nodemon
 EXPOSE 8010

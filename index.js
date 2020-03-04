@@ -42,6 +42,7 @@ var startApp = function() {
 
   // public files, don't use login handler here
   app.use(express.static('camicroscope'))
+  app.use(express.static('static'))
 
   // iip, proxy
   app.use("/img/IIP/raw/", auth.loginHandler(auth.PUBKEY))
