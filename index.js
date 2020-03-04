@@ -41,8 +41,8 @@ var startApp = function() {
   app.get("/auth/Token/renew", auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction))
 
   // public files, don't use login handler here
-  app.use(express.static('camicroscope'))
   app.use(express.static('static'))
+  app.use(express.static('camicroscope'))
 
   // iip, proxy
   app.use("/img/IIP/raw/", auth.loginHandler(auth.PUBKEY))
