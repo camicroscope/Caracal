@@ -30,43 +30,35 @@ describe('Slide Lifecycle Step 1', function() {
     });
   });
 });
-/**
 describe('Slide Lifecycle Step 2', function() {
-  // can we see it in find
-  it('Finds the added slide', function(done) {
+  it('Finds the Slide', function(done) {
     this.timeout(5000);
-    const getProcess = fetch(findurl);
-    getProcess.then((x)=>x.json()).then((x)=>{
-      console.log(x);
-      assert.equal(x.length, 1, 'Slide Shows up in API List');
+    var slideData = {'name': 'TEST', 'specimen': '', 'study': '', 'location': '/images/sample.svs', 'mpp': 0.499};
+    chai.request(server)
+    .post(findurl)
+    .set('Content-Type', 'application/json; charset=utf-8')
+    .send(slideData)
+    .end(function(err, res){
+      (res).should.have.status(200);
+      (res.body).should.be.an('array');
+      (res.body.length).should.be.eql(1);
       done();
-    }).catch((e)=>{
-      console.log('err');
-      console.log(e);
-      done(e);
     });
   });
 });
-
 describe('Slide Lifecycle Step 3', function() {
   it('Deletes a Slide', function(done) {
     this.timeout(5000);
-    var deleteProcess = fetch(deleteurl, {
-      'method': 'DELETE',
-      'mode': 'cors',
-      'headers': {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    });
-    deleteProcess.then((x)=>x.json()).then((x)=>{
-      console.log(x);
-      assert.equal(x.result.n, 1, 'Delete Reported Successful');
+    var slideData = {'name': 'TEST', 'specimen': '', 'study': '', 'location': '/images/sample.svs', 'mpp': 0.499};
+    chai.request(server)
+    .post(deleteurl)
+    .set('Content-Type', 'application/json; charset=utf-8')
+    .send(slideData)
+    .end(function(err, res){
+      (res).should.have.status(200);
+      (res.body).should.be.a('object');
+      (res.body.result.n).should.be.eql(1);
       done();
-    }).catch((e)=>{
-      console.log('err');
-      console.log(e);
-      done(e);
     });
   });
 });
-**/
