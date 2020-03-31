@@ -1,10 +1,10 @@
 {
-  "name": "caboodle",
+  "name": "Caracal",
   "version": "1.0.0",
   "description": "Conslidated Backend, Auth, and Security Services",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/*.js --recursive --exit",
+    "test": "mocha test/* --exit",
     "lint": "eslint *.js handlers/*.js test/**/*.js",
     "start": "node caracal.js"
   },
