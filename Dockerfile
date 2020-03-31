@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:12-alpine
 RUN mkdir /root/src
 RUN apk add git
 COPY . /root/src
