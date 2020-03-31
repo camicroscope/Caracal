@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const server = require('../caracal.js');
+const server = require('../../caracal.js');
 
 var should = chai.should();
 chai.use(chaiHttp);
@@ -12,7 +12,6 @@ const findurl = '/data/Slide/find';
 const deleteurl = '/data/Slide/delete';
 
 process.env.DISABLE_SEC = 'true';
-var PORT = 8010;
 
 describe('Slide Lifecycle Step 1', function() {
   it('Posts a Slide', function(done) {

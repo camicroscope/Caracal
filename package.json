@@ -4,8 +4,8 @@
   "description": "Conslidated Backend, Auth, and Security Services",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/*.js --exit",
-    "lint": "eslint *.js handlers/*.js test/*.js",
+    "test": "mocha test/*.js --recursive --exit",
+    "lint": "eslint *.js handlers/*.js test/**/*.js",
     "start": "node caracal.js"
   },
   "repository": {

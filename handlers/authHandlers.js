@@ -6,7 +6,6 @@ var fs = require('fs');
 
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
-console.log('DIS SEC', DISABLE_SEC);
 var AUD = process.env.AUD || false;
 var ISS = process.env.ISS || false;
 var EXPIRY = process.env.EXPIRY || '1d';
@@ -190,23 +189,25 @@ function loginHandler(checkKey) {
   };
 }
 
+// use filter handler AFTER data handler
 function filterHandler(dataField, filterField, attrField) {
   return function(req, res, next) {
     // do nothing if sec disabled, or if filter contains "**"
+    // all docs with no set attrField are passed too
     var filter = req[filterField];
     // make filter an array
     if (!Array.isArray(filter)) {
       filter = [filter];
     }
-    if (!DISABLE_SEC && filter.indexOf('**') == -1) {
+    if (filter.indexOf('**') == -1) {
       // filter data in dataField if attrField in filterField
       var data = req[dataField];
       // is data an array?
       if (Array.isArray(data)) {
         // remove ones where does not match
-        req[dataField] = data.filter((x) => filter.indexOf(x[attrField]) >= 0);
+        req[dataField] = data.filter((x) => (!x[attrField] || filter.indexOf(x[attrField]) >= 0) );
       } else {
-        if (filter.indexOf(data[attrField]) >= 0) {
+        if (!data[attrField] || filter.indexOf(data[attrField]) >= 0) {
           req[dataField] = data;
         } else {
           req[dataField] = {};

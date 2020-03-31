@@ -56,6 +56,7 @@ app.use('/loader/', loaderHandler);
 app.use('/data', auth.loginHandler(auth.PUBKEY));
 // slide
 app.use('/data/Slide/find', dataHandlers.Slide.find);
+app.use('/data/Slide/find', auth.filterHandler('data', 'userFilter', 'filter'));
 app.use('/data/Slide/post', permissionHandler(['Admin', 'Editor']));
 app.use('/data/Slide/post', dataHandlers.Slide.add);
 app.use('/data/Slide/delete', permissionHandler(['Admin', 'Editor']));
