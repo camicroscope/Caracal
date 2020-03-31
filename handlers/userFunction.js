@@ -13,8 +13,8 @@ function userFunction(token) {
         res(publicToken);
       } else {
         const newToken = {};
-        newToken.userType = x[0].userType || "Null";
-        newToken.userFilter = x[0].userFilter || ["Public"];
+        newToken.userType = x[0].userType || 'Null';
+        newToken.userFilter = x[0].userFilter || ['Public'];
         newToken.sub = token.email;
         newToken.email = token.email;
         newToken.name = token.name;
