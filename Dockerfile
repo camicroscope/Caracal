@@ -8,4 +8,4 @@ RUN if [ -z ${viewer} ]; then git clone https://github.com/camicroscope/camicros
 RUN npm install
 RUN npm install -g nodemon
 EXPOSE 8010
-CMD nodemon index.js
+CMD nodemon caracal.js
