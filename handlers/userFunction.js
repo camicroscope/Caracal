@@ -1,17 +1,17 @@
 // userFunction -- used for login given id provider token
 function userFunction(token) {
   return new Promise(function(res, rej) {
-    newToken = {}
-    newToken.userType = "Admin"
+    newToken = {};
+    newToken.userType = 'Admin';
     // ** means we are immune to filters
-    newToken.userFilter = ["**"]
-    newToken.sub = token.sub
-    newToken.email = token.email
-    newToken.name = token.name
-    newToken.picture = token.picture
-    res(newToken)
-  })
+    newToken.userFilter = ['**'];
+    newToken.sub = token.sub;
+    newToken.email = token.email;
+    newToken.name = token.name;
+    newToken.picture = token.picture;
+    res(newToken);
+  });
 }
 
 
-module.exports = userFunction
+module.exports = userFunction;
