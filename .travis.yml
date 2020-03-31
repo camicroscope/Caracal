@@ -5,20 +5,18 @@ node_js:
    - "12"
 install:
     - npm install
-    - npm install jsdom
-    - npm install -g http-server
     - npm install -g mocha
-    - npm install eslint
-    - npm install eslint-config-google
+
+env:
+  - DISABLE_SEC=true
 
 stages:
   - name: tests
   - name: lintjs
   - name: linthtml
 
-before_script:
-  - npm start & # start the service
-  - sleep 3 # give some time to bind to sockets, etc
+services:
+    - mongodb
 
 jobs:
   include:
