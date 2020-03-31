@@ -129,11 +129,11 @@ app.use('/data', function(req, res, next) {
 });
 
 var startApp = function(app) {
-  return function(){
-      app.listen(PORT, () => console.log('listening on ' + PORT));
-  }
+  return function() {
+    app.listen(PORT, () => console.log('listening on ' + PORT));
+  };
 };
 
 throng(WORKERS, startApp(app));
 
-module.exports = app // for tests
+module.exports = app; // for tests

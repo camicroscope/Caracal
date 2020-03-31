@@ -6,12 +6,12 @@ var fs = require('fs');
 
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
-console.log("DIS SEC", DISABLE_SEC)
+console.log('DIS SEC', DISABLE_SEC);
 var AUD = process.env.AUD || false;
 var ISS = process.env.ISS || false;
 var EXPIRY = process.env.EXPIRY || '1d';
-var PUBKEY
-var PRIKEY
+var PUBKEY;
+var PRIKEY;
 
 try {
   const prikey_path = './keys/key';
@@ -19,8 +19,8 @@ try {
     PRIKEY = fs.readFileSync(prikey_path, 'utf8');
   } else {
     if (DISABLE_SEC) {
-      PRIKEY = ""
-      console.warn("prikey null since DISABLE_SEC and no prikey provided")
+      PRIKEY = '';
+      console.warn('prikey null since DISABLE_SEC and no prikey provided');
     } else {
       console.error('prikey does not exist');
     }
@@ -35,8 +35,8 @@ try {
     var PUBKEY = fs.readFileSync(pubkey_path, 'utf8');
   } else {
     if (DISABLE_SEC) {
-      PUBKEY = ""
-      console.warn("pubkey null since DISABLE_SEC and no prikey provided")
+      PUBKEY = '';
+      console.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
       console.error('pubkey does not exist');
     }
