@@ -4,7 +4,7 @@
 
 # Caracal
 
-Conslidated Backend, Auth, and Security Services 
+Conslidated Backend, Auth, and Security Services
 
 
 ## routes
@@ -43,3 +43,4 @@ userFilter -- list of values which must be present in given field in filtered da
 ### Special filter values
 \*\* -- immune to filters (can see everything)
 Public -- users with no userFilter are assigned this filter
+An item with no filter value is returned in all cases, and is thus also public.

@@ -2,7 +2,7 @@ var dataHandlers = require('./dataHandlers.js');
 // userFunction -- used for login given id provider token
 function userFunction(token) {
   return new Promise(function(res, rej) {
-    dataHandlers.User.forLogin(token.sub).then((x)=>{
+    dataHandlers.User.forLogin(token.email).then((x)=>{
       if (x.length <= 0) {
         const publicToken = {};
         publicToken.userFilter = ['Public'];
@@ -13,9 +13,9 @@ function userFunction(token) {
         res(publicToken);
       } else {
         const newToken = {};
-        newToken.userType = x[0].userType;
-        newToken.userFilter = x[0].userFilter;
-        newToken.sub = x[0].sub;
+        newToken.userType = x[0].userType || 'Null';
+        newToken.userFilter = x[0].userFilter || ['Public'];
+        newToken.sub = token.email;
         newToken.email = token.email;
         newToken.name = token.name;
         newToken.picture = token.picture;
