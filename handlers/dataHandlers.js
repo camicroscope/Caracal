@@ -553,6 +553,10 @@ User.find = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
+User.forLogin = function(sub) {
+  return mongoFind('user', {'sub': sub});
+};
+
 User.get = function(req, res, next) {
   // slide, specimen, study, location
   mongoFind('user', {_id: req.query.id}).then((x) => {
