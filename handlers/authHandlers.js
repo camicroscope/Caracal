@@ -14,9 +14,9 @@ var PUBKEY;
 var PRIKEY;
 
 try {
-  const prikey_path = './keys/key';
-  if (fs.existsSync(prikey_path)) {
-    PRIKEY = fs.readFileSync(prikey_path, 'utf8');
+  const prikeyPath = './keys/key';
+  if (fs.existsSync(prikeyPath)) {
+    PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
   } else {
     if (DISABLE_SEC) {
       PRIKEY = '';
@@ -30,9 +30,9 @@ try {
 }
 
 try {
-  const pubkey_path = './keys/key.pub';
-  if (fs.existsSync(pubkey_path)) {
-    var PUBKEY = fs.readFileSync(pubkey_path, 'utf8');
+  const prikeyPath = './keys/key.pub';
+  if (fs.existsSync(prikeyPath)) {
+    var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
   } else {
     if (DISABLE_SEC) {
       PUBKEY = '';
@@ -83,13 +83,13 @@ function getJwtKid(token) {
   return JSON.parse(jsonPayload).kid;
 };
 
-function jwkTokenTrade(jwks_client, sign_key, UserFunction) {
+function jwkTokenTrade(jwksClient, signKey, userFunction) {
   return function(req, res) {
     var THISTOKEN = getToken(req);
     if (!THISTOKEN) {
       res.status(401).send('{"err":"no token found"}');
     }
-    jwks_client.getSigningKey(getJwtKid(THISTOKEN), (err, key) => {
+    jwksClient.getSigningKey(getJwtKid(THISTOKEN), (err, key) => {
       console.log(key);
       if (err) {
         console.error(err);
@@ -97,25 +97,25 @@ function jwkTokenTrade(jwks_client, sign_key, UserFunction) {
           'err': err,
         });
       } else {
-        const use_key = key.publicKey || key.rsaPublicKey;
-        tokenTrade(use_key, sign_key, UserFunction)(req, res);
+        const useKey = key.publicKey || key.rsaPublicKey;
+        tokenTrade(useKey, signKey, userFunction)(req, res);
       }
     });
   };
 }
 
 // curry these calls
-function tokenTrade(check_key, sign_key, UserFunction) {
+function tokenTrade(checkKey, signKey, userFunction) {
   return function(req, res) {
     var THISTOKEN = getToken(req);
-    const jwt_options = {};
+    const jwtOptions = {};
     if (AUD) {
-      jwt_options.audience = AUD;
+      jwtOptions.audience = AUD;
     }
     if (ISS) {
-      jwt_options.issuer = ISS;
+      jwtOptions.issuer = ISS;
     }
-    jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token) {
+    jwt.verify(THISTOKEN, checkKey, jwtOptions, function(err, token) {
       if (err) {
         console.error(err);
         res.status(401).send({
@@ -128,7 +128,7 @@ function tokenTrade(check_key, sign_key, UserFunction) {
             err: 'email and sub are unset from source token',
           });
         } else {
-          UserFunction(token).then((x) => {
+          userFunction(token).then((x) => {
             console.log(x);
             if (x === false) {
               res.status(401).send({
@@ -138,7 +138,7 @@ function tokenTrade(check_key, sign_key, UserFunction) {
               data = x;
               delete data['exp'];
               // sign using the mounted key
-              var token = jwt.sign(data, sign_key, {
+              var token = jwt.sign(data, signKey, {
                 algorithm: 'RS256',
                 expiresIn: EXPIRY,
               });
@@ -156,7 +156,7 @@ function tokenTrade(check_key, sign_key, UserFunction) {
   };
 }
 
-function loginHandler(check_key) {
+function loginHandler(checkKey) {
   return function(req, res, next) {
     if (DISABLE_SEC) {
       req.tokenInfo = {
@@ -166,14 +166,14 @@ function loginHandler(check_key) {
       next();
     } else {
       var THISTOKEN = getToken(req);
-      const jwt_options = {};
+      const jwtOptions = {};
       if (AUD) {
-        jwt_options.audience = AUD;
+        jwtOptions.audience = AUD;
       }
       if (ISS) {
-        jwt_options.issuer = ISS;
+        jwtOptions.issuer = ISS;
       }
-      jwt.verify(THISTOKEN, check_key, jwt_options, function(err, token) {
+      jwt.verify(THISTOKEN, checkKey, jwtOptions, function(err, token) {
         if (err) {
           console.error(err);
           res.status(401).send({
@@ -190,26 +190,26 @@ function loginHandler(check_key) {
   };
 }
 
-function filterHandler(data_field, filter_field, attr_field) {
+function filterHandler(dataField, filterField, attrField) {
   return function(req, res, next) {
     // do nothing if sec disabled, or if filter contains "**"
-    var filter = req[filter_field];
+    var filter = req[filterField];
     // make filter an array
     if (!Array.isArray(filter)) {
       filter = [filter];
     }
     if (!DISABLE_SEC && filter.indexOf('**') == -1) {
-      // filter data in data_field if attr_field in filter_field
-      var data = req[data_field];
+      // filter data in dataField if attrField in filterField
+      var data = req[dataField];
       // is data an array?
       if (Array.isArray(data)) {
         // remove ones where does not match
-        req[data_field] = data.filter((x) => filter.indexOf(x[attr_field]) >= 0);
+        req[dataField] = data.filter((x) => filter.indexOf(x[attrField]) >= 0);
       } else {
-        if (filter.indexOf(data[attr_field]) >= 0) {
-          req[data_field] = data;
+        if (filter.indexOf(data[attrField]) >= 0) {
+          req[dataField] = data;
         } else {
-          req[data_field] = {};
+          req[dataField] = {};
         }
       }
     }
