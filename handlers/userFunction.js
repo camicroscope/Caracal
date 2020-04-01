@@ -6,7 +6,7 @@ function userFunction(token) {
   return new Promise(function(res, rej) {
     dataHandlers.User.forLogin(token.email).then((x)=>{
       if (x.length <= 0) {
-        if (ALLOW_PUBLIC){
+        if (ALLOW_PUBLIC) {
           const publicToken = {};
           publicToken.userFilter = ['Public'];
           publicToken.userType = 'Null';
@@ -15,7 +15,7 @@ function userFunction(token) {
           publicToken.picture = token.picture;
           res(publicToken);
         } else {
-          rej(new Error("Public users not allowed on this instance"));
+          rej(new Error('Public users not allowed on this instance'));
         }
       } else {
         const newToken = {};
