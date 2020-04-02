@@ -60,8 +60,12 @@ app.use('/data/Slide/find', auth.filterHandler('data', 'userFilter', 'filter'));
 app.use('/data/Slide/post', permissionHandler(['Admin', 'Editor']));
 app.use('/data/Slide/post', dataHandlers.Slide.add);
 app.use('/data/Slide/delete', permissionHandler(['Admin', 'Editor']));
+app.use('/data/Slide/delete', dataHandlers.Slide.find);
+app.use('/data/Slide/delete', auth.editHandler('data', 'userFilter', 'filter'));
 app.use('/data/Slide/delete', dataHandlers.Slide.delete);
 app.use('/data/Slide/update', permissionHandler(['Admin', 'Editor']));
+app.use('/data/Slide/update', dataHandlers.Slide.find);
+app.use('/data/Slide/update', auth.editHandler('data', 'userFilter', 'filter'));
 app.use('/data/Slide/update', dataHandlers.Slide.update);
 // mark
 app.use('/data/Mark/find', dataHandlers.Mark.find);

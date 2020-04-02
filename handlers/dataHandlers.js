@@ -142,7 +142,6 @@ function mongoUpdate(collection, query, newVals) {
   });
 }
 
-
 var Slide = {};
 Slide.find = function(req, res, next) {
   // slide, specimen, study, location
