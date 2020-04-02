@@ -19,7 +19,7 @@ Conslidated Backend, Auth, and Security Services
 |---|---|---|
 | WORKERS | number of child processes | 4 |
 |JWK_URL | jwks url for id provider | (*required*) |
-|PORT | the port to use | 8010 |
+|PORT | the port to use | 4010 |
 |AUD | jwt audience to accept | (if unset, does not check)|
 |ISS | jwt issuer to accept |(if unset, does not check)|
 |EXPIRY | expire in time for jwks| 1d |

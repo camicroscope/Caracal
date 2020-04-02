@@ -16,7 +16,7 @@ const dataHandlers = require('./handlers/dataHandlers.js');
 
 var WORKERS = process.env.NUM_THREADS || 4;
 
-var PORT = process.env.PORT || 8010;
+var PORT = process.env.PORT || 4010;
 
 
 const app = express();
