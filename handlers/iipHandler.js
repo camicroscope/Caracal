@@ -23,7 +23,7 @@ iipHandler = function(req, res, next) {
     secure: false,
     onError(err, req, res) {
       console.log(err);
-      err.__statusCode = 500;
+      err.statusCode = 500;
       next(err);
     },
     changeOrigin: true,

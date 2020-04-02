@@ -20,5 +20,6 @@ module.exports = {
     "max-len" : ["error", { "code": 120 ,"ignoreTemplateLiterals": true},],
     "no-unused-vars" : 0,
     "no-var" : 0,
+    "prefer-const":0,
   },
 };

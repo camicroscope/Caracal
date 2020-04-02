@@ -126,7 +126,16 @@ app.use('/data/User/update', dataHandlers.User.update);
 
 // render mongo returns/data
 app.use('/data', function(req, res, next) {
-  res.send(req.data);
+  res.json(req.data);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  console.error(JSON.stringify(err));
+  let statusCode = err.statusCode || 500;
+  let errorMessage = {};
+  errorMessage.message = err.error || err;
+  res.status(statusCode).json(errorMessage);
 });
 
 var startApp = function(app) {

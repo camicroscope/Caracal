@@ -11,7 +11,9 @@ function permissionHandler(permissionList, test=false) {
         next();
       } else {
         req.permission_ok = false;
-        next('Permission not granted');
+        let errorMessage = {'statusCode': 401};
+        errorMessage.error = 'Permission not granted';
+        next(errorMessage);
       }
     }
   };
