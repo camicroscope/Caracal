@@ -133,9 +133,11 @@ app.use('/data', function(req, res, next) {
 app.use(function(err, req, res, next) {
   console.error(JSON.stringify(err));
   let statusCode = err.statusCode || 500;
-  let errorMessage = {};
-  errorMessage.message = err.error || err;
-  res.status(statusCode).json(errorMessage);
+  // wrap strings in a json
+  if (typeof err === 'string' || err instanceof String) {
+    err = {'error': err};
+  }
+  res.status(statusCode).json(err);
 });
 
 var startApp = function(app) {
