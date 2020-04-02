@@ -9,6 +9,7 @@ var DISABLE_SEC = process.env.DISABLE_SEC || false;
 var AUD = process.env.AUD || false;
 var ISS = process.env.ISS || false;
 var EXPIRY = process.env.EXPIRY || '1d';
+var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
 
@@ -180,7 +181,7 @@ function loginHandler(checkKey) {
           });
         } else {
           req.tokenInfo = token;
-          req.userType = token.userType || 'Null';
+          req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
           req.userFilter = token.userFilter || ['Public'];
           next();
         }

@@ -24,6 +24,7 @@ Conslidated Backend, Auth, and Security Services
 |ISS | jwt issuer to accept |(if unset, does not check)|
 |EXPIRY | expire in time for jwks| 1d |
 |DISABLE_SEC | set truthy to disable permission and login handlers | false |
+|ALLOW_PUBLIC | set truthy to allow public users | false |
 |IIP_PATH | IIP server location | http://ca-iip |
 |LOADER_PATH | loader utility location | http://ca-load/ |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
