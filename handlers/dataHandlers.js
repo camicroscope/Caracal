@@ -176,7 +176,7 @@ Slide.update = function(req, res, next) {
   var newVals = {
     $set: JSON.parse(req.body),
   };
-  mongoUpdate('slide', query).then((x) => {
+  mongoUpdate('slide', query, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
