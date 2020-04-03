@@ -217,12 +217,12 @@ function editHandler(dataField, filterField, attrField) {
         }
       }
       req.query = {_id: req[dataField][0]._id['$oid']};
+      next()
     }
-    // don't error if 1 or 0 objects
-    if (req[dataField].length <= 1) {
+    else if (req[dataField].length == 0) {
       let errorMessage = {};
       errorMessage.error = 'Nothing applicable to change.';
-      errorMessage.statusCode = 200;
+      errorMessage.statusCode = 400;
       next(errorMessage);
     } else {
       let errorMessage = {};
