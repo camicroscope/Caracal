@@ -210,7 +210,12 @@ function editHandler(dataField, filterField, attrField) {
     }
     // edit routes should operate on one object
     if (req[dataField].length == 1) {
-      delete req.query;
+      // DESTROY query
+      for (let n in req.query){
+        if (req.query.hasOwnProperty(n)){
+          delete req.query[n]
+        }
+      }
       req.query = {_id: req[dataField][0]._id['$oid']};
     }
     // don't error if 1 or 0 objects
