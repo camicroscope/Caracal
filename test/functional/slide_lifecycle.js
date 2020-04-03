@@ -32,11 +32,9 @@ describe('Slide Lifecycle Step 1', function() {
 describe('Slide Lifecycle Step 2', function() {
   it('Finds the Slide', function(done) {
     this.timeout(5000);
-    var slideData = {'name': 'TEST', 'specimen': '', 'study': '', 'location': '/images/sample.svs', 'mpp': 0.499};
     chai.request(server)
-        .post(findurl)
+        .get(findurl + '?name=TEST')
         .set('Content-Type', 'application/json; charset=utf-8')
-        .send(slideData)
         .end(function(err, res) {
           (res).should.have.status(200);
           (res.body).should.be.an('array');
@@ -48,11 +46,9 @@ describe('Slide Lifecycle Step 2', function() {
 describe('Slide Lifecycle Step 3', function() {
   it('Deletes a Slide', function(done) {
     this.timeout(5000);
-    var slideData = {'name': 'TEST', 'specimen': '', 'study': '', 'location': '/images/sample.svs', 'mpp': 0.499};
     chai.request(server)
-        .post(deleteurl)
+        .delete(deleteurl + '?name=TEST')
         .set('Content-Type', 'application/json; charset=utf-8')
-        .send(slideData)
         .end(function(err, res) {
           (res).should.have.status(200);
           (res.body).should.be.a('object');

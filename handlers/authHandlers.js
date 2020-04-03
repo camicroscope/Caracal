@@ -3,6 +3,7 @@ var jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 var atob = require('atob');
 var fs = require('fs');
+var filterFunction = require('./filterFunction.js');
 
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
@@ -193,29 +194,41 @@ function loginHandler(checkKey) {
 // use filter handler AFTER data handler
 function filterHandler(dataField, filterField, attrField) {
   return function(req, res, next) {
-    // do nothing if sec disabled, or if filter contains "**"
-    // all docs with no set attrField are passed too
-    var filter = req[filterField];
-    // make filter an array
-    if (!Array.isArray(filter)) {
-      filter = [filter];
+    req[dataField] = filterFunction(req[filterField], req[dataField], attrField, '**');
+    next();
+  };
+}
+
+// use edit handler AFTER a find route to populate data, but BEFORE the edit itself
+function editHandler(dataField, filterField, attrField) {
+  return function(req, res, next) {
+    if (filterField && attrField) {
+      req[dataField] = filterFunction(req[filterField], req[dataField], attrField, '**');
     }
-    if (filter.indexOf('**') == -1) {
-      // filter data in dataField if attrField in filterField
-      var data = req[dataField];
-      // is data an array?
-      if (Array.isArray(data)) {
-        // remove ones where does not match
-        req[dataField] = data.filter((x) => (!x[attrField] || filter.indexOf(x[attrField]) >= 0) );
-      } else {
-        if (!data[attrField] || filter.indexOf(data[attrField]) >= 0) {
-          req[dataField] = data;
-        } else {
-          req[dataField] = {};
+    if (!Array.isArray(req[dataField])) {
+      req[dataField] = [req[dataField]];
+    }
+    // edit routes should operate on one object
+    if (req[dataField].length == 1) {
+      // DESTROY query
+      for (let n in req.query) {
+        if (req.query.hasOwnProperty(n)) {
+          delete req.query[n];
         }
       }
+      req.query = {_id: req[dataField][0]._id['$oid']};
+      next();
+    } else if (req[dataField].length == 0) {
+      let errorMessage = {};
+      errorMessage.error = 'Nothing applicable to change.';
+      errorMessage.statusCode = 400;
+      next(errorMessage);
+    } else {
+      let errorMessage = {};
+      errorMessage.error = 'At most one document may be changed at once.';
+      errorMessage.statusCode = 400;
+      next(errorMessage);
     }
-    next();
   };
 }
 
@@ -224,6 +237,7 @@ auth.jwkTokenTrade = jwkTokenTrade;
 auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
 auth.loginHandler = loginHandler;
+auth.editHandler = editHandler;
 auth.CLIENT = CLIENT;
 auth.PRIKEY = PRIKEY;
 auth.PUBKEY = PUBKEY;

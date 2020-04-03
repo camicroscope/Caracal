@@ -103,6 +103,7 @@ function mongoDelete(collection, query) {
             if (err) {
               rej(err);
             }
+            delete result.connection;
             res(result);
             db.close();
           });
@@ -130,6 +131,7 @@ function mongoUpdate(collection, query, newVals) {
             if (err) {
               rej(err);
             }
+            delete result.connection;
             res(result);
             db.close();
           });
@@ -141,7 +143,6 @@ function mongoUpdate(collection, query, newVals) {
     }
   });
 }
-
 
 var Slide = {};
 Slide.find = function(req, res, next) {
@@ -176,7 +177,7 @@ Slide.update = function(req, res, next) {
   var newVals = {
     $set: JSON.parse(req.body),
   };
-  mongoUpdate('slide', query).then((x) => {
+  mongoUpdate('slide', query, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
