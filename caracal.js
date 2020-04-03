@@ -143,7 +143,7 @@ app.post('/data/User/update', dataHandlers.User.update);
 // render mongo returns/data
 app.use('/data', function(req, res, next) {
   if (!req.data) {
-    res.status(404).json({'error': 'nothing found'});
+    res.status(404).json({});
   }
   res.json(req.data);
 });
