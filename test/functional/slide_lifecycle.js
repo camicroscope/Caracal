@@ -49,7 +49,7 @@ describe('Slide Lifecycle Step 3', function() {
   it('Deletes a Slide', function(done) {
     this.timeout(5000);
     chai.request(server)
-        .delete(deleteurl + "?name=TEST")
+        .delete(deleteurl + '?name=TEST')
         .set('Content-Type', 'application/json; charset=utf-8')
         .end(function(err, res) {
           (res).should.have.status(200);

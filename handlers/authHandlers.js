@@ -217,9 +217,8 @@ function editHandler(dataField, filterField, attrField) {
         }
       }
       req.query = {_id: req[dataField][0]._id['$oid']};
-      next()
-    }
-    else if (req[dataField].length == 0) {
+      next();
+    } else if (req[dataField].length == 0) {
       let errorMessage = {};
       errorMessage.error = 'Nothing applicable to change.';
       errorMessage.statusCode = 400;
