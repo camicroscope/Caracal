@@ -2,6 +2,7 @@ var mongo = require('mongodb');
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var MONGO_DB = process.env.MONGO_DB || 'camic';
+var DISABLE_SEC = process.env.DISABLE_SEC || false;
 
 function mongoFind(collection, query) {
   return new Promise(function(res, rej) {
@@ -591,6 +592,39 @@ User.delete = function(req, res, next) {
     req.data = x;
     next();
   }).catch((e) => next(e));
+};
+
+User.wcido = function(req, res, next) {
+  var userType = req.query.ut;
+  var permissions = {
+    slide: {post: true, delete: true, update: true},
+    heatmap: {post: true, delete: true, update: true},
+    heatmapEdit: {post: true, delete: true, update: true},
+    user: {post: true, delete: true, update: true},
+    config: {post: true, delete: true, update: true},
+    mark: {post: true, delete: true, update: true},
+    template: {post: true, delete: true, update: true},
+    logs: {post: true, delete: true, update: true},
+  };
+  if (DISABLE_SEC || userType == 'Admin') {
+    res.send(permissions);
+  } else if (userType == 'Editor') {
+    permissions['user'] = {post: false, delete: false, update: false};
+    res.send(permissions);
+  } else if (userType == 'Null') {
+    for (const key in permissions) {
+      if (permissions.hasOwnProperty(key)) {
+        permissions[key] = {post: false, delete: false, update: false};
+        if (key == 'logs') {
+          permissions[key] = {post: true, delete: false, update: false};
+        }
+      }
+    }
+    res.send(permissions);
+  } else {
+    var error = {error: 'undefined UserType'};
+    res.send(error);
+  }
 };
 
 dataHandlers = {};
