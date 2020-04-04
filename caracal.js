@@ -139,6 +139,7 @@ app.delete('/data/User/delete', permissionHandler(['Admin']));
 app.delete('/data/user/delete', dataHandlers.User.delete);
 app.post('/data/User/update', permissionHandler(['Admin']));
 app.post('/data/User/update', dataHandlers.User.update);
+app.get('/data/User/wcido',dataHandlers.User.wcido);
 
 // render mongo returns/data
 app.use('/data', function(req, res, next) {
