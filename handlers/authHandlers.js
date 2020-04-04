@@ -160,7 +160,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
 function loginHandler(checkKey) {
   return function(req, res, next) {
     if (DISABLE_SEC) {
-      let token = jwt.decode(getToken(req)) || {}
+      let token = jwt.decode(getToken(req)) || {};
       req.tokenInfo = disToken;
       req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
       req.userFilter = token.userFilter || ['Public'];
