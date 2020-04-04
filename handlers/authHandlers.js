@@ -159,12 +159,9 @@ function tokenTrade(checkKey, signKey, userFunction) {
 
 function loginHandler(checkKey) {
   return function(req, res, next) {
+    let tokenFcn = jwt.verify
     if (DISABLE_SEC) {
-      req.tokenInfo = {
-        'user': 'none',
-        'sub': 'none',
-      };
-      next();
+      tokenFcn = jwt.decode
     } else {
       var THISTOKEN = getToken(req);
       const jwtOptions = {};
@@ -174,7 +171,7 @@ function loginHandler(checkKey) {
       if (ISS) {
         jwtOptions.issuer = ISS;
       }
-      jwt.verify(THISTOKEN, checkKey, jwtOptions, function(err, token) {
+      tokenFcn(THISTOKEN, checkKey, jwtOptions, function(err, token) {
         if (err) {
           console.error(err);
           res.status(401).send({
