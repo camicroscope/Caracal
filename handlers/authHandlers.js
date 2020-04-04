@@ -159,11 +159,13 @@ function tokenTrade(checkKey, signKey, userFunction) {
 
 function loginHandler(checkKey) {
   return function(req, res, next) {
-    let tokenFcn = jwt.verify
     if (DISABLE_SEC) {
-      tokenFcn = jwt.decode
+      let token = jwt.decode(getToken(req)) || {}
+      req.tokenInfo = disToken;
+      req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
+      req.userFilter = token.userFilter || ['Public'];
+      next();
     } else {
-      var THISTOKEN = getToken(req);
       const jwtOptions = {};
       if (AUD) {
         jwtOptions.audience = AUD;
@@ -171,7 +173,7 @@ function loginHandler(checkKey) {
       if (ISS) {
         jwtOptions.issuer = ISS;
       }
-      tokenFcn(THISTOKEN, checkKey, jwtOptions, function(err, token) {
+      jwt.verify(getToken(req), checkKey, jwtOptions, function(err, token) {
         if (err) {
           console.error(err);
           res.status(401).send({
