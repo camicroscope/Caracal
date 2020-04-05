@@ -56,6 +56,7 @@ app.use('/loader/', loaderHandler);
 app.use('/data', auth.loginHandler(auth.PUBKEY));
 // slide
 app.get('/data/Slide/find', dataHandlers.Slide.find);
+app.get('/data/Slide/find/mark', dataHandlers.Slide.aggregate);
 app.get('/data/Slide/find', auth.filterHandler('data', 'userFilter', 'filter'));
 app.post('/data/Slide/post', permissionHandler(['Admin', 'Editor']));
 app.post('/data/Slide/post', dataHandlers.Slide.add);
@@ -161,7 +162,7 @@ app.use(function(err, req, res, next) {
 
 var startApp = function(app) {
   return function() {
-    app.listen(PORT, () => console.log('listening on ' + PORT));
+    app.listen(PORT, () => console.log('listening on ' + PORT + ' changes done 2'));
   };
 };
 

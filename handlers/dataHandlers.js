@@ -144,6 +144,65 @@ function mongoUpdate(collection, query, newVals) {
   });
 }
 
+function mongoAggregate(collection, query) {
+  return new Promise(function(res, rej) {
+    try {
+      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
+        if (err) {
+          rej(err);
+        } else {
+          // if (query['_id']) {
+          //   query['_id'] = new mongo.ObjectID(query['_id']);
+          // }
+          // $project: {
+          //   "_id": {
+          //     "$toString": "$_id"
+          //   }
+          // }
+          var dbo = db.db(MONGO_DB);
+          dbo.collection(collection).aggregate([
+            {
+              "$addFields": { 
+                "slideId": { 
+                  "$toString": "$_id" 
+                }
+              }
+            }, 
+            {
+              $lookup: query 
+              // {
+              //   "from": "mark",
+              //   "localField": "slideId",
+              //   "foreignField": "provenance.image.slide",
+              //   "as": "marks"
+              // }
+            }
+          ]).toArray(function(err, result) {
+            if (err) {
+              rej(err);
+            }
+            // compatible with bindaas odd format
+            // console.log('change')
+// 
+// 
+            // 
+            result.forEach((x) => {
+              x['_id'] = {
+                '$oid': x['_id'],
+              };
+            });
+            res(result);
+            db.close();
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      rej(error);
+    }
+  });
+}
+
 var Slide = {};
 Slide.find = function(req, res, next) {
   // slide, specimen, study, location
@@ -158,6 +217,16 @@ Slide.find = function(req, res, next) {
 Slide.get = function(req, res, next) {
   // slide, specimen, study, location
   mongoFind('slide', {_id: req.query.id}).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+Slide.aggregate = function(req, res, next) {
+  var query = req.query;
+  console.log(query);
+  delete query.token;
+  mongoAggregate('slide', query).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
