@@ -170,13 +170,21 @@ function mongoAggregate(collection, query) {
             }, 
             {
               $lookup: query 
+            },
+            {              
+              $lookup:{
+                  from: "heatmap", 
+                  localField: "slideId", 
+                  foreignField: "provenance.image.slide",
+                  as: "heatmaps"
+              }
               // {
               //   "from": "mark",
               //   "localField": "slideId",
               //   "foreignField": "provenance.image.slide",
               //   "as": "marks"
               // }
-            }
+            }    
           ]).toArray(function(err, result) {
             if (err) {
               rej(err);
