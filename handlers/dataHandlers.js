@@ -232,7 +232,7 @@ Slide.get = function(req, res, next) {
 
 Slide.aggregate = function(req, res, next) {
   var query = req.query;
-  console.log(query);
+  // console.log(query);
   delete query.token;
   mongoAggregate('slide', query).then((x) => {
     req.data = x;
