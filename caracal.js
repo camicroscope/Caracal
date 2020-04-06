@@ -162,7 +162,7 @@ app.use(function(err, req, res, next) {
 
 var startApp = function(app) {
   return function() {
-    app.listen(PORT, () => console.log('listening on ' + PORT + ' changes done 2'));
+    app.listen(PORT, () => console.log('listening on ' + PORT));
   };
 };
 
