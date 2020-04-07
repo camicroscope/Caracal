@@ -5,9 +5,9 @@ var atob = require('atob');
 var fs = require('fs');
 var filterFunction = require('./filterFunction.js');
 
-const readline = require('readline-sync')
-const { exec } = require('child_process')
-const keyGenCommand = "openssl req -subj '/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US' -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub"
+const readline = require('readline-sync');
+const {exec} = require('child_process');
+const keyGenCommand = "openssl req -subj '/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US' -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
 
 
 var JWK_URL = process.env.JWK_URL;
@@ -45,15 +45,13 @@ try {
       console.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
       console.error('pubkey does not exist');
-      
-      const inp = readline.question('Do you want to generate keys?[y, n]')
-      if(inp == 'y'){
-        try{
-        exec(keyGenCommand)
-        console.log('keys are generated. please restart the server.' + '\n');
-        }
-        catch(err){
-          console.log({err: err})
+      const inp = readline.question('Do you want to generate keys?[y, n]');
+      if (inp == 'y') {
+        try {
+          exec(keyGenCommand);
+          console.log('keys are generated. please restart the server.' + '\n');
+        } catch (err) {
+          console.log({err: err});
         }
       }
     }
@@ -61,8 +59,6 @@ try {
 } catch (err) {
   console.error(err);
 }
-
-
 if (DISABLE_SEC && !JWK_URL) {
   var CLIENT = jwksClient({
     jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
@@ -73,11 +69,8 @@ if (DISABLE_SEC && !JWK_URL) {
   });
 } else {
   console.error('need JWKS URL (JWK_URL)');
-  process.exit(1)
+  process.exit(1);
 }
-
-
-
 const getToken = function(req) {
   if (req.headers.authorization &&
     req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
