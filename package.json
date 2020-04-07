@@ -26,7 +26,6 @@
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.6.0",
     "mongodb": "^3.3.5",
-    "readline-sync": "^1.4.10",
     "throng": "^4.0.0"
   },
   "devDependencies": {
