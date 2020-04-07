@@ -21,7 +21,6 @@
   "homepage": "https://github.com/camicroscope/caboodle#readme",
   "dependencies": {
     "atob": "^2.1.2",
-    "child_process": "^1.0.2",
     "express": "^4.17.1",
     "http-proxy-middleware": "^0.20.0",
     "jsonwebtoken": "^8.5.1",
