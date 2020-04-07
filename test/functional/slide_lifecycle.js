@@ -16,7 +16,7 @@ process.env.DISABLE_SEC = 'true';
 describe('Slide Lifecycle Step 1', function() {
   it('Posts a Slide', function(done) {
     this.timeout(5000);
-    var slideData = {'name': 'TEST', 'specimen': '', 'study': '', 'location': '/images/sample.svs', 'mpp': 0.499};
+    var slideData = {'name': 'TEST', 'specimen': '', 'study': '', 'location': './images/sample.svs', 'mpp': 0.499};
     chai.request(server)
         .post(posturl)
         .set('Content-Type', 'application/json; charset=utf-8')
