@@ -5,6 +5,11 @@ var atob = require('atob');
 var fs = require('fs');
 var filterFunction = require('./filterFunction.js');
 
+const readline = require('readline-sync')
+const { exec } = require('child_process')
+const keyGenCommand = "openssl req -subj '/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US' -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub"
+
+
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
 var AUD = process.env.AUD || false;
@@ -40,6 +45,11 @@ try {
       console.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
       console.error('pubkey does not exist');
+      
+      const inp = readline.question('Do you want to generate keys?[y, n]')
+      if(inp == 'y'){
+        exec(keyGenCommand)
+      }
     }
   }
 } catch (err) {
@@ -57,8 +67,10 @@ if (DISABLE_SEC && !JWK_URL) {
   });
 } else {
   console.error('need JWKS URL (JWK_URL)');
-  process.exit(1);
+  process.exit(1)
 }
+
+
 
 const getToken = function(req) {
   if (req.headers.authorization &&
