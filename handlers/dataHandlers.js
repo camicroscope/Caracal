@@ -1,4 +1,5 @@
 var mongo = require('mongodb');
+const {exec} = require('child_process');
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var MONGO_DB = process.env.MONGO_DB || 'camic';
@@ -187,8 +188,19 @@ Slide.delete = function(req, res, next) {
   var query = req.query;
   delete query.token;
   mongoDelete('slide', query).then((x) => {
-    req.data = x;
-    next();
+    exec(`rm '${req.data[0].location}'`, (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error : ${error.message}`);
+        throw error;
+      }
+      if (stderr) {
+        console.log(`stderror : ${stderr}`);
+        throw new Error(stderr);
+      } else {
+        req.data = x;
+        next();
+      }
+    });
   }).catch((e) => next(e));
 };
 
