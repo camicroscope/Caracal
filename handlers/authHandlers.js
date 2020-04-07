@@ -5,10 +5,8 @@ var atob = require('atob');
 var fs = require('fs');
 var filterFunction = require('./filterFunction.js');
 
-const readline = require('readline-sync');
 const {exec} = require('child_process');
 const keyGenCommand = "openssl req -subj '/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US' -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
-
 
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
@@ -18,6 +16,17 @@ var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
+var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || true;
+
+if (!fs.existsSync('./keys/key.pub') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
+  try {
+    exec(keyGenCommand);
+    console.log('keys are generated. please restart the server.' + '\n');
+    process.exit(0);
+  } catch (err) {
+    console.log({err: err});
+  }
+}
 
 try {
   const prikeyPath = './keys/key';
@@ -45,15 +54,6 @@ try {
       console.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
       console.error('pubkey does not exist');
-      const inp = readline.question('Do you want to generate keys?[y, n]');
-      if (inp == 'y') {
-        try {
-          exec(keyGenCommand);
-          console.log('keys are generated. please restart the server.' + '\n');
-        } catch (err) {
-          console.log({err: err});
-        }
-      }
     }
   }
 } catch (err) {
