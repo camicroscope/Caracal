@@ -48,7 +48,13 @@ try {
       
       const inp = readline.question('Do you want to generate keys?[y, n]')
       if(inp == 'y'){
+        try{
         exec(keyGenCommand)
+        console.log('keys are generated. please restart the server.' + '\n');
+        }
+        catch(err){
+          console.log({err: err})
+        }
       }
     }
   }
