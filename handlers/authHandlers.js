@@ -6,8 +6,8 @@ var fs = require('fs');
 var filterFunction = require('./filterFunction.js');
 
 const {exec} = require('child_process');
-const keyGenCommand = "openssl req -subj '/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US' -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
-
+const preCommand = "openssl req -subj ";
+const postCommand = " -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
 var AUD = process.env.AUD || false;
@@ -18,9 +18,9 @@ var PUBKEY;
 var PRIKEY;
 var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || true;
 
-if (!fs.existsSync('./keys/key.pub') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
+if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
-    exec(keyGenCommand);
+    exec(`${preCommand}'/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US'${postCommand}`);
     console.log('keys are generated. please restart the server.' + '\n');
     process.exit(0);
   } catch (err) {
