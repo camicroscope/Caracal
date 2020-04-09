@@ -17,7 +17,7 @@ module.exports = {
   'rules': {
     "require-jsdoc" : 0,
     "valid-jsdoc" : 0,
-    "max-len" : ["error", { "code": 178 ,"ignoreTemplateLiterals": true},],
+    "max-len" : ["error", { "code": 120 ,"ignoreTemplateLiterals": true},],
     "no-unused-vars" : 0,
     "no-var" : 0,
     "prefer-const":0,
