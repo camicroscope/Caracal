@@ -91,7 +91,7 @@ function jwkTokenTrade(jwksClient, signKey, userFunction) {
       res.status(401).send('{"err":"no token found"}');
     }
     jwksClient.getSigningKey(getJwtKid(THISTOKEN), (err, key) => {
-      console.log(key);
+      // console.log(key);
       if (err) {
         console.error(err);
         res.status(401).send({
@@ -130,7 +130,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
           });
         } else {
           userFunction(token).then((x) => {
-            console.log(x);
+            // console.log(x);
             if (x === false) {
               res.status(401).send({
                 'err': 'User Unauthorized',

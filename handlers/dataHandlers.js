@@ -31,7 +31,6 @@ function mongoFind(collection, query) {
         }
       });
     } catch (error) {
-      console.error(error);
       rej(error);
     }
   });
@@ -130,6 +129,7 @@ function mongoUpdate(collection, query, newVals) {
           }
           dbo.collection(collection).updateOne(query, newVals, function(err, result) {
             if (err) {
+              console.log(err);
               rej(err);
             }
             delete result.connection;
@@ -139,7 +139,6 @@ function mongoUpdate(collection, query, newVals) {
         }
       });
     } catch (error) {
-      console.error(error);
       rej(error);
     }
   });
@@ -183,6 +182,35 @@ Slide.update = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
+Slide.deleteRequestAdd = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  var newVals = {
+    $set: JSON.parse(req.body),
+  };
+  mongoUpdate('slide', query, newVals).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => {
+    next(e);
+  });
+};
+
+Slide.deleteRequestRemove = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  var newVals = {
+    $unset: JSON.parse(req.body),
+  };
+  mongoUpdate('slide', query, newVals).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => {
+    next(e);
+  });
+};
+
 Slide.delete = function(req, res, next) {
   var query = req.query;
   delete query.token;
