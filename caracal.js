@@ -63,21 +63,20 @@ app.delete('/data/Slide/delete', permissionHandler(['Admin']));
 app.delete('/data/Slide/delete', dataHandlers.Slide.find);
 app.delete('/data/Slide/delete', auth.editHandler('data', 'userFilter', 'filter'));
 app.delete('/data/Slide/delete', dataHandlers.Slide.delete);
-
-app.post('/data/Slide/delete/request/add', permissionHandler(['Editor']));
-app.post('/data/Slide/delete/request/add', dataHandlers.Slide.find);
-app.post('/data/Slide/delete/request/add', auth.editHandler('data', 'userFilter', 'filter'));
-app.post('/data/Slide/delete/request/add', dataHandlers.Slide.deleteRequestAdd);
-
-app.post('/data/Slide/delete/request/remove', permissionHandler(['Editor', 'Admin']));
-app.post('/data/Slide/delete/request/remove', dataHandlers.Slide.find);
-app.post('/data/Slide/delete/request/remove', auth.editHandler('data', 'userFilter', 'filter'));
-app.post('/data/Slide/delete/request/remove', dataHandlers.Slide.deleteRequestRemove);
-
 app.post('/data/Slide/update', permissionHandler(['Admin', 'Editor']));
 app.post('/data/Slide/update', dataHandlers.Slide.find);
 app.post('/data/Slide/update', auth.editHandler('data', 'userFilter', 'filter'));
 app.post('/data/Slide/update', dataHandlers.Slide.update);
+// Requests
+app.get('/data/Request/find', permissionHandler(['Editor', 'Admin']));
+app.get('/data/Request/find', dataHandlers.Request.find);
+app.get('/data/Request/find', auth.filterHandler('data', 'userFilter', 'filter'));
+app.post('/data/Request/add', permissionHandler(['Editor']));
+app.post('/data/Request/add', dataHandlers.Request.add);
+app.delete('/data/Request/delete', permissionHandler(['Editor', 'Admin']));
+app.delete('/data/Request/delete', dataHandlers.Request.find);
+app.delete('/data/Request/delete', auth.editHandler('data', 'userFilter', 'filter'));
+app.delete('/data/Request/delete', dataHandlers.Request.delete);
 // mark
 app.get('/data/Mark/find', dataHandlers.Mark.find);
 app.get('/data/Mark/spatial', dataHandlers.Mark.spatial);

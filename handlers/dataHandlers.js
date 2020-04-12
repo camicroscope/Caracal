@@ -183,34 +183,6 @@ Slide.update = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
-Slide.deleteRequestAdd = function(req, res, next) {
-  var query = req.query;
-  delete query.token;
-  var newVals = {
-    $set: JSON.parse(req.body),
-  };
-  mongoUpdate('slide', query, newVals).then((x) => {
-    req.data = x;
-    next();
-  }).catch((e) => {
-    next(e);
-  });
-};
-
-Slide.deleteRequestRemove = function(req, res, next) {
-  var query = req.query;
-  delete query.token;
-  var newVals = {
-    $unset: JSON.parse(req.body),
-  };
-  mongoUpdate('slide', query, newVals).then((x) => {
-    req.data = x;
-    next();
-  }).catch((e) => {
-    next(e);
-  });
-};
-
 Slide.delete = function(req, res, next) {
   var query = req.query;
   delete query.token;
@@ -219,6 +191,34 @@ Slide.delete = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
+var Request = {};
+Request.find = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  mongoFind('request', query).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+Request.add = function(req, res, next) {
+  var data = JSON.parse(req.body);
+  mongoAdd('request', data).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+Request.delete = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  mongoDelete('request', query).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
 
 var Mark = {};
 Mark.find = function(req, res, next) {
@@ -657,6 +657,7 @@ User.wcido = function(req, res, next) {
 
 dataHandlers = {};
 dataHandlers.Slide = Slide;
+dataHandlers.Request = Request;
 dataHandlers.Config = Config;
 dataHandlers.HeatmapEdit = HeatmapEdit;
 dataHandlers.Heatmap = Heatmap;
