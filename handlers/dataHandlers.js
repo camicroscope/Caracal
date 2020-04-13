@@ -638,6 +638,7 @@ User.wcido = function(req, res, next) {
     res.send(permissions);
   } else if (userType == 'Editor') {
     permissions['user'] = {post: false, delete: false, update: false};
+    permissions['slide'] = {post: true, delete: false, update: true};
     res.send(permissions);
   } else if (userType == 'Null') {
     for (const key in permissions) {
