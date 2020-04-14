@@ -31,7 +31,6 @@ function mongoFind(collection, query) {
         }
       });
     } catch (error) {
-      console.error(error);
       rej(error);
     }
   });
@@ -130,6 +129,7 @@ function mongoUpdate(collection, query, newVals) {
           }
           dbo.collection(collection).updateOne(query, newVals, function(err, result) {
             if (err) {
+              console.log(err);
               rej(err);
             }
             delete result.connection;
@@ -139,7 +139,6 @@ function mongoUpdate(collection, query, newVals) {
         }
       });
     } catch (error) {
-      console.error(error);
       rej(error);
     }
   });
@@ -183,6 +182,7 @@ Slide.update = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
 Slide.delete = function(req, res, next) {
   var query = req.query;
   delete query.token;
@@ -191,6 +191,34 @@ Slide.delete = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
+var Request = {};
+Request.find = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  mongoFind('request', query).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+Request.add = function(req, res, next) {
+  var data = JSON.parse(req.body);
+  mongoAdd('request', data).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+Request.delete = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  mongoDelete('request', query).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
 
 var Mark = {};
 Mark.find = function(req, res, next) {
@@ -610,6 +638,7 @@ User.wcido = function(req, res, next) {
     res.send(permissions);
   } else if (userType == 'Editor') {
     permissions['user'] = {post: false, delete: false, update: false};
+    permissions['slide'] = {post: true, delete: false, update: true};
     res.send(permissions);
   } else if (userType == 'Null') {
     for (const key in permissions) {
@@ -629,6 +658,7 @@ User.wcido = function(req, res, next) {
 
 dataHandlers = {};
 dataHandlers.Slide = Slide;
+dataHandlers.Request = Request;
 dataHandlers.Config = Config;
 dataHandlers.HeatmapEdit = HeatmapEdit;
 dataHandlers.Heatmap = Heatmap;
