@@ -49,7 +49,8 @@ app.use('/img/IIP/raw/', iipHandler);
 
 // loader, proxy
 app.use('/loader/', auth.loginHandler(auth.PUBKEY));
-app.use('/loader/', permissionHandler(['Admin']));
+app.use('/loader/', permissionHandler(['Admin', 'Editor']));
+app.use('/loader/slide/delete', permissionHandler(['Admin']));
 app.use('/loader/', loaderHandler);
 
 // data, mongo
