@@ -16,13 +16,11 @@ var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
-var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || true;
+var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || false;
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
     execSync(`${preCommand}'/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US'${postCommand}`);
-    console.log('keys are generated. please restart the server.' + '\n');
-    process.exit(0);
   } catch (err) {
     console.log({err: err});
   }
