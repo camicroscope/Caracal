@@ -29,7 +29,7 @@ Conslidated Backend, Auth, and Security Services
 |LOADER_PATH | loader utility location | http://ca-load/ |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
 |MONGO_DB | mongo db to use, default camic |
-
+|GENERATE_KEY_IF_MISSING | automatic generate key in server in not found | false |
 
 ## files used
 key/key and key/key.pub are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own
