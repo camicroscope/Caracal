@@ -5,6 +5,9 @@ var atob = require('atob');
 var fs = require('fs');
 var filterFunction = require('./filterFunction.js');
 
+const {execSync} = require('child_process');
+const preCommand = "openssl req -subj ";
+const postCommand = " -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
 var JWK_URL = process.env.JWK_URL;
 var DISABLE_SEC = process.env.DISABLE_SEC || false;
 var AUD = process.env.AUD || false;
@@ -13,6 +16,15 @@ var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
+var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || false;
+
+if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
+  try {
+    execSync(`${preCommand}'/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US'${postCommand}`);
+  } catch (err) {
+    console.log({err: err});
+  }
+}
 
 try {
   const prikeyPath = './keys/key';
@@ -45,8 +57,6 @@ try {
 } catch (err) {
   console.error(err);
 }
-
-
 if (DISABLE_SEC && !JWK_URL) {
   var CLIENT = jwksClient({
     jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
@@ -59,7 +69,6 @@ if (DISABLE_SEC && !JWK_URL) {
   console.error('need JWKS URL (JWK_URL)');
   process.exit(1);
 }
-
 const getToken = function(req) {
   if (req.headers.authorization &&
     req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
@@ -91,7 +100,7 @@ function jwkTokenTrade(jwksClient, signKey, userFunction) {
       res.status(401).send('{"err":"no token found"}');
     }
     jwksClient.getSigningKey(getJwtKid(THISTOKEN), (err, key) => {
-      console.log(key);
+      // console.log(key);
       if (err) {
         console.error(err);
         res.status(401).send({
@@ -130,7 +139,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
           });
         } else {
           userFunction(token).then((x) => {
-            console.log(x);
+            // console.log(x);
             if (x === false) {
               res.status(401).send({
                 'err': 'User Unauthorized',
@@ -160,13 +169,12 @@ function tokenTrade(checkKey, signKey, userFunction) {
 function loginHandler(checkKey) {
   return function(req, res, next) {
     if (DISABLE_SEC) {
-      req.tokenInfo = {
-        'user': 'none',
-        'sub': 'none',
-      };
+      let token = jwt.decode(getToken(req)) || {};
+      req.tokenInfo = token;
+      req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
+      req.userFilter = token.userFilter || ['Public'];
       next();
     } else {
-      var THISTOKEN = getToken(req);
       const jwtOptions = {};
       if (AUD) {
         jwtOptions.audience = AUD;
@@ -174,7 +182,7 @@ function loginHandler(checkKey) {
       if (ISS) {
         jwtOptions.issuer = ISS;
       }
-      jwt.verify(THISTOKEN, checkKey, jwtOptions, function(err, token) {
+      jwt.verify(getToken(req), checkKey, jwtOptions, function(err, token) {
         if (err) {
           console.error(err);
           res.status(401).send({

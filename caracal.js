@@ -50,6 +50,7 @@ app.use('/img/IIP/raw/', iipHandler);
 // loader, proxy
 app.use('/loader/', auth.loginHandler(auth.PUBKEY));
 app.use('/loader/', permissionHandler(['Admin', 'Editor']));
+app.use('/loader/slide/delete', permissionHandler(['Admin']));
 app.use('/loader/', loaderHandler);
 
 // data, mongo
@@ -59,7 +60,7 @@ app.get('/data/Slide/find', dataHandlers.Slide.find);
 app.get('/data/Slide/find', auth.filterHandler('data', 'userFilter', 'filter'));
 app.post('/data/Slide/post', permissionHandler(['Admin', 'Editor']));
 app.post('/data/Slide/post', dataHandlers.Slide.add);
-app.delete('/data/Slide/delete', permissionHandler(['Admin', 'Editor']));
+app.delete('/data/Slide/delete', permissionHandler(['Admin']));
 app.delete('/data/Slide/delete', dataHandlers.Slide.find);
 app.delete('/data/Slide/delete', auth.editHandler('data', 'userFilter', 'filter'));
 app.delete('/data/Slide/delete', dataHandlers.Slide.delete);
@@ -67,6 +68,15 @@ app.post('/data/Slide/update', permissionHandler(['Admin', 'Editor']));
 app.post('/data/Slide/update', dataHandlers.Slide.find);
 app.post('/data/Slide/update', auth.editHandler('data', 'userFilter', 'filter'));
 app.post('/data/Slide/update', dataHandlers.Slide.update);
+// Requests
+app.get('/data/Request/find', permissionHandler(['Editor', 'Admin']));
+app.get('/data/Request/find', dataHandlers.Request.find);
+app.get('/data/Request/find', auth.filterHandler('data', 'userFilter', 'filter'));
+app.post('/data/Request/add', dataHandlers.Request.add);
+app.delete('/data/Request/delete', permissionHandler(['Editor', 'Admin']));
+app.delete('/data/Request/delete', dataHandlers.Request.find);
+app.delete('/data/Request/delete', auth.editHandler('data', 'userFilter', 'filter'));
+app.delete('/data/Request/delete', dataHandlers.Request.delete);
 // mark
 app.get('/data/Mark/find', dataHandlers.Mark.find);
 app.get('/data/Mark/spatial', dataHandlers.Mark.spatial);
@@ -139,6 +149,7 @@ app.delete('/data/User/delete', permissionHandler(['Admin']));
 app.delete('/data/user/delete', dataHandlers.User.delete);
 app.post('/data/User/update', permissionHandler(['Admin']));
 app.post('/data/User/update', dataHandlers.User.update);
+app.get('/data/User/wcido', dataHandlers.User.wcido);
 
 // render mongo returns/data
 app.use('/data', function(req, res, next) {

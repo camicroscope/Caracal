@@ -21,5 +21,6 @@ module.exports = {
     "no-unused-vars" : 0,
     "no-var" : 0,
     "prefer-const":0,
+    "quotes": 0
   },
 };
