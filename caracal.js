@@ -74,7 +74,6 @@ app.post('/data/Slide/update', dataHandlers.Slide.update);
 app.get('/data/Request/find', permissionHandler(['Editor', 'Admin']));
 app.get('/data/Request/find', dataHandlers.Request.find);
 app.get('/data/Request/find', auth.filterHandler('data', 'userFilter', 'filter'));
-app.post('/data/Request/add', permissionHandler(['Editor']));
 app.post('/data/Request/add', dataHandlers.Request.add);
 app.delete('/data/Request/delete', permissionHandler(['Editor', 'Admin']));
 app.delete('/data/Request/delete', dataHandlers.Request.find);
