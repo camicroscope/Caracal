@@ -38,6 +38,8 @@ app.use(function(req, res, next) {
 // auth related services
 app.get('/auth/Token/check', auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFunction));
 app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction));
+app.get('/auth/Token/proto', auth.protoTokenExists());
+
 
 // public files, don't use login handler here
 app.use(express.static('static'));

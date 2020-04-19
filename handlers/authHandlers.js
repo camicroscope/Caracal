@@ -9,14 +9,21 @@ const {execSync} = require('child_process');
 const preCommand = "openssl req -subj ";
 const postCommand = " -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
 var JWK_URL = process.env.JWK_URL;
-var DISABLE_SEC = process.env.DISABLE_SEC || false;
+var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 var AUD = process.env.AUD || false;
 var ISS = process.env.ISS || false;
 var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
-var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || false;
+var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
+
+// GLOBALS FOR GENERATING PROTOTYPE TOKEN MECHANISM
+var PROTO_TOKEN_EXPIRY = process.env.PROTO_TOKEN_EXPIRY || '1h';
+var PROTO_TOKEN_EXPIRY_IN_MSEC = Number(process.env.PROTO_TOKEN_EXPIRY_IN_MSEC) || 3600000; // One hour in milliseconds
+var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false; // Set to true to enable prototype token generation mechanism 
+var SHOW_FIRST_TOKEN = false;
+var PROTO_TOKEN;
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
@@ -30,6 +37,23 @@ try {
   const prikeyPath = './keys/key';
   if (fs.existsSync(prikeyPath)) {
     PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
+    if (!SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
+      let protoData = {
+        email: 'sample@admin.com',
+        userType: 'Admin',
+        userFilter: ['Public'], 
+      }
+      PROTO_TOKEN = jwt.sign(protoData, PRIKEY, {
+        algorithm: 'RS256',
+        expiresIn: PROTO_TOKEN_EXPIRY,
+      });
+      SHOW_FIRST_TOKEN = true; // set this to indicate that first token has been generated
+
+      setTimeout(() => {
+        PROTO_TOKEN = '';
+        SHOW_FIRST_TOKEN = false;
+      }, PROTO_TOKEN_EXPIRY_IN_MSEC);
+    }
   } else {
     if (DISABLE_SEC) {
       PRIKEY = '';
@@ -57,6 +81,7 @@ try {
 } catch (err) {
   console.error(err);
 }
+
 if (DISABLE_SEC && !JWK_URL) {
   var CLIENT = jwksClient({
     jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
@@ -69,6 +94,7 @@ if (DISABLE_SEC && !JWK_URL) {
   console.error('need JWKS URL (JWK_URL)');
   process.exit(1);
 }
+
 const getToken = function(req) {
   if (req.headers.authorization &&
     req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
@@ -80,6 +106,9 @@ const getToken = function(req) {
   } else if (req.cookies && req.cookies.token) {
     // Handle token presented as a cookie parameter
     return req.cookies.token;
+  } else if (SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
+    // Get prototype token if activated
+    return PROTO_TOKEN; 
   }
 };
 
@@ -240,12 +269,27 @@ function editHandler(dataField, filterField, attrField) {
   };
 }
 
+function protoTokenExists() {
+  return function(req, res) {
+    if (SHOW_FIRST_TOKEN) {
+      res.send({
+        'exists': true,
+      });
+    } else {
+      res.send({
+        'exists': false,
+      });
+    }
+  }
+}
+
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;
 auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
 auth.loginHandler = loginHandler;
 auth.editHandler = editHandler;
+auth.protoTokenExists = protoTokenExists;
 auth.CLIENT = CLIENT;
 auth.PRIKEY = PRIKEY;
 auth.PUBKEY = PUBKEY;
