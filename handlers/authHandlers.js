@@ -21,7 +21,7 @@ var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') |
 // GLOBALS FOR GENERATING PROTOTYPE TOKEN MECHANISM
 var PROTO_TOKEN_EXPIRY = process.env.PROTO_TOKEN_EXPIRY || '1h';
 var PROTO_TOKEN_EXPIRY_IN_MSEC = Number(process.env.PROTO_TOKEN_EXPIRY_IN_MSEC) || 3600000; // One hour in milliseconds
-var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false; // Set to true to enable prototype token generation mechanism 
+var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false; // Set to true to enable prototype token generation mechanism
 var SHOW_FIRST_TOKEN = false;
 var PROTO_TOKEN;
 
@@ -41,8 +41,8 @@ try {
       let protoData = {
         email: 'sample@admin.com',
         userType: 'Admin',
-        userFilter: ['Public'], 
-      }
+        userFilter: ['Public'],
+      };
       PROTO_TOKEN = jwt.sign(protoData, PRIKEY, {
         algorithm: 'RS256',
         expiresIn: PROTO_TOKEN_EXPIRY,
@@ -108,7 +108,7 @@ const getToken = function(req) {
     return req.cookies.token;
   } else if (SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
     // Get prototype token if activated
-    return PROTO_TOKEN; 
+    return PROTO_TOKEN;
   }
 };
 
@@ -280,7 +280,7 @@ function protoTokenExists() {
         'exists': false,
       });
     }
-  }
+  };
 }
 
 auth = {};
