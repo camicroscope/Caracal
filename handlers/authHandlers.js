@@ -21,7 +21,8 @@ var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') |
 // GLOBALS FOR GENERATING PROTOTYPE TOKEN MECHANISM
 var PROTO_TOKEN_EXPIRY = process.env.PROTO_TOKEN_EXPIRY || '1h';
 var PROTO_TOKEN_EXPIRY_IN_MSEC = Number(process.env.PROTO_TOKEN_EXPIRY_IN_MSEC) || 3600000; // One hour in milliseconds
-var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false; // Set to true to enable prototype token generation mechanism
+// Set below var to true to enable prototype token generation mechanism
+var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false;
 var SHOW_FIRST_TOKEN = false;
 var PROTO_TOKEN;
 
