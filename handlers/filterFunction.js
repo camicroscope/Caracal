@@ -3,7 +3,6 @@ function filterFunction(filter, data, attr, wildcard) {
     try {
       filter = JSON.parse(filter.replace(/'/g, '"'));
     } catch (err) {
-      console.log(err);
       filter=[filter]; // make an array of the filter
     }
   }
