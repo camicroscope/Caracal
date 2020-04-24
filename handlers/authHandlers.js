@@ -9,14 +9,15 @@ const {execSync} = require('child_process');
 const preCommand = "openssl req -subj ";
 const postCommand = " -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
 var JWK_URL = process.env.JWK_URL;
-var DISABLE_SEC = process.env.DISABLE_SEC || false;
+var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 var AUD = process.env.AUD || false;
 var ISS = process.env.ISS || false;
 var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
-var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || false;
+var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
+
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
@@ -57,6 +58,7 @@ try {
 } catch (err) {
   console.error(err);
 }
+
 if (DISABLE_SEC && !JWK_URL) {
   var CLIENT = jwksClient({
     jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
@@ -69,6 +71,7 @@ if (DISABLE_SEC && !JWK_URL) {
   console.error('need JWKS URL (JWK_URL)');
   process.exit(1);
 }
+
 const getToken = function(req) {
   if (req.headers.authorization &&
     req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
@@ -239,6 +242,7 @@ function editHandler(dataField, filterField, attrField) {
     }
   };
 }
+
 
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;

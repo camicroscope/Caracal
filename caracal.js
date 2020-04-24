@@ -39,6 +39,7 @@ app.use(function(req, res, next) {
 app.get('/auth/Token/check', auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFunction));
 app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction));
 
+
 // public files, don't use login handler here
 app.use(express.static('static'));
 app.use(express.static('camicroscope'));

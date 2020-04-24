@@ -1,4 +1,4 @@
-var ALLOW_PUBLIC = process.env.ALLOW_PUBLIC;
+var ALLOW_PUBLIC = (process.env.ALLOW_PUBLIC === 'true');
 
 var dataHandlers = require('./dataHandlers.js');
 // userFunction -- used for login given id provider token

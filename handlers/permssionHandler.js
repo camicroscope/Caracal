@@ -1,8 +1,8 @@
-var DISABLE_SEC = process.env.DISABLE_SEC || false;
+var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 
 function permissionHandler(permissionList, test=false) {
   return function(req, res, next) {
-    if (!test &&DISABLE_SEC) {
+    if (!test && DISABLE_SEC) {
       req.permission_ok = true;
       next();
     } else {
