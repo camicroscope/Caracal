@@ -18,13 +18,6 @@ var PUBKEY;
 var PRIKEY;
 var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
 
-// GLOBALS FOR GENERATING PROTOTYPE TOKEN MECHANISM
-var PROTO_TOKEN_EXPIRY = process.env.PROTO_TOKEN_EXPIRY || '1h';
-var PROTO_TOKEN_EXPIRY_IN_MSEC = Number(process.env.PROTO_TOKEN_EXPIRY_IN_MSEC) || 3600000; // One hour in milliseconds
-// Set below var to true to enable prototype token generation mechanism
-var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false;
-var SHOW_FIRST_TOKEN = false;
-var PROTO_TOKEN;
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
@@ -38,23 +31,6 @@ try {
   const prikeyPath = './keys/key';
   if (fs.existsSync(prikeyPath)) {
     PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
-    if (!SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
-      let protoData = {
-        email: 'sample@admin.com',
-        userType: 'Admin',
-        userFilter: ['Public'],
-      };
-      PROTO_TOKEN = jwt.sign(protoData, PRIKEY, {
-        algorithm: 'RS256',
-        expiresIn: PROTO_TOKEN_EXPIRY,
-      });
-      SHOW_FIRST_TOKEN = true; // set this to indicate that first token has been generated
-
-      setTimeout(() => {
-        PROTO_TOKEN = '';
-        SHOW_FIRST_TOKEN = false;
-      }, PROTO_TOKEN_EXPIRY_IN_MSEC);
-    }
   } else {
     if (DISABLE_SEC) {
       PRIKEY = '';
@@ -107,9 +83,6 @@ const getToken = function(req) {
   } else if (req.cookies && req.cookies.token) {
     // Handle token presented as a cookie parameter
     return req.cookies.token;
-  } else if (SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
-    // Get prototype token if activated
-    return PROTO_TOKEN;
   }
 };
 
@@ -270,19 +243,6 @@ function editHandler(dataField, filterField, attrField) {
   };
 }
 
-function protoTokenExists() {
-  return function(req, res) {
-    if (SHOW_FIRST_TOKEN) {
-      res.send({
-        'exists': true,
-      });
-    } else {
-      res.send({
-        'exists': false,
-      });
-    }
-  };
-}
 
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;
@@ -290,7 +250,6 @@ auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
 auth.loginHandler = loginHandler;
 auth.editHandler = editHandler;
-auth.protoTokenExists = protoTokenExists;
 auth.CLIENT = CLIENT;
 auth.PRIKEY = PRIKEY;
 auth.PUBKEY = PUBKEY;
