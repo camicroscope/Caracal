@@ -18,13 +18,6 @@ var PUBKEY;
 var PRIKEY;
 var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
 
-// GLOBALS FOR GENERATING PROTOTYPE TOKEN MECHANISM
-var PROTO_TOKEN_EXPIRY = process.env.PROTO_TOKEN_EXPIRY || '1h';
-var PROTO_TOKEN_EXPIRY_IN_MSEC = Number(process.env.PROTO_TOKEN_EXPIRY_IN_MSEC) || 3600000; // One hour in milliseconds
-// Set below var to true to enable prototype token generation mechanism
-var ACTIVATE_PROTO_TOKEN = (process.env.ACTIVATE_PROTO_TOKEN === 'true') || false;
-var SHOW_FIRST_TOKEN = false;
-var PROTO_TOKEN;
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
@@ -270,19 +263,6 @@ function editHandler(dataField, filterField, attrField) {
   };
 }
 
-function protoTokenExists() {
-  return function(req, res) {
-    if (SHOW_FIRST_TOKEN) {
-      res.send({
-        'exists': true,
-      });
-    } else {
-      res.send({
-        'exists': false,
-      });
-    }
-  };
-}
 
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;

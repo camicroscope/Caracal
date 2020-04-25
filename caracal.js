@@ -41,6 +41,7 @@ app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunct
 app.get('/auth/Token/proto', auth.protoTokenExists());
 
 
+
 // public files, don't use login handler here
 app.use(express.static('static'));
 app.use(express.static('camicroscope'));
