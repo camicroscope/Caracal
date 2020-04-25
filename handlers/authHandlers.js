@@ -17,6 +17,7 @@ var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
 var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
+var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") || false;
 
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
@@ -27,66 +28,103 @@ if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE
   }
 }
 
-try {
-  const prikeyPath = './keys/key';
-  if (fs.existsSync(prikeyPath)) {
-    PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
-    if (!SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
-      let protoData = {
-        email: 'sample@admin.com',
-        userType: 'Admin',
-        userFilter: ['Public'],
-      };
-      PROTO_TOKEN = jwt.sign(protoData, PRIKEY, {
-        algorithm: 'RS256',
-        expiresIn: PROTO_TOKEN_EXPIRY,
-      });
-      SHOW_FIRST_TOKEN = true; // set this to indicate that first token has been generated
-
-      setTimeout(() => {
-        PROTO_TOKEN = '';
-        SHOW_FIRST_TOKEN = false;
-      }, PROTO_TOKEN_EXPIRY_IN_MSEC);
-    }
-  } else {
-    if (DISABLE_SEC) {
-      PRIKEY = '';
-      console.warn('prikey null since DISABLE_SEC and no prikey provided');
-    } else {
-      console.error('prikey does not exist');
-    }
+if (ENABLE_SECURITY_AT) {
+  var countDown = Date.parse(ENABLE_SECURITY_AT) - Date.now();
+  if (countDown > 0) {
+    DISABLE_SEC = true;
+    setTimeout(() => {
+      DISABLE_SEC = false;
+      try {
+        const prikeyPath = './keys/key';
+        if (fs.existsSync(prikeyPath)) {
+          PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
+        } else {
+          if (DISABLE_SEC) {
+            PRIKEY = '';
+            console.warn('prikey null since DISABLE_SEC and no prikey provided');
+          } else {
+            console.error('prikey does not exist');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      
+      try {
+        const prikeyPath = './keys/key.pub';
+        if (fs.existsSync(prikeyPath)) {
+          var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
+        } else {
+          if (DISABLE_SEC) {
+            PUBKEY = '';
+            console.warn('pubkey null since DISABLE_SEC and no prikey provided');
+          } else {
+            console.error('pubkey does not exist');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      
+      if (DISABLE_SEC && !JWK_URL) {
+        var CLIENT = jwksClient({
+          jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
+        });
+      } else if (JWK_URL) {
+        var CLIENT = jwksClient({
+          jwksUri: JWK_URL,
+        });
+      } else {
+        console.error('need JWKS URL (JWK_URL)');
+        process.exit(1);
+      }    
+    }, countDown);
   }
-} catch (err) {
-  console.error(err);
-}
-
-try {
-  const prikeyPath = './keys/key.pub';
-  if (fs.existsSync(prikeyPath)) {
-    var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
-  } else {
-    if (DISABLE_SEC) {
-      PUBKEY = '';
-      console.warn('pubkey null since DISABLE_SEC and no prikey provided');
-    } else {
-      console.error('pubkey does not exist');
-    }
-  }
-} catch (err) {
-  console.error(err);
-}
-
-if (DISABLE_SEC && !JWK_URL) {
-  var CLIENT = jwksClient({
-    jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
-  });
-} else if (JWK_URL) {
-  var CLIENT = jwksClient({
-    jwksUri: JWK_URL,
-  });
 } else {
-  console.error('need JWKS URL (JWK_URL)');
-  process.exit(1);
+  try {
+    const prikeyPath = './keys/key';
+    if (fs.existsSync(prikeyPath)) {
+      PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
+    } else {
+      if (DISABLE_SEC) {
+        PRIKEY = '';
+        console.warn('prikey null since DISABLE_SEC and no prikey provided');
+      } else {
+        console.error('prikey does not exist');
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  try {
+    const prikeyPath = './keys/key.pub';
+    if (fs.existsSync(prikeyPath)) {
+      var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
+    } else {
+      if (DISABLE_SEC) {
+        PUBKEY = '';
+        console.warn('pubkey null since DISABLE_SEC and no prikey provided');
+      } else {
+        console.error('pubkey does not exist');
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  if (DISABLE_SEC && !JWK_URL) {
+    var CLIENT = jwksClient({
+      jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
+    });
+  } else if (JWK_URL) {
+    var CLIENT = jwksClient({
+      jwksUri: JWK_URL,
+    });
+  } else {
+    console.error('need JWKS URL (JWK_URL)');
+    process.exit(1);
+  }
 }
 
 const getToken = function(req) {
@@ -100,9 +138,6 @@ const getToken = function(req) {
   } else if (req.cookies && req.cookies.token) {
     // Handle token presented as a cookie parameter
     return req.cookies.token;
-  } else if (SHOW_FIRST_TOKEN && ACTIVATE_PROTO_TOKEN) {
-    // Get prototype token if activated
-    return PROTO_TOKEN;
   }
 };
 
@@ -259,6 +294,20 @@ function editHandler(dataField, filterField, attrField) {
       errorMessage.error = 'At most one document may be changed at once.';
       errorMessage.statusCode = 400;
       next(errorMessage);
+    }
+  };
+}
+
+function protoTokenExists() {
+  return function(req, res) {
+    if (DISABLE_SEC) {
+      res.send({
+        'exists': true,
+      });
+    } else {
+      res.send({
+        'exists': false,
+      });
     }
   };
 }
