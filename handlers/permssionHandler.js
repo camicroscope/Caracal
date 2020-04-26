@@ -4,7 +4,7 @@ var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SE
 try {
   if (ENABLE_SECURITY_AT) {
     DISABLE_SEC = true;
-    var countDown = Date.parse(ENABLE_SECURITY_AT) - Date.now();
+    var countDown = Date.parse(ENABLE_SECURITY_AT) - ((new Date()).getTime() + (new Date()).getTimezoneOffset()*60*1000);
     setTimeout(() => {
       DISABLE_SEC = false;
     }, countDown);

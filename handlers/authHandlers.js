@@ -28,59 +28,17 @@ if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE
   }
 }
 
+var countDown = 0;
 if (ENABLE_SECURITY_AT) {
-  var countDown = Date.parse(ENABLE_SECURITY_AT) - Date.now();
-  if (countDown > 0) {
-    DISABLE_SEC = true;
-    setTimeout(() => {
-      DISABLE_SEC = false;
-      try {
-        const prikeyPath = './keys/key';
-        if (fs.existsSync(prikeyPath)) {
-          PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
-        } else {
-          if (DISABLE_SEC) {
-            PRIKEY = '';
-            console.warn('prikey null since DISABLE_SEC and no prikey provided');
-          } else {
-            console.error('prikey does not exist');
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-      
-      try {
-        const prikeyPath = './keys/key.pub';
-        if (fs.existsSync(prikeyPath)) {
-          var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
-        } else {
-          if (DISABLE_SEC) {
-            PUBKEY = '';
-            console.warn('pubkey null since DISABLE_SEC and no prikey provided');
-          } else {
-            console.error('pubkey does not exist');
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-      
-      if (DISABLE_SEC && !JWK_URL) {
-        var CLIENT = jwksClient({
-          jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
-        });
-      } else if (JWK_URL) {
-        var CLIENT = jwksClient({
-          jwksUri: JWK_URL,
-        });
-      } else {
-        console.error('need JWKS URL (JWK_URL)');
-        process.exit(1);
-      }    
-    }, countDown);
-  }
-} else {
+  countDown = Date.parse(ENABLE_SECURITY_AT) - ((new Date()).getTime() + (new Date()).getTimezoneOffset()*60*1000);
+  if (countDown <= 0) {
+    countDown = 0;
+  } 
+}
+
+DISABLE_SEC = true;
+setTimeout(() => {
+  DISABLE_SEC = false;
   try {
     const prikeyPath = './keys/key';
     if (fs.existsSync(prikeyPath)) {
@@ -96,7 +54,7 @@ if (ENABLE_SECURITY_AT) {
   } catch (err) {
     console.error(err);
   }
-
+  
   try {
     const prikeyPath = './keys/key.pub';
     if (fs.existsSync(prikeyPath)) {
@@ -112,7 +70,7 @@ if (ENABLE_SECURITY_AT) {
   } catch (err) {
     console.error(err);
   }
-
+  
   if (DISABLE_SEC && !JWK_URL) {
     var CLIENT = jwksClient({
       jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
@@ -124,8 +82,8 @@ if (ENABLE_SECURITY_AT) {
   } else {
     console.error('need JWKS URL (JWK_URL)');
     process.exit(1);
-  }
-}
+  }    
+}, countDown);
 
 const getToken = function(req) {
   if (req.headers.authorization &&
