@@ -1,8 +1,9 @@
 var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
+var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") || false;
 
 function permissionHandler(permissionList, test=false) {
   return function(req, res, next) {
-    if (!test && DISABLE_SEC) {
+    if (!test && DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       req.permission_ok = true;
       next();
     } else {

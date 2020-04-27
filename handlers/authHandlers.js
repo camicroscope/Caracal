@@ -16,8 +16,9 @@ var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
+var CLIENT;
 var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
-
+var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") || false;
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
@@ -32,7 +33,7 @@ try {
   if (fs.existsSync(prikeyPath)) {
     PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
   } else {
-    if (DISABLE_SEC) {
+    if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PRIKEY = '';
       console.warn('prikey null since DISABLE_SEC and no prikey provided');
     } else {
@@ -48,7 +49,7 @@ try {
   if (fs.existsSync(prikeyPath)) {
     var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
   } else {
-    if (DISABLE_SEC) {
+    if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PUBKEY = '';
       console.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
@@ -60,17 +61,17 @@ try {
 }
 
 if (DISABLE_SEC && !JWK_URL) {
-  var CLIENT = jwksClient({
+  CLIENT = jwksClient({
     jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
   });
 } else if (JWK_URL) {
-  var CLIENT = jwksClient({
+  CLIENT = jwksClient({
     jwksUri: JWK_URL,
   });
 } else {
   console.error('need JWKS URL (JWK_URL)');
   process.exit(1);
-}
+}  
 
 const getToken = function(req) {
   if (req.headers.authorization &&
@@ -171,7 +172,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
 
 function loginHandler(checkKey) {
   return function(req, res, next) {
-    if (DISABLE_SEC) {
+    if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       let token = jwt.decode(getToken(req)) || {};
       req.tokenInfo = token;
       req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
@@ -243,6 +244,20 @@ function editHandler(dataField, filterField, attrField) {
   };
 }
 
+function firstSetupUserSignupExists() {
+  return function(req, res) {
+    if (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
+      res.send({
+        'exists': true,
+      });
+    } else {
+      res.send({
+        'exists': false,
+      });
+    }
+  };
+}
+
 
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;
@@ -250,6 +265,7 @@ auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
 auth.loginHandler = loginHandler;
 auth.editHandler = editHandler;
+auth.firstSetupUserSignupExists = firstSetupUserSignupExists;
 auth.CLIENT = CLIENT;
 auth.PRIKEY = PRIKEY;
 auth.PUBKEY = PUBKEY;
