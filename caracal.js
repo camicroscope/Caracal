@@ -163,11 +163,13 @@ app.use('/data', function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  console.error(err.toString());
   let statusCode = err.statusCode || 500;
   // wrap strings in a json
   if (typeof err === 'string' || err instanceof String) {
     err = {'error': err};
+    console.error(err)
+  } else {
+    console.error(err.error || err.message || err.toString());
   }
   res.status(statusCode).json(err);
 });
