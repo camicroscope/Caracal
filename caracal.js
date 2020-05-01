@@ -38,6 +38,8 @@ app.use(function(req, res, next) {
 // auth related services
 app.get('/auth/Token/check', auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFunction));
 app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction));
+app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
+
 
 // public files, don't use login handler here
 app.use(express.static('static'));
@@ -161,11 +163,13 @@ app.use('/data', function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  console.error(JSON.stringify(err));
   let statusCode = err.statusCode || 500;
   // wrap strings in a json
   if (typeof err === 'string' || err instanceof String) {
     err = {'error': err};
+    console.error(err)
+  } else {
+    console.error(err.error || err.message || err.toString());
   }
   res.status(statusCode).json(err);
 });

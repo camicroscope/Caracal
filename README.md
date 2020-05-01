@@ -30,6 +30,7 @@ Conslidated Backend, Auth, and Security Services
 |MONGO_URI | mongo connection uri | mongodb://localhost |
 |MONGO_DB | mongo db to use, default camic |
 |GENERATE_KEY_IF_MISSING | automatic generate key in server in not found | false |
+|ENABLE_SECURITY_AT| time at which to enable security; [see parsable times](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse)| (not active) |
 
 ## files used
 key/key and key/key.pub are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own

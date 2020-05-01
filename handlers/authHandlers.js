@@ -9,14 +9,16 @@ const {execSync} = require('child_process');
 const preCommand = "openssl req -subj ";
 const postCommand = " -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
 var JWK_URL = process.env.JWK_URL;
-var DISABLE_SEC = process.env.DISABLE_SEC || false;
+var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 var AUD = process.env.AUD || false;
 var ISS = process.env.ISS || false;
 var EXPIRY = process.env.EXPIRY || '1d';
 var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || 'Null';
 var PUBKEY;
 var PRIKEY;
-var GENERATE_KEY_IF_MISSING = process.env.GENERATE_KEY_IF_MISSING || false;
+var CLIENT;
+var GENERATE_KEY_IF_MISSING = (process.env.GENERATE_KEY_IF_MISSING === 'true') || false;
+var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") || false;
 
 if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE_KEY_IF_MISSING) {
   try {
@@ -31,7 +33,7 @@ try {
   if (fs.existsSync(prikeyPath)) {
     PRIKEY = fs.readFileSync(prikeyPath, 'utf8');
   } else {
-    if (DISABLE_SEC) {
+    if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PRIKEY = '';
       console.warn('prikey null since DISABLE_SEC and no prikey provided');
     } else {
@@ -47,7 +49,7 @@ try {
   if (fs.existsSync(prikeyPath)) {
     var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
   } else {
-    if (DISABLE_SEC) {
+    if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PUBKEY = '';
       console.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
@@ -57,18 +59,20 @@ try {
 } catch (err) {
   console.error(err);
 }
+
 if (DISABLE_SEC && !JWK_URL) {
-  var CLIENT = jwksClient({
+  CLIENT = jwksClient({
     jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', // a default value
   });
 } else if (JWK_URL) {
-  var CLIENT = jwksClient({
+  CLIENT = jwksClient({
     jwksUri: JWK_URL,
   });
 } else {
   console.error('need JWKS URL (JWK_URL)');
   process.exit(1);
-}
+}  
+
 const getToken = function(req) {
   if (req.headers.authorization &&
     req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
@@ -168,7 +172,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
 
 function loginHandler(checkKey) {
   return function(req, res, next) {
-    if (DISABLE_SEC) {
+    if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       let token = jwt.decode(getToken(req)) || {};
       req.tokenInfo = token;
       req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
@@ -240,12 +244,28 @@ function editHandler(dataField, filterField, attrField) {
   };
 }
 
+function firstSetupUserSignupExists() {
+  return function(req, res) {
+    if (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
+      res.send({
+        'exists': true,
+      });
+    } else {
+      res.send({
+        'exists': false,
+      });
+    }
+  };
+}
+
+
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;
 auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
 auth.loginHandler = loginHandler;
 auth.editHandler = editHandler;
+auth.firstSetupUserSignupExists = firstSetupUserSignupExists;
 auth.CLIENT = CLIENT;
 auth.PRIKEY = PRIKEY;
 auth.PUBKEY = PUBKEY;

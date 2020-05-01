@@ -2,7 +2,8 @@ var mongo = require('mongodb');
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var MONGO_DB = process.env.MONGO_DB || 'camic';
-var DISABLE_SEC = process.env.DISABLE_SEC || false;
+var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
+
 
 function mongoFind(collection, query) {
   return new Promise(function(res, rej) {
