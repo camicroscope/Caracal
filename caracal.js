@@ -12,6 +12,7 @@ const iipHandler = require('./handlers/iipHandler.js');
 const loaderHandler = require('./handlers/loaderHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
+const sanitizeBody = require('./handlers/sanitizeHandler.js')
 // TODO validation of data
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -57,6 +58,8 @@ app.use('/loader/', loaderHandler);
 
 // data, mongo
 app.use('/data', auth.loginHandler(auth.PUBKEY));
+// sanitize
+app.use("/data", sanitizeBody)
 // slide
 app.get('/data/Slide/find', dataHandlers.Slide.find);
 app.get('/data/Slide/find', auth.filterHandler('data', 'userFilter', 'filter'));
