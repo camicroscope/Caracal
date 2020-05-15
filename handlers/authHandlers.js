@@ -71,7 +71,7 @@ if (DISABLE_SEC && !JWK_URL) {
 } else {
   console.error('need JWKS URL (JWK_URL)');
   process.exit(1);
-}  
+}
 
 const getToken = function(req) {
   if (req.headers.authorization &&
