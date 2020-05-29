@@ -173,7 +173,12 @@ function tokenTrade(checkKey, signKey, userFunction) {
 function loginHandler(checkKey) {
   return function(req, res, next) {
     if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
-      let token = jwt.decode(getToken(req)) || {};
+      let token = {};
+      try {
+        token = jwt.decode(getToken(req)) || {};
+      } catch (e) {
+        console.warn(e);
+      }
       req.tokenInfo = token;
       req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
       req.userFilter = token.userFilter || ['Public'];
