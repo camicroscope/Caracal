@@ -1,4 +1,7 @@
 FROM node:12-alpine
+RUN apk add build-base python3-dev py3-pip jpeg-dev zlib-dev
+ENV LIBRARY_PATH=/lib:/usr/lib
+RUN pip3 install Pillow numpy
 RUN apk add git
 RUN mkdir /root/src
 COPY . /root/src

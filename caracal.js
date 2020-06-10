@@ -1,9 +1,16 @@
 const express = require('express');
+const morgan = require('morgan');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
 var proxy = require('http-proxy-middleware');
 const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
+
+// Workbench Utilities
+const datasetGen = require('./workbench-utils/dataSetGen.js');
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
@@ -23,6 +30,32 @@ var PORT = process.env.PORT || 4010;
 const app = express();
 app.use(cookieParser());
 
+app.use(
+    fileUpload({
+      createParentPath: true,
+    }),
+);
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(morgan('dev'));
+
+// Development-workbench utils
+app.post('/workbench/getLabelsZip', permissionHandler(['Admin', 'Editor']));
+app.post('/workbench/getLabelsZip', datasetGen.getZip);
+app.post('/workbench/getLabelsZips', permissionHandler(['Admin', 'Editor']));
+app.post('/workbench/getLabelsZips', datasetGen.getMultipleZips);
+app.post('/workbench/deleteDataset', permissionHandler(['Admin', 'Editor']));
+app.post('/workbench/deleteDataset', datasetGen.deleteDataset );
+app.post('/workbench/deleteUnselected', permissionHandler(['Admin', 'Editor']));
+app.post('/workbench/deleteUnselected', datasetGen.deleteUnselectedLabels );
+app.post('/workbench/generateSprite', permissionHandler(['Admin', 'Editor']));
+app.post('/workbench/generateSprite', function(req, res) {
+  datasetGen.generateSpritesheet(req, res);
+  app.get('/download/dataset.zip', (req, res) => res.download('./workbench-utils/dataset.zip'));
+} );
+
+
 // handle non-json raw body for post
 app.use(function(req, res, next) {
   var data = '';
@@ -35,6 +68,7 @@ app.use(function(req, res, next) {
     next();
   });
 });
+
 
 // auth related services
 app.get('/auth/Token/check', auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFunction));
@@ -155,6 +189,7 @@ app.delete('/data/user/delete', dataHandlers.User.delete);
 app.post('/data/User/update', permissionHandler(['Admin']));
 app.post('/data/User/update', dataHandlers.User.update);
 app.get('/data/User/wcido', dataHandlers.User.wcido);
+
 
 // render mongo returns/data
 app.use('/data', function(req, res, next) {
