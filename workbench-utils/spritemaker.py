@@ -80,7 +80,7 @@ for idx in p:
 # Save answers file (Y)
 newFile = open("./workbench-utils/dataset/labels.bin", "wb")
 newFileByteArray = bytearray(one_hot_y)
-bytesWritte = newFile.write(newFileByteArray)
+bytesWritte = newFile.write(newFileByteArray)s
 # should be num classes * original answer key size
 assert bytesWritte == ((len(sys.argv)-1) * len(y_data))
 
