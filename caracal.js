@@ -54,7 +54,7 @@ app.post('/workbench/generateSprite', function(req, res) {
   datasetGen.generateSpritesheet(req, res);
   app.get('/download/dataset.zip', (req, res) => res.download('./workbench-utils/dataset.zip'));
 } );
-
+a
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
