@@ -5,8 +5,8 @@ const csv = require('csv-parser');
 const AdmZip = require('adm-zip');
 const crypto = require('crypto');
 const del = require('del');
-var zip1 = require('cross-zip');
-const {isIP} = require('net');
+// var zip1 = require('cross-zip');
+// const {isIP} = require('net');
 // const {PythonShell} = require('python-shell');
 
 let Promises = [];
