@@ -1,10 +1,12 @@
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
-const csv = require('csv-parser');
+// const csv = require('csv-parser');
+const csv = require('csvtojson');
 const AdmZip = require('adm-zip');
 const crypto = require('crypto');
 const del = require('del');
+const extract = require('extract-zip');
 // var zip1 = require('cross-zip');
 // const {isIP} = require('net');
 // const {PythonShell} = require('python-shell');
@@ -37,15 +39,15 @@ let getMultipleZips = async function(req, res) {
 
         // move zip to uploads directory
         zip
-            .mv('./uploads/' + zip.name)
+            .mv('./workbench-utils/uploads/' + zip.name)
             .then(async function() {
               new Promise(async function(resolve, reject) {
-                await unzipUploads(fileNames);
+                await unzipUpload(zip.name);
                 resolve('Extracted');
               })
                   .then(async (resolve) => {
                     console.log(resolve);
-                    let location = './uploads/' + zip.name;
+                    let location = './workbench-utils/uploads/' + zip.name;
                     console.log(location);
                     // deleteFile(location);
                     await readCSV(location.slice(0, -4), res);
@@ -93,15 +95,15 @@ let getZip = async function(req, res) {
       let zip = req.files.zips;
       fileNames.push(zip.name);
       zip
-          .mv('./uploads/' + zip.name)
+          .mv('./workbench-utils/uploads/' + zip.name)
           .then(function() {
             new Promise(function(resolve, reject) {
-              unzipUploads(fileNames);
+              unzipUpload(fileNames[0]);
               resolve('Extracted');
             })
                 .then((resolve) => {
                   console.log(resolve);
-                  readCSV('./uploads/' + fileNames[0].slice(0, -4), res);
+                  readCSV('./workbench-utils/uploads/' + fileNames[0].slice(0, -4), res);
                 })
                 .catch((error) => {
                   console.log(error);
@@ -181,14 +183,14 @@ let generateSpritesheet = async function(req, res) {
 
 async function createDatasetZip(res) {
   let zip = new AdmZip();
-  zip.addLocalFile('./workbench-utils/dataset/labels.bin');
-  zip.addLocalFile('./workbench-utils/dataset/data.jpg');
-  // zip.addLocalFolder('./workbench-utils/dataset');
+  // zip.addLocalFile('./workbench-utils/dataset/labels.bin');
+  // zip.addLocalFile('./workbench-utils/dataset/data.jpg');
+  zip.addLocalFolder('./workbench-utils/dataset');
   await zip.writeZip('./workbench-utils/dataset.zip');
   // var inPath = path.join(__dirname, 'workbench-utils/dataset'); // folder to zip
   // var outPath = path.join(__dirname, 'myFile.zip');
   // zip1.zipSync(inPath, outPath);
-  deleteFolder(['./workbench-utils/dataset']);
+  // deleteFolder(['./workbench-utils/dataset']);
   res.send({
     status: 'done',
     message: 'sprite zip ready',
@@ -219,11 +221,6 @@ function makeSpritesheet(files, res) {
 
     createDatasetZip(res);
   });
-  // PythonShell.run('./workbench-utils/spritemaker.py', null, function(err, results) {
-  //   if (err) throw err;
-  //   console.log('finished');
-  //   console.log('results: %j', results);
-  // });
 }
 
 // Check if all the zip files are processed and dataset folder has been organized
@@ -236,7 +233,7 @@ function checkCompletion(res) {
     PromiseCount++;
     if (PromiseCount == zipCount) {
       console.log('END');
-      deleteFolder(['./uploads']);
+      deleteFolder(['./workbench-utils/uploads']);
       fs.readdir('./workbench-utils/dataset', (err, files) => {
         for (i = 0; i <= files.length; i++) {
           if (i != files.length) {
@@ -269,16 +266,14 @@ function checkCompletion(res) {
 
 function organizeDataFolder(location, CSVrows, res) {
   let dir = './workbench-utils/dataset';
-  let dir1 = './workbench-utils/dataset1';
-
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
-    fs.mkdirSync(dir1);
   }
   for (i = 0; i <= CSVrows.length; i++) {
     if (i != CSVrows.length) {
       if (CSVrows[i].note != '') {
         let dir = './workbench-utils/dataset/' + CSVrows[i].note;
+        console.log('DDIIRR::' + dir);
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir);
         }
@@ -290,7 +285,12 @@ function organizeDataFolder(location, CSVrows, res) {
             new Promise(function(resolve, reject) {
               fs.rename(oldPath, newPath, function(err) {
                 if (err) throw err;
-                console.log('Successfully renamed - AKA moved!: ' + oldPath);
+                console.log(
+                    'Successfully renamed - AKA moved!: ' +
+                  oldPath +
+                  '  TOOO  ' +
+                  newPath,
+                );
                 resolve('moved: ' + oldPath);
               });
             }),
@@ -304,27 +304,34 @@ function organizeDataFolder(location, CSVrows, res) {
 
 function readCSV(location, res) {
   let CSVrows = [];
-  fs.createReadStream(location + '/patches.csv')
-      .pipe(csv())
-      .on('data', (row) => {
-        CSVrows.push(row);
-      })
-      .on('end', () => {
-      // console.log(CSVrows);
-        console.log('CSV file successfully processed');
-        organizeDataFolder(location, CSVrows, res);
-      // deleteFile(location + '.zip');
+  // console.log('LOCCC:'+location);
+
+  let converter = csv()
+      .fromFile(location + '/patches.csv')
+      .then((json) => {
+      // CSVrows = json;
+        for (i = 0; i < json.length; i++) {
+          console.log(location + ' ::  ' + json[i].note);
+        }
+        organizeDataFolder(location, json, res);
       });
 }
 
-function unzipUploads(fileNames) {
-  let zip;
-  for (i = 0; i < fileNames.length; i++) {
-    zip = new AdmZip('./uploads/' + fileNames[i]);
-    zip.extractAllTo(
-        './uploads/' + fileNames[i].slice(0, -4),
-        /* overwrite*/ true,
-    );
+
+async function unzipUpload(fileName) {
+  // let zip = '';
+  // zip=new AdmZip('./uploads/' + fileName);
+  // zip.extractAllTo(
+  //     './uploads/' + fileName.slice(0, -4),
+  //     /* overwrite*/ true,
+  // );
+  try {
+    await extract(__dirname + '/uploads/' + fileName, {
+      dir: __dirname + '/uploads/' + fileName.slice(0, -4),
+    });
+    console.log('Extraction complete');
+  } catch (err) {
+    console.log(err);
   }
 }
 
