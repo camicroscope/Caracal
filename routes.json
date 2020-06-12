@@ -33,7 +33,7 @@
     "route": "/img/IIP/raw/",
     "handlers":[
       {"function": "loginHandler", "args":[]},
-      {"function":"proxyHandler", "args": ["http://ca-iip/", 3]}
+      {"function":"iipHandler", "args": []}
     ]
   },
 
