@@ -43,37 +43,41 @@ app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunct
 app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
 
 var HANDLERS = {
-  "loginHandler":function(){return auth.loginHandler(auth.PUBKEY)},
-  "sanitizeBody":function(){return sanitizeBody},
-  "mongoFind":dataHandlers.General.find,
-  "mongoAdd":dataHandlers.General.add,
-  "mongoUpdate":dataHandlers.General.update,
-  "mongoDelete":dataHandlers.General.delete,
-  "mongoDistinct":dataHandlers.General.distinct,
-  "filterHandler":auth.filterHandler,
-  "permissionHandler":permissionHandler,
-  "editHandler":auth.editHandler
-}
+  "loginHandler": function() {
+    return auth.loginHandler(auth.PUBKEY);
+  },
+  "sanitizeBody": function() {
+    return sanitizeBody;
+  },
+  "mongoFind": dataHandlers.General.find,
+  "mongoAdd": dataHandlers.General.add,
+  "mongoUpdate": dataHandlers.General.update,
+  "mongoDelete": dataHandlers.General.delete,
+  "mongoDistinct": dataHandlers.General.distinct,
+  "filterHandler": auth.filterHandler,
+  "permissionHandler": permissionHandler,
+  "editHandler": auth.editHandler,
+};
 
 // register configurable services
 // TODO verify all
-for (let i in routeConfig){
-  let rule = routeConfig[i]
-  // rule needs "method"
-  if (rule.method == 'static'){
-    // static needs "use"
-    console.log("static?")
-    console.log(rule)
-    app.use(express.static(rule.use));
-  } else {
-    for (let j in rule.handlers){
-      let handler = rule.handlers[j]
-      console.log(rule.method)
-      console.log(rule)
-      // rule needs "route"
-      // handler needs "function" and "args"
-      // handler.function needs to be in handlers
-      app[rule.method](rule.route, HANDLERS[handler.function](...handler.args))
+for (let i in routeConfig) {
+  if (Object.prototype.hasOwnProperty.call(routeConfig, i)) {
+    let rule = routeConfig[i];
+    // rule needs "method"
+    if (rule.method == 'static') {
+      // static needs "use"
+      app.use(express.static(rule.use));
+    } else {
+      for (let j in rule.handlers) {
+        if (Object.prototype.hasOwnProperty.call(rule.handlers, j)) {
+          let handler = rule.handlers[j];
+          // rule needs "route"
+          // handler needs "function" and "args"
+          // handler.function needs to be in handlers
+          app[rule.method](rule.route, HANDLERS[handler.function](...handler.args));
+        }
+      }
     }
   }
 }

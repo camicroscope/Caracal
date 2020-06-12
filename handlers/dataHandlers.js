@@ -145,7 +145,7 @@ function mongoUpdate(database, collection, query, newVals) {
 }
 
 var General = {};
-General.find = function(db, collection){
+General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
@@ -154,9 +154,9 @@ General.find = function(db, collection){
       next();
     }).catch((e) => next(e));
   };
-}
+};
 
-General.get = function(db, collection){
+General.get = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
@@ -165,9 +165,9 @@ General.get = function(db, collection){
       next();
     }).catch((e) => next(e));
   };
-}
+};
 
-General.distinct = function(db, collection, upon){
+General.distinct = function(db, collection, upon) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
@@ -176,9 +176,9 @@ General.distinct = function(db, collection, upon){
       next();
     }).catch((e) => next(e));
   };
-}
+};
 
-General.add = function(db, collection){
+General.add = function(db, collection) {
   return function(req, res, next) {
     var data = JSON.parse(req.body);
     mongoAdd(db, collection, data).then((x) => {
@@ -186,9 +186,9 @@ General.add = function(db, collection){
       next();
     }).catch((e) => next(e));
   };
-}
+};
 
-General.update = function(db, collection){
+General.update = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
@@ -200,9 +200,9 @@ General.update = function(db, collection){
       next();
     }).catch((e) => next(e));
   };
-}
+};
 
-General.delete = function(db, collection){
+General.delete = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
@@ -211,7 +211,7 @@ General.delete = function(db, collection){
       next();
     }).catch((e) => next(e));
   };
-}
+};
 
 var Slide = {};
 Slide.find = function(req, res, next) {
