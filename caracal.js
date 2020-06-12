@@ -57,6 +57,7 @@ var HANDLERS = {
 
 // register configurable services
 // TODO verify all
+console.log(routeConfig)
 for (let rule in routeConfig){
   // rule needs "method"
   if (rule.method == 'static'){
