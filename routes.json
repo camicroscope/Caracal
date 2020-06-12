@@ -111,7 +111,7 @@
     ]
   },{
     "route":"/data/Mark/multi",
-    "method":"post",
+    "method":"get",
     "handlers":[
       {"function":"markMulti", "args": []}
     ]
