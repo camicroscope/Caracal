@@ -310,7 +310,7 @@
     ]
   },{
     "route":"/data/User/wcido",
-    "method":"post",
+    "method":"get",
     "handlers":[
       {"function":"wcido", "args": []}
     ]
