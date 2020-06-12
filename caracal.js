@@ -57,8 +57,8 @@ var HANDLERS = {
 
 // register configurable services
 // TODO verify all
-for (let rule in routeConfig){
-  console.log(rule)
+for (let i in routeConfig){
+  let rule = routeConfig[i]
   // rule needs "method"
   if (rule.method == 'static'){
     // static needs "use"
@@ -66,7 +66,8 @@ for (let rule in routeConfig){
     console.log(rule)
     app.use(express.static(rule.use));
   } else {
-    for (let handler in rule.handlers){
+    for (let j in rule.handlers){
+      let handler = rule.handlers[j]
       console.log(rule.method)
       console.log(rule)
       // rule needs "route"
