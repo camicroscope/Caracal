@@ -59,7 +59,7 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
-  "iipHandler": : function() {
+  "iipHandler": function() {
     return iipHandler;
   },
   "markMulti": function() {
