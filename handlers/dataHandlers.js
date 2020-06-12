@@ -240,6 +240,7 @@ Mark.spatial = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
 Mark.multi = function(req, res, next) {
   var query = req.query;
   if (query.nameList) {
@@ -271,6 +272,7 @@ Mark.multi = function(req, res, next) {
       $lt: req.query.footprint,
     };
   }
+  console.log(query)
   mongoFind('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
