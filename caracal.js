@@ -69,18 +69,18 @@ var HANDLERS = {
   "filterHandler": auth.filterHandler,
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
-  "markMulti": function(){
-    return dataHandlers.Mark.multi
+  "markMulti": function() {
+    return dataHandlers.Mark.multi;
   },
-  "markSpatial": function(){
-    return dataHandlers.Mark.spatial
+  "markSpatial": function() {
+    return dataHandlers.Mark.spatial;
   },
-  "heatmapTypes": function(){
-    return dataHandlers.Heatmap.types
+  "heatmapTypes": function() {
+    return dataHandlers.Heatmap.types;
   },
-  "wcido": function(){
-    return dataHandlers.User.wcido
-  }
+  "wcido": function() {
+    return dataHandlers.User.wcido;
+  },
 };
 
 // register configurable services
