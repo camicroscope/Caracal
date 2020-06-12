@@ -53,6 +53,7 @@ app.use('/loader/', permissionHandler(['Admin', 'Editor']));
 app.use('/loader/slide/delete', permissionHandler(['Admin']));
 app.use('/loader/', loaderHandler);
 
+// TODO way to populate this semi-automatically?
 var HANDLERS = {
   "loginHandler": function() {
     return auth.loginHandler(auth.PUBKEY);

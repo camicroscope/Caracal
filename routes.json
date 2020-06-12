@@ -105,7 +105,7 @@
     ]
   },{
     "route":"/data/Mark/types",
-    "method":"post",
+    "method":"get",
     "handlers":[
       {"function":"mongoDistinct", "args": ["camic", "mark", "provenance.analysis"]}
     ]
@@ -160,7 +160,7 @@
     ]
   },{
     "route":"/data/Heatmap/types",
-    "method":"post",
+    "method":"get",
     "handlers":[
       {"function":"heatmapTypes", "args": []}
     ]
