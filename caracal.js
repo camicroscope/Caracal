@@ -42,6 +42,17 @@ app.get('/auth/Token/check', auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFu
 app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction));
 app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
 
+// TODO replace these too
+// iip, proxy
+app.use('/img/IIP/raw/', auth.loginHandler(auth.PUBKEY));
+app.use('/img/IIP/raw/', iipHandler);
+
+// loader, proxy
+app.use('/loader/', auth.loginHandler(auth.PUBKEY));
+app.use('/loader/', permissionHandler(['Admin', 'Editor']));
+app.use('/loader/slide/delete', permissionHandler(['Admin']));
+app.use('/loader/', loaderHandler);
+
 var HANDLERS = {
   "loginHandler": function() {
     return auth.loginHandler(auth.PUBKEY);
@@ -57,6 +68,18 @@ var HANDLERS = {
   "filterHandler": auth.filterHandler,
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
+  "markMulti": function(){
+    return dataHandlers.Mark.multi
+  },
+  "markSpatial": function(){
+    return dataHandlers.Mark.multi
+  },
+  "heatmapTypes": function(){
+    return dataHandlers.Heatmap.types
+  },
+  "wcido": function(){
+    return dataHandlers.User.wcido
+  }
 };
 
 // register configurable services
