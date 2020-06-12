@@ -1,0 +1,48 @@
+[
+  {
+    "method":"static",
+    "use":"static"
+  },{
+    "method":"static",
+    "use":"camicroscope"
+  },{
+    "route":"/data",
+    "method":"use",
+    "handlers":[
+      {"function":"loginHandler", "args": []},
+      {"function":"sanitizeBody", "args": []}
+    ]
+  },{
+    "route":"/data/Slide/find",
+    "method":"get",
+    "handlers":[
+      {"function":"mongoFind", "args": ["camic", "slide"]},
+      {"function":"filterHandler", "args": ["data", "userFilter", "filter"]}
+    ]
+  },{
+    "route":"/data/Slide/post",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"mongoAdd", "args": ["camic", "slide"]}
+    ]
+  },{
+    "route":"/data/Slide/delete",
+    "method":"delete",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin"]]},
+      {"function":"mongoFind", "args": ["camic", "slide"]},
+      {"function":"editHandler", "args": ["data", "userFilter", "filter"]},
+      {"function":"mongoDelete", "args": ["camic", "slide"]}
+    ]
+  },{
+    "route":"/data/Slide/update",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin"]]},
+      {"function":"mongoFind", "args": ["camic", "slide"]},
+      {"function":"editHandler", "args": ["data", "userFilter", "filter"]},
+      {"function":"mongoUpdate", "args": ["camic", "slide"]}
+    ]
+  }
+]
