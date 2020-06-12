@@ -5,7 +5,39 @@
   },{
     "method":"static",
     "use":"camicroscope"
+  },
+
+  {
+    "method":"use",
+    "route": "/loader/",
+    "handlers":[
+      {"function": "loginHandler", "args":[]},
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]}
+    ]
   },{
+    "method":"use",
+    "route": "/loader/slide/delete",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin"]]}
+    ]
+  },{
+    "method":"use",
+    "route": "/loader/",
+    "handlers":[
+      {"function":"proxyHandler", "args": ["http://ca-load:4000/"]}
+    ]
+  },
+
+  {
+    "method":"use",
+    "route": "/img/IIP/raw/",
+    "handlers":[
+      {"function": "loginHandler", "args":[]},
+      {"function":"proxyHandler", "args": ["http://ca-iip/"]}
+    ]
+  },
+
+  {
     "route":"/data",
     "method":"use",
     "handlers":[

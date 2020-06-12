@@ -10,7 +10,7 @@ var routeConfig = require("./routes.json");
 const auth = require('./handlers/authHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
 const iipHandler = require('./handlers/iipHandler.js');
-const loaderHandler = require('./handlers/loaderHandler.js');
+const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
@@ -42,17 +42,6 @@ app.get('/auth/Token/check', auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFu
 app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction));
 app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
 
-// TODO replace these too
-// iip, proxy
-app.use('/img/IIP/raw/', auth.loginHandler(auth.PUBKEY));
-app.use('/img/IIP/raw/', iipHandler);
-
-// loader, proxy
-app.use('/loader/', auth.loginHandler(auth.PUBKEY));
-app.use('/loader/', permissionHandler(['Admin', 'Editor']));
-app.use('/loader/slide/delete', permissionHandler(['Admin']));
-app.use('/loader/', loaderHandler);
-
 // TODO way to populate this semi-automatically?
 var HANDLERS = {
   "loginHandler": function() {
@@ -69,6 +58,7 @@ var HANDLERS = {
   "filterHandler": auth.filterHandler,
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
+  "proxyHandler": proxyHandler,
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },
