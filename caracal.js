@@ -61,9 +61,13 @@ for (let rule in routeConfig){
   // rule needs "method"
   if (rule.method == 'static'){
     // static needs "use"
+    console.log("static?")
+    console.log(rule)
     app.use(express.static(rule.use));
   } else {
     for (let handler in rule.handlers){
+      console.log(rule.method)
+      console.log(rule)
       // rule needs "route"
       // handler needs "function" and "args"
       // handler.function needs to be in handlers
