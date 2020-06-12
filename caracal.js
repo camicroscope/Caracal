@@ -73,7 +73,7 @@ var HANDLERS = {
     return dataHandlers.Mark.multi
   },
   "markSpatial": function(){
-    return dataHandlers.Mark.multi
+    return dataHandlers.Mark.spatial
   },
   "heatmapTypes": function(){
     return dataHandlers.Heatmap.types
