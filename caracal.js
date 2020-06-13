@@ -81,18 +81,35 @@ var HANDLERS = {
 for (let i in routeConfig) {
   if (Object.prototype.hasOwnProperty.call(routeConfig, i)) {
     let rule = routeConfig[i];
-    // rule needs "method"
+    if (!rule.method){
+      console.error('rule number '+ i +' has no "method"');
+      process.exit(1)
+    }
     if (rule.method == 'static') {
-      // static needs "use"
+      if (!rule.use){
+        console.error('rule number '+ i +' is static and has no "use"');
+        process.exit(1)
+      }
       app.use(express.static(rule.use));
     } else {
       for (let j in rule.handlers) {
         if (Object.prototype.hasOwnProperty.call(rule.handlers, j)) {
           let handler = rule.handlers[j];
-          // rule needs "route"
-          // handler needs "function" and "args"
+          if (!rule.route){
+            console.error('rule number '+ i +' has no "route"');
+            process.exit(1)
+          }
+          if (!handler.function){
+            console.error('rule number '+ i +' handler ' + j + ' has no "function"');
+            process.exit(1)
+          }
+          if (handler.function in HANDLERS){
+            console.error('handler named "'+ handler.function + '"not found (rule '+ i +' handler ' + j + ')');
+            process.exit(1)
+          }
+          let args = handler.args || []
           // handler.function needs to be in handlers
-          app[rule.method](rule.route, HANDLERS[handler.function](...handler.args));
+          app[rule.method](rule.route, HANDLERS[handler.function](...args));
         }
       }
     }
