@@ -103,7 +103,7 @@ for (let i in routeConfig) {
             console.error('rule number '+ i +' handler ' + j + ' has no "function"');
             process.exit(1)
           }
-          if (HANDLERS.hasOwnProperty(handler.function)){
+          if (! HANDLERS.hasOwnProperty(handler.function)){
             console.error('handler named "'+ handler.function + '" not found (rule '+ i +' handler ' + j + ')');
             process.exit(1)
           }
