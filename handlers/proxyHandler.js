@@ -1,7 +1,7 @@
 var proxy = require('http-proxy-middleware');
 
-proxyHandler = function(target, n){
-  n = n || 2
+proxyHandler = function(target, n) {
+  n = n || 2;
   return function(req, res, next) {
     proxy({
       secure: false,
@@ -13,8 +13,8 @@ proxyHandler = function(target, n){
       changeOrigin: true,
       target: target,
       pathRewrite: function(path, req) {
-        console.log(target)
-        console.log(path)
+        console.log(target);
+        console.log(path);
         // NOTE -- this may need to change if the original url has more subdirs or so added
         var splitPath = path.split('/');
         return '/' + splitPath.slice(n, splitPath.length).join('/');
