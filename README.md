@@ -8,11 +8,22 @@ Conslidated Backend, Auth, and Security Services
 
 
 ## routes
+The routes.json sets up each route functionally as a list, executed on startup in order.
+Static routes simply describe folders to host statically, and require "method" set to static and "use" to the folder to host.
+Other routes require method to be set to the required supported http method (e.g. get, post), the route prefix as "route", and a list of "handlers"
+Each handler should have args set to the initialization arguments for the handler, and "function" set to the handler's registered name.
+
+Routes are setup in this method primarily so that caMicroscope deployments can be customized, but this means that caracal can be used for entirely different projects.
+
+### Default Route (routes.json) Rationale
 - camicroscope is served as static files on /
 - auth login and check are in /auth/
 - iip images are used within /iip/
 - mongo data interactions are within /data/
 
+
+## Handlers
+Handlers are the specific functions designed for use by routes. They should have pattern `handler(...args) = function(req, res, next)`
 
 ## Environment variables Used
 |variable | Description | default |
@@ -26,11 +37,11 @@ Conslidated Backend, Auth, and Security Services
 |DISABLE_SEC | set truthy to disable permission and login handlers | false |
 |ALLOW_PUBLIC | set truthy to allow public users | false |
 |IIP_PATH | IIP server location | http://ca-iip |
-|LOADER_PATH | loader utility location | http://ca-load/ |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
 |MONGO_DB | mongo db to use, default camic |
 |GENERATE_KEY_IF_MISSING | automatic generate key in server in not found | false |
 |ENABLE_SECURITY_AT| time at which to enable security; [see parsable times](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse)| (not active) |
+
 
 ## files used
 key/key and key/key.pub are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own
