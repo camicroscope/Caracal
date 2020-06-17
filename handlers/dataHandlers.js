@@ -294,7 +294,7 @@ Heatmap.types = function(req, res, next) {
 var User = {};
 
 User.forLogin = function(email) {
-  return mongoFind('user', {'email': email});
+  return mongoFind('camic', 'user', {'email': email});
 };
 
 User.wcido = function(req, res, next) {
