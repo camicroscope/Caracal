@@ -243,6 +243,7 @@ Mark.spatial = function(req, res, next) {
 
 Mark.multi = function(req, res, next) {
   var query = req.query;
+  console.log("before: ", JSON.stringify(query))
   if (query.nameList) {
     query['provenance.analysis.execution_id'] = {
       '$in': JSON.parse(query.nameList),
@@ -272,6 +273,8 @@ Mark.multi = function(req, res, next) {
       $lt: req.query.footprint,
     };
   }
+  delete query.footprint;
+  console.log("after: ", JSON.stringify(query))
   mongoFind('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
