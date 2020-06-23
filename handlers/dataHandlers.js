@@ -221,23 +221,23 @@ Mark.spatial = function(req, res, next) {
   // handle  x0, y0, x1, y1, footprint
   if (req.query.x0 && req.query.x1) {
     query.x = {
-      $gt: parseFloat(req.query.x0),
-      $lt: parseFloat(req.query.x1),
+      '$gt': parseFloat(req.query.x0),
+      '$lt': parseFloat(req.query.x1),
     };
   }
   delete query.x0;
   delete query.x1;
   if (req.query.y0 && req.query.y1) {
     query.y = {
-      $gt: parseFloat(req.query.y0),
-      $lt: parseFloat(req.query.y1),
+      '$gt': parseFloat(req.query.y0),
+      '$lt': parseFloat(req.query.y1),
     };
   }
   delete query.y0;
   delete query.y1;
   if (query.footprint) {
     query.footprint = {
-      $lt: parseFloat(query.footprint),
+      '$gt': parseFloat(query.footprint),
     };
   }
   mongoFind('camic', 'mark', query).then((x) => {
@@ -274,7 +274,7 @@ Mark.multi = function(req, res, next) {
   delete query.y1;
   if (query.footprint) {
     query.footprint = {
-      '$lt': parseFloat(query.footprint),
+      '$gt': parseFloat(query.footprint),
     };
   }
   mongoFind('camic', 'mark', query).then((x) => {
