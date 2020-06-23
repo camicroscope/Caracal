@@ -240,6 +240,7 @@ Mark.spatial = function(req, res, next) {
       $lt: parseFloat(query.footprint),
     };
   }
+  console.log(JSON.stringify(query))
   mongoFind('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
