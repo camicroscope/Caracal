@@ -5,6 +5,7 @@ COPY . /root/src
 WORKDIR /root/src
 RUN npm install
 ARG viewer
-RUN if [ -z ${viewer} ]; then git clone https://github.com/camicroscope/camicroscope.git; else git clone https://github.com/camicroscope/camicroscope.git --branch=$viewer; fi
+ARG fork
+RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
 EXPOSE 8010
 CMD node caracal.js
