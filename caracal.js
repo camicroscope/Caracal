@@ -14,6 +14,8 @@ const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
+const DataSet = require('./handlers/datasetHandler.js');
+const Model = require('./handlers/modelTrainer.js');
 // TODO validation of data
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -23,6 +25,21 @@ var PORT = process.env.PORT || 4010;
 
 const app = express();
 app.use(cookieParser());
+
+app.use(express.json({limit: '100mb'}));
+
+// workbench utilities
+app.post('/workbench/uploadDataset', express.json(), DataSet.getDataset);
+app.post('/workbench/trainModel', express.json(), Model.trainModel);
+app.post('/workbench/deleteUserData', express.json(), DataSet.deleteData);
+app.post('/workbench/modelDownload', express.json(), (req, res) => {
+  let downloadURL = '/workbench/download/' + req.body.userFolder;
+  app.get(downloadURL, (req1, res1) =>
+    res1.download('./dataset/' + req.body.userFolder + '/' + req.body.Params.modelName + '.zip'),
+  );
+  res.json({url: downloadURL});
+});
+
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
