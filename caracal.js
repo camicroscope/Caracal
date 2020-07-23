@@ -26,10 +26,9 @@ var PORT = process.env.PORT || 4010;
 const app = express();
 app.use(cookieParser());
 
-app.use(express.json({limit: '100mb'}));
 
 // workbench utilities
-app.post('/workbench/uploadDataset', express.json(), DataSet.getDataset);
+app.post('/workbench/uploadDataset', express.json({limit: '100mb'}), DataSet.getDataset);
 app.post('/workbench/trainModel', express.json(), Model.trainModel);
 app.post('/workbench/deleteUserData', express.json(), DataSet.deleteData);
 app.post('/workbench/modelDownload', express.json(), (req, res) => {
