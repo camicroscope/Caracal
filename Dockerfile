@@ -1,5 +1,5 @@
 FROM node:14-stretch-slim
-RUN apt-get update  &&  apt-get upgrade -y  &&  apt-get install -y git
+RUN apt-get update  &&  apt-get upgrade -y  &&  apt-get install -y git build-essential python3
 RUN mkdir /root/src
 COPY . /root/src
 WORKDIR /root/src
