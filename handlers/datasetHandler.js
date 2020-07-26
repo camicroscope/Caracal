@@ -10,31 +10,34 @@ const crypto = require("crypto");
 const AdmZip = require('adm-zip');
 const path = require('path');
 
-let LABELS_PATH = '';
-let IMAGES_SPRITE_PATH = '';
+let LABELS_PATH = null;
+let IMAGES_SPRITE_PATH = null;
 
-let datasetImages = [];
 
 class Data {
   constructor() {
-    this.IMAGE_SIZE = 0;
-    this.NUM_CLASSES = 0;
-    this.NUM_TRAIN_ELEMENTS = 0;
-    this.NUM_TEST_ELEMENTS = 0;
+    this.IMAGE_SIZE = null;
+    this.NUM_CLASSES = null;
+    this.NUM_TRAIN_ELEMENTS = null;
+    this.NUM_TEST_ELEMENTS = null;
     this.IMAGES_SPRITE_PATH = IMAGES_SPRITE_PATH;
-    this.NUM_CHANNELS = 0; // 1 for grayscale; 4 for rgba
+    this.NUM_CHANNELS = null; // 1 for grayscale; 4 for rgba
     this.LABELS_PATH = LABELS_PATH;
-    this.shuffledTrainIndex = 0;
-    this.shuffledTestIndex = 0;
+    this.shuffledTrainIndex = null;
+    this.shuffledTestIndex = null;
+    this.datasetImages = null;
+    this.xs = null;
+    this.labels = null;
   }
   async load() {
+    var This = this;
     const imgRequest = new Promise((resolve) => {
       // console.log(this.IMAGES_SPRITE_PATH);
       inkjet.decode(fs.readFileSync(this.IMAGES_SPRITE_PATH), function(err, decoded) {
         const pixels = Float32Array.from(decoded.data).map((pixel) => {
           return pixel / 255;
         });
-        datasetImages = pixels;
+        This.datasetImages = pixels;
         resolve();
       });
     });
@@ -53,11 +56,11 @@ class Data {
     this.testIndices = tf.util.createShuffledIndices(this.NUM_TEST_ELEMENTS);
 
     // Slice the the images and labels into train and test sets.
-    this.trainImages = datasetImages.slice(
+    this.trainImages = this.datasetImages.slice(
         0,
         this.IMAGE_SIZE * this.NUM_TRAIN_ELEMENTS * this.NUM_CHANNELS,
     );
-    this.testImages = datasetImages.slice(
+    this.testImages = this.datasetImages.slice(
         this.IMAGE_SIZE * this.NUM_TRAIN_ELEMENTS * this.NUM_CHANNELS,
     );
     this.trainLabels = this.datasetLabels.slice(
@@ -110,14 +113,13 @@ class Data {
       batchLabelsArray.set(label, i * this.NUM_CLASSES);
     }
 
-    const xs = tf.tensor3d(batchImagesArray, [
+    this.xs = tf.tensor3d(batchImagesArray, [
       batchSize,
       this.IMAGE_SIZE,
       this.NUM_CHANNELS,
     ]);
-    const labels = tf.tensor2d(batchLabelsArray, [batchSize, this.NUM_CLASSES]).toFloat();
-
-    return {xs, labels};
+    this.labels = tf.tensor2d(batchLabelsArray, [batchSize, this.NUM_CLASSES]).toFloat();
+    return {xs: this.xs, labels: this.labels};
   }
 }
 

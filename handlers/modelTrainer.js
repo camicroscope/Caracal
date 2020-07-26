@@ -44,20 +44,20 @@ async function train(model, data, Params) {
   let TEST_DATA_SIZE = Params.testDataSize;
   let WIDTH = Params.width;
   let HEIGHT = Params.height;
-
+  let d1; let d2;
   const [trainXs, trainYs] = tf.tidy(() => {
-    const d = data.nextTrainBatch(TRAIN_DATA_SIZE);
+    d1 = data.nextTrainBatch(TRAIN_DATA_SIZE);
     return [
-      d.xs.reshape([TRAIN_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]),
-      d.labels,
+      d1.xs.reshape([TRAIN_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]),
+      d1.labels,
     ];
   });
 
   const [testXs, testYs] = tf.tidy(() => {
-    const d = data.nextTestBatch(TEST_DATA_SIZE);
+    d2 = data.nextTestBatch(TEST_DATA_SIZE);
     return [
-      d.xs.reshape([TEST_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]),
-      d.labels,
+      d2.xs.reshape([TEST_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]),
+      d2.labels,
     ];
   });
 
@@ -67,41 +67,46 @@ async function train(model, data, Params) {
     epochs: Number(Params.epochs),
     shuffle: Params.shuffle,
     // callbacks: console.log(1),
+  }).then(() => {
+    tf.dispose([trainXs, trainYs, testXs, testYs, d2, d1]);
   });
 }
 
 async function run(Layers, Params, res, userFolder) {
+  let model; let trained; let data;
   try {
-    const data = new Data.Data();
+    data = new Data.Data();
     data.IMAGE_SIZE = Params.height * Params.width;
     data.NUM_CLASSES = Params.numClasses;
     data.NUM_CHANNELS = Params.numChannels;
     data.NUM_TEST_ELEMENTS = Params.testDataSize;
     data.NUM_TRAIN_ELEMENTS = Params.trainDataSize;
-    // console.log(data);
-    try {
-      await data.load();
-      let model = getModel(Layers, Params, res);
-      model.summary();
-      await train(model, data, Params);
-      console.log('TRAINING DONE');
-      await model.save('file://./dataset/' + userFolder + '/');
 
-      let zip = new AdmZip();
-      zip.addLocalFile("./dataset/" + userFolder + '/model.json');
-      zip.addLocalFile("./dataset/" + userFolder + '/weights.bin');
-      zip.writeZip("./dataset/" + userFolder + '/' + Params.modelName +'.zip');
+    await data.load();
 
-      res.json({status: 'done'});
-    } catch (error) {
-      console.log(error);
-      res.status(400).json({message: error.message});
-      // res.send(error);
-    }
+    model = getModel(Layers, Params, res);
+
+    model.summary();
+
+    trained = await train(model, data, Params);
+    console.log('TRAINING DONE');
+
+    await model.save('file://./dataset/' + userFolder + '/');
+
+    tf.dispose([model, trained, data.xs, data.labels]);
+    tf.disposeVariables();
+
+    let zip = new AdmZip();
+    zip.addLocalFile('./dataset/' + userFolder + '/model.json');
+    zip.addLocalFile('./dataset/' + userFolder + '/weights.bin');
+    zip.writeZip('./dataset/' + userFolder + '/' + Params.modelName + '.zip');
+
+    res.json({status: 'done'});
   } catch (error) {
     console.log(error);
+    tf.dispose([model, trained, data.xs, data.labels]);
+    tf.disposeVariables();
     res.status(400).json({message: error.message});
-    // res.send(error);
   }
 }
 
