@@ -30,7 +30,7 @@ class Data {
     this.labels = null;
   }
   async load() {
-    var This = this;
+    let This = this;
     const imgRequest = new Promise((resolve) => {
       // console.log(this.IMAGES_SPRITE_PATH);
       inkjet.decode(fs.readFileSync(this.IMAGES_SPRITE_PATH), function(err, decoded) {
@@ -123,36 +123,42 @@ class Data {
   }
 }
 
-function getDataset(req, res) {
-  // console.log(req.body.ar);
-  let userFolder = crypto.randomBytes(20).toString('hex');
-  if (!fs.existsSync('dataset')) {
-    fs.mkdirSync('dataset/');
-  }
-  fs.mkdirSync('dataset/' + userFolder);
-  fs.writeFile('dataset/' + userFolder + '/dataset.zip', req.body.file,
-      {encoding: 'base64'},
-      async function(err) {
-        let zip = new AdmZip('dataset/' + userFolder + '/dataset.zip');
-        await zip.extractAllTo('dataset/' + userFolder, true);
-        LABELS_PATH = 'dataset/' + userFolder + '/labels.bin';
-        IMAGES_SPRITE_PATH = 'dataset/' + userFolder + '/data.jpg';
-        fs.unlink('dataset/' + userFolder + '/dataset.zip', () => {});
-        res.json({status: 'DONE', userFolder: userFolder});
-      },
-  );
+function getDataset() {
+  return function(req, res) {
+    let data = JSON.parse(req.body);
+    // console.log(req.body.ar);
+    let userFolder = crypto.randomBytes(20).toString('hex');
+    if (!fs.existsSync('dataset')) {
+      fs.mkdirSync('dataset/');
+    }
+    fs.mkdirSync('dataset/' + userFolder);
+    fs.writeFile('dataset/' + userFolder + '/dataset.zip', data.file,
+        {encoding: 'base64'},
+        async function(err) {
+          let zip = new AdmZip('dataset/' + userFolder + '/dataset.zip');
+          await zip.extractAllTo('dataset/' + userFolder, true);
+          LABELS_PATH = 'dataset/' + userFolder + '/labels.bin';
+          IMAGES_SPRITE_PATH = 'dataset/' + userFolder + '/data.jpg';
+          fs.unlink('dataset/' + userFolder + '/dataset.zip', () => {});
+          res.json({status: 'DONE', userFolder: userFolder});
+        },
+    );
+  };
 }
 
-function deleteData(req, res) {
-  let dir = path.normalize(req.body.userFolder).replace(/^(\.\.(\/|\\|$))+/, '');
-  dir = path.join('./dataset/', dir);
-  fs.rmdir(dir, {recursive: true}, (err) => {
-    if (err) {
-      throw err;
-    }
-    console.log(`Temp folder deleted!`);
-  });
-  res.json({status: 'Temp folder deleted!'});
+function deleteData() {
+  return function(req, res) {
+    let data = JSON.parse(req.body);
+    let dir = path.normalize(data.userFolder).replace(/^(\.\.(\/|\\|$))+/, '');
+    dir = path.join('./dataset/', dir);
+    fs.rmdir(dir, {recursive: true}, (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log(`Temp folder deleted!`);
+    });
+    res.json({status: 'Temp folder deleted!'});
+  };
 }
 
 module.exports = {Data: Data, getDataset: getDataset, deleteData: deleteData};

@@ -346,5 +346,29 @@
     "handlers":[
       {"function":"wcido", "args": []}
     ]
+  },{
+    "route":"/workbench/uploadDataset",
+    "method":"post",
+    "handlers":[
+      {"function":"getDataset", "args": []}
+    ]
+  },{
+    "route":"/workbench/trainModel",
+    "method":"post",
+    "handlers":[
+      {"function":"trainModel", "args": []}
+    ]
+  },{
+    "route":"/workbench/deleteUserData",
+    "method":"post",
+    "handlers":[
+      {"function":"deleteDataset", "args": []}
+    ]
+  },{
+    "route":"/workbench/modelDownload",
+    "method":"post",
+    "handlers":[
+      {"function":"sendTrainedModel", "args": []}
+    ]
   }
 ]

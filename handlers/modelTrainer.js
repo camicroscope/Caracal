@@ -164,9 +164,24 @@ function makeLayers(layers, res, userFolder) {
   run(Layers, Params, res, userFolder);
 }
 
-function trainModel(req, res) {
-  Params = req.body.Params;
-  makeLayers(req.body.Layers, res, req.body.userFolder);
+function trainModel() {
+  return function(req, res) {
+    let data = JSON.parse(req.body);
+    Params = data.Params;
+    makeLayers(data.Layers, res, data.userFolder);
+  };
 }
 
-module.exports = {trainModel: trainModel};
+function sendTrainedModel() {
+  return function(req, res) {
+    let data = JSON.parse(req.body);
+    let downloadURL = '/workbench/download/' + data.userFolder;
+    let app = require('../caracal.js');
+    app.get(downloadURL, (req1, res1) =>
+      res1.download('./dataset/' + data.userFolder + '/' + data.Params.modelName + '.zip'),
+    );
+    res.json({url: downloadURL});
+  };
+}
+
+module.exports = {trainModel: trainModel, sendTrainedModel: sendTrainedModel};

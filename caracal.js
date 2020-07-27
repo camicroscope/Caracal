@@ -27,19 +27,6 @@ const app = express();
 app.use(cookieParser());
 
 
-// workbench utilities
-app.post('/workbench/uploadDataset', express.json({limit: '100mb'}), DataSet.getDataset);
-app.post('/workbench/trainModel', express.json(), Model.trainModel);
-app.post('/workbench/deleteUserData', express.json(), DataSet.deleteData);
-app.post('/workbench/modelDownload', express.json(), (req, res) => {
-  let downloadURL = '/workbench/download/' + req.body.userFolder;
-  app.get(downloadURL, (req1, res1) =>
-    res1.download('./dataset/' + req.body.userFolder + '/' + req.body.Params.modelName + '.zip'),
-  );
-  res.json({url: downloadURL});
-});
-
-
 // handle non-json raw body for post
 app.use(function(req, res, next) {
   var data = '';
@@ -75,6 +62,10 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  "getDataset": DataSet.getDataset,
+  "trainModel": Model.trainModel,
+  "deleteDataset": DataSet.deleteData,
+  "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
     return iipHandler;
   },
