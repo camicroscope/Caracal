@@ -14,6 +14,8 @@ const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
+const DataSet = require('./handlers/datasetHandler.js');
+const Model = require('./handlers/modelTrainer.js');
 // TODO validation of data
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -23,6 +25,7 @@ var PORT = process.env.PORT || 4010;
 
 const app = express();
 app.use(cookieParser());
+
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
@@ -59,6 +62,10 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  "getDataset": DataSet.getDataset,
+  "trainModel": Model.trainModel,
+  "deleteDataset": DataSet.deleteData,
+  "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
     return iipHandler;
   },
