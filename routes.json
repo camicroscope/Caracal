@@ -153,8 +153,25 @@
     "handlers":[
       {"function":"markSpatial", "args": []}
     ]
+  },{
+    "route":"/data/PresetLabels/add",
+    "method":"get",
+    "handlers":[
+      {"function":"addPresetLabels", "args": []}
+    ]
+  },{
+    "route":"/data/PresetLabels/update",
+    "method":"get",
+    "handlers":[
+      {"function":"updatePresetLabels", "args": []}
+    ]
+  },{
+    "route":"/data/PresetLabels/remove",
+    "method":"get",
+    "handlers":[
+      {"function":"removePresetLabels", "args": []}
+    ]
   },
-
   {
     "route":"/data/Template/find",
     "method":"get",

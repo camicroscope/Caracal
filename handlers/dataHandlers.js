@@ -219,7 +219,7 @@ PresetLabels.add = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var update = JSON.parse(req.body);
-  mongoUpdate('camic', 'configuration', { 'config_name': 'labels' }, { $push: { configuration: update }}).then((x) => {
+  mongoUpdate('camic', 'configuration', { 'config_name': 'labels'}, { $push:{ configuration: update}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
@@ -252,7 +252,7 @@ PresetLabels.update = function(req, res, next) {
       $unset:{'configuration.$.size':1}
     }
   }
-  mongoUpdate('camic', 'configuration', { 'config_name': 'labels', 'configuration.key': query.key }, newVals).then((x) => {
+  mongoUpdate('camic', 'configuration', {'config_name': 'labels','configuration.key': query.key}, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
@@ -261,8 +261,7 @@ PresetLabels.update = function(req, res, next) {
 PresetLabels.remove = function(req, res, next){
   var query = req.query;
   delete query.token;
-  var update = JSON.parse(req.body);
-  mongoUpdate('camic', 'configuration', { 'config_name': 'labels' }, { $pull: { configuration: update }}).then((x) => {
+  mongoUpdate('camic', 'configuration', {'config_name': 'labels' }, {$pull: {configuration: {key: query.key}}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
