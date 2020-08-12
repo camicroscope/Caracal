@@ -155,19 +155,19 @@
     ]
   },{
     "route":"/data/Presetlabels/add",
-    "method":"get",
+    "method":"post",
     "handlers":[
       {"function":"addPresetlabels", "args": []}
     ]
   },{
     "route":"/data/Presetlabels/update",
-    "method":"get",
+    "method":"post",
     "handlers":[
       {"function":"updatePresetlabels", "args": []}
     ]
   },{
     "route":"/data/PresetLabels/remove",
-    "method":"get",
+    "method":"post",
     "handlers":[
       {"function":"removePresetlabels", "args": []}
     ]
