@@ -154,22 +154,22 @@
       {"function":"markSpatial", "args": []}
     ]
   },{
-    "route":"/data/PresetLabels/add",
+    "route":"/data/Presetlabels/add",
     "method":"get",
     "handlers":[
-      {"function":"addPresetLabels", "args": []}
+      {"function":"addPresetlabels", "args": []}
     ]
   },{
-    "route":"/data/PresetLabels/update",
+    "route":"/data/Presetlabels/update",
     "method":"get",
     "handlers":[
-      {"function":"updatePresetLabels", "args": []}
+      {"function":"updatePresetlabels", "args": []}
     ]
   },{
     "route":"/data/PresetLabels/remove",
     "method":"get",
     "handlers":[
-      {"function":"removePresetLabels", "args": []}
+      {"function":"removePresetlabels", "args": []}
     ]
   },
   {

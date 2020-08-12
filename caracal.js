@@ -81,14 +81,14 @@ var HANDLERS = {
   "wcido": function() {
     return dataHandlers.User.wcido;
   },
-  "addPresetLabels": function() {
-    return dataHandlers.PresetLabels.add;
+  "addPresetlabels": function() {
+    return dataHandlers.Presetlabels.add;
   },
-  "updatePresetLabels": function() {
-    return dataHandlers.PresetLabels.update;
+  "updatePresetlabels": function() {
+    return dataHandlers.Presetlabels.update;
   },
-  "removePresetLabels": function() {
-    return dataHandlers.PresetLabels.remove;
+  "removePresetlabels": function() {
+    return dataHandlers.Presetlabels.remove;
   },  
 };
 

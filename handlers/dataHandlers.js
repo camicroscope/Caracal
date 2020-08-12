@@ -213,9 +213,9 @@ General.delete = function(db, collection) {
   };
 };
 
-var PresetLabels = {};
+var Presetlabels = {};
 // add a label
-PresetLabels.add = function(req, res, next) {
+Presetlabels.add = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var update = JSON.parse(req.body);
@@ -228,7 +228,7 @@ PresetLabels.add = function(req, res, next) {
 }
 
 // update a label
-PresetLabels.update = function(req, res, next) {
+Presetlabels.update = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var update = JSON.parse(req.body);
@@ -263,7 +263,7 @@ PresetLabels.update = function(req, res, next) {
   }).catch((e) => next(e));
 }
 // remove a label by key
-PresetLabels.remove = function(req, res, next){
+Presetlabels.remove = function(req, res, next){
   var query = req.query;
   delete query.token;
   console.log('PresetLabels.remove ----------------')
@@ -401,7 +401,7 @@ dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
-dataHandlers.PresetLabels = PresetLabels;
+dataHandlers.Presetlabels = Presetlabels;
 
 dataHandlers.General = General;
 module.exports = dataHandlers;
