@@ -81,6 +81,15 @@ var HANDLERS = {
   "wcido": function() {
     return dataHandlers.User.wcido;
   },
+  "addPresetLabels": function() {
+    return dataHandlers.PresetLabels.add;
+  },
+  "updatePresetLabels": function() {
+    return dataHandlers.PresetLabels.update;
+  },
+  "removePresetLabels": function() {
+    return dataHandlers.PresetLabels.remove;
+  },  
 };
 
 // register configurable services

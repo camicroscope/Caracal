@@ -213,6 +213,76 @@ General.delete = function(db, collection) {
   };
 };
 
+var PresetLabels ={}
+// add a label
+PresetLabels.add = function(req, res, next){
+    var query = req.query;
+    delete query.token;
+    var update = JSON.parse(req.body)
+    mongoUpdate('camic', 'configuration', {
+      'config_name': 'labels',
+    }, {
+      $push:{
+        configuration: update
+      }
+    }).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+}
+
+// update a label
+PresetLabels.update = function(req, res, next){
+    var query = req.query;
+    delete query.token;
+    var update = JSON.parse(req.body)
+    var newVals; 
+    if(update.size){
+      newVals = {
+        $set: {
+          'configuration.$.key': labels.key,
+          'configuration.$.type': labels.type,
+          'configuration.$.mode': labels.mode,
+          'configuration.$.color': labels.color,
+          'configuration.$.size': labels.size
+        }
+      }
+    }else{
+      newVals = {
+        $set: {
+          'configuration.$.key': labels.key,
+          'configuration.$.type': labels.type,
+          'configuration.$.color': labels.color,
+          'configuration.$.mode': labels.mode          
+        },
+        $unset:{'configuration.$.size':1}
+      }
+    }
+    mongoUpdate('camic', 'configuration', {
+      'config_name': 'labels',
+      'configuration.key': query.key
+    }, newVals).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+}
+// remove a label by key
+PresetLabels.remove = function(req, res, next){
+    var query = req.query;
+    delete query.token;
+    var update = JSON.parse(req.body)
+    mongoUpdate('camic', 'configuration', {
+      'config_name': 'labels',
+    }, {
+      $pull:{
+        configuration: update
+      }
+    }).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+}
+
 var Mark = {};
 // special routes
 Mark.spatial = function(req, res, next) {
@@ -340,5 +410,7 @@ dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
+dataHandlers.PresetLabels = PresetLabels;
+
 dataHandlers.General = General;
 module.exports = dataHandlers;
