@@ -166,7 +166,7 @@
       {"function":"updatePresetlabels", "args": []}
     ]
   },{
-    "route":"/data/PresetLabels/remove",
+    "route":"/data/Presetlabels/remove",
     "method":"post",
     "handlers":[
       {"function":"removePresetlabels", "args": []}

@@ -231,7 +231,7 @@ Presetlabels.add = function(req, res, next) {
 Presetlabels.update = function(req, res, next) {
   var query = req.query;
   delete query.token;
-  var update = JSON.parse(req.body);
+  var labels = JSON.parse(req.body);
   console.log('PresetLabels.update ----------------')
   console.log(query)
   console.log(update)
