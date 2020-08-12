@@ -219,6 +219,8 @@ PresetLabels.add = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var update = JSON.parse(req.body);
+  console.log('PresetLabels.add ----------------')
+  console.log(update)
   mongoUpdate('camic', 'configuration', { 'config_name': 'labels'}, { $push:{ configuration: update}}).then((x) => {
     req.data = x;
     next();
@@ -230,6 +232,9 @@ PresetLabels.update = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var update = JSON.parse(req.body);
+  console.log('PresetLabels.update ----------------')
+  console.log(query)
+  console.log(update)
   var newVals; 
   if(update.size){
     newVals = {
@@ -261,6 +266,8 @@ PresetLabels.update = function(req, res, next) {
 PresetLabels.remove = function(req, res, next){
   var query = req.query;
   delete query.token;
+  console.log('PresetLabels.remove ----------------')
+  console.log(query)
   mongoUpdate('camic', 'configuration', {'config_name': 'labels' }, {$pull: {configuration: {key: query.key}}}).then((x) => {
     req.data = x;
     next();
