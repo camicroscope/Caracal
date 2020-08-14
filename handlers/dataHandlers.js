@@ -219,53 +219,53 @@ Presetlabels.add = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var labels = JSON.parse(req.body);
-  mongoUpdate('camic', 'configuration', { 'config_name': 'labels'}, { $push:{ configuration: labels}}).then((x) => {
+  mongoUpdate('camic', 'configuration', {'config_name': 'labels'}, {$push: {configuration: labels}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
-}
+};
 
 // update a label
 Presetlabels.update = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var labels = JSON.parse(req.body);
-  var newVals; 
-  if(labels.size){
+  var newVals;
+  if (labels.size) {
     newVals = {
       $set: {
         'configuration.$.key': labels.key,
         'configuration.$.type': labels.type,
         'configuration.$.mode': labels.mode,
         'configuration.$.color': labels.color,
-        'configuration.$.size': labels.size
-      }
-    }
-  }else{
+        'configuration.$.size': labels.size,
+      },
+    };
+  } else {
     newVals = {
       $set: {
         'configuration.$.key': labels.key,
         'configuration.$.type': labels.type,
         'configuration.$.color': labels.color,
-        'configuration.$.mode': labels.mode          
+        'configuration.$.mode': labels.mode,
       },
-      $unset:{'configuration.$.size':1}
-    }
+      $unset: {'configuration.$.size': 1},
+    };
   }
-  mongoUpdate('camic', 'configuration', {'config_name': 'labels','configuration.key': query.key}, newVals).then((x) => {
+  mongoUpdate('camic', 'configuration', {'config_name': 'labels', 'configuration.key': query.key}, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
-}
+};
 // remove a label by key
-Presetlabels.remove = function(req, res, next){
+Presetlabels.remove = function(req, res, next) {
   var query = req.query;
   delete query.token;
-  mongoUpdate('camic', 'configuration', {'config_name': 'labels' }, {$pull: {configuration: {key: query.key}}}).then((x) => {
+  mongoUpdate('camic', 'configuration', {'config_name': 'labels'}, {$pull: {configuration: {key: query.key}}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
-}
+};
 
 var Mark = {};
 // special routes

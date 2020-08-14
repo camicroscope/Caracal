@@ -89,7 +89,7 @@ var HANDLERS = {
   },
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
-  },  
+  },
 };
 
 // register configurable services
