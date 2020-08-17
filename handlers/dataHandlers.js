@@ -253,10 +253,10 @@ Presetlabels.update = function(req, res, next) {
     };
   }
   mongoUpdate('camic', 'configuration',
-    {
-      'config_name': 'preset_label',
-      'configuration.key': query.key
-    }, newVals).then((x) => {
+      {
+        'config_name': 'preset_label',
+        'configuration.key': query.key,
+      }, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
@@ -266,9 +266,9 @@ Presetlabels.remove = function(req, res, next) {
   var query = req.query;
   delete query.token;
   mongoUpdate('camic', 'configuration',
-    {
-      'config_name': 'preset_label'
-    }, {$pull: {configuration: {key: query.key}}}).then((x) => {
+      {
+        'config_name': 'preset_label',
+      }, {$pull: {configuration: {key: query.key}}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
