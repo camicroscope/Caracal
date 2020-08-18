@@ -6,6 +6,10 @@ module.exports = {
   },
   'extends': [
     'google',
+    'plugin:security/recommended'
+  ],
+  plugins: [
+    'security'
   ],
   'globals': {
     'Atomics': 'readonly',
