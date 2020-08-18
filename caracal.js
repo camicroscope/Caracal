@@ -5,6 +5,7 @@ const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
+var helmet = require('helmet');
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
@@ -24,6 +25,7 @@ var PORT = process.env.PORT || 4010;
 
 const app = express();
 app.use(cookieParser());
+app.use(helmet());
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
