@@ -24,6 +24,7 @@
     "adm-zip": "^0.4.16",
     "atob": "^2.1.2",
     "express": "^4.17.1",
+    "helmet": "^4.1.0",
     "http-proxy-middleware": "^0.20.0",
     "inkjet": "^2.1.2",
     "jsonwebtoken": "^8.5.1",

@@ -5,6 +5,7 @@ const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
+var helmet = require('helmet');
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
@@ -22,10 +23,9 @@ var WORKERS = process.env.NUM_THREADS || 4;
 
 var PORT = process.env.PORT || 4010;
 
-
 const app = express();
 app.use(cookieParser());
-
+app.use(helmet());
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
@@ -155,7 +155,24 @@ app.use(function(err, req, res, next) {
 
 var startApp = function(app) {
   return function() {
-    app.listen(PORT, () => console.log('listening on ' + PORT));
+    // Prepare for SSL/HTTPS
+    var httpsOptions = {};
+    try {
+      var sslPkPath = "./ssl/privatekey.pem";
+      var sslCertPath = "./ssl/certificate.pem";
+      if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
+        console.info("Starting in HTTPS Mode mode");
+        httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
+        httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    if (httpsOptions.key && httpsOptions.cert) {
+      https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
+    } else {
+      app.listen(PORT, () => console.log('listening on ' + PORT));
+    }
   };
 };
 
