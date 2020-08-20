@@ -37,14 +37,18 @@ app.use(helmet.contentSecurityPolicy({
       'ajax.googleapis.com',
       'cdn.jsdelivr.net',
     ],
-    styleSrc:[
+    styleSrc: [
       "'self'",
       'fonts.googleapis.com',
       'use.fontawesome.com',
       'stackpath.bootstrapcdn.com',
       'cdnjs.cloudflare.com',
     ],
-  }
+    fontSrc: [
+      "'self'",
+      'use.fontawesome.com',
+    ]
+  },
 }));
 
 // handle non-json raw body for post
