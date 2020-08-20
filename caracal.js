@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
 var helmet = require('helmet');
-const fs = require('fs'); 
+const fs = require('fs');
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
@@ -26,7 +26,26 @@ var PORT = process.env.PORT || 4010;
 
 const app = express();
 app.use(cookieParser());
-app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: [
+      "'self'",
+      'code.jquery.com',
+      'stackpath.bootstrapcdn.com',
+      'apis.google.com',
+      'ajax.googleapis.com',
+      'cdn.jsdelivr.net',
+    ],
+    styleSrc:[
+      "'self'",
+      'fonts.googleapis.com',
+      'use.fontawesome.com',
+      'stackpath.bootstrapcdn.com',
+      'cdnjs.cloudflare.com',
+    ],
+  }
+}));
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
