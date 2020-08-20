@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
 var helmet = require('helmet');
+const fs = require('fs'); 
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
