@@ -28,7 +28,9 @@ const app = express();
 app.use(cookieParser());
 app.use(helmet.contentSecurityPolicy({
   directives: {
-    defaultSrc: ["'self'"],
+    defaultSrc: [
+      "'self'"
+    ],
     scriptSrc: [
       "'self'",
       "'unsafe-inline'",
@@ -49,7 +51,10 @@ app.use(helmet.contentSecurityPolicy({
     fontSrc: [
       "'self'",
       'use.fontawesome.com',
-    ]
+    ],
+    imgSrc: [
+      "'self'",
+    ],
   },
 }));
 
