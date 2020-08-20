@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: [
-      "'self'"
+      "'self'",
     ],
     scriptSrc: [
       "'self'",
