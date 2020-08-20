@@ -230,30 +230,30 @@ Presetlabels.update = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var labels = JSON.parse(req.body);
-  
+
   // initial data
   var newVals = {
     $set: {
       'configuration.$.type': labels.type,
       'configuration.$.mode': labels.mode,
       'configuration.$.color': labels.color,
-    }, 
+    },
   };
 
   // $unset/$set size
   if (labels.size) {
     newVals['$set']['configuration.$.size'] = labels.size;
   } else {
-    if(!newVals['$unset']) newVals['$unset'] = {}
-      newVals['$unset']['configuration.$.size'] = 1;
+    if (!newVals['$unset']) newVals['$unset'] = {};
+    newVals['$unset']['configuration.$.size'] = 1;
   }
 
   // $unset/$set key
   if (labels.key) {
     newVals['$set']['configuration.$.key'] = labels.key;
   } else {
-    if(!newVals['$unset']) newVals['$unset'] = {}
-      newVals['$unset']['configuration.$.key'] = 1;
+    if (!newVals['$unset']) newVals['$unset'] = {};
+    newVals['$unset']['configuration.$.key'] = 1;
   }
 
   mongoUpdate('camic', 'configuration',
