@@ -31,6 +31,7 @@ app.use(helmet.contentSecurityPolicy({
     defaultSrc: ["'self'"],
     scriptSrc: [
       "'self'",
+      "'unsafe-inline'",
       'code.jquery.com',
       'stackpath.bootstrapcdn.com',
       'apis.google.com',
@@ -39,6 +40,7 @@ app.use(helmet.contentSecurityPolicy({
     ],
     styleSrc: [
       "'self'",
+      "'unsafe-inline'",
       'fonts.googleapis.com',
       'use.fontawesome.com',
       'stackpath.bootstrapcdn.com',
