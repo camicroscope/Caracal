@@ -234,6 +234,7 @@ Presetlabels.update = function(req, res, next) {
   // initial data
   var newVals = {
     $set: {
+      'configuration.$.id': labels.id,
       'configuration.$.type': labels.type,
       'configuration.$.mode': labels.mode,
       'configuration.$.color': labels.color,
@@ -259,12 +260,13 @@ Presetlabels.update = function(req, res, next) {
   mongoUpdate('camic', 'configuration',
       {
         'config_name': 'preset_label',
-        'configuration.key': query.key,
+        'configuration.id': query.id,
       }, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
 };
+
 // remove a label by key
 Presetlabels.remove = function(req, res, next) {
   var query = req.query;
@@ -272,7 +274,7 @@ Presetlabels.remove = function(req, res, next) {
   mongoUpdate('camic', 'configuration',
       {
         'config_name': 'preset_label',
-      }, {$pull: {configuration: {key: query.key}}}).then((x) => {
+      }, {$pull: {configuration: {key: query.id}}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
