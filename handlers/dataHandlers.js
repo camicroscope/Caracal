@@ -274,7 +274,7 @@ Presetlabels.remove = function(req, res, next) {
   mongoUpdate('camic', 'configuration',
       {
         'config_name': 'preset_label',
-      }, {$pull: {configuration: {key: query.id}}}).then((x) => {
+      }, {$pull: {configuration: {id: query.id}}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
