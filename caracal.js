@@ -34,6 +34,7 @@ app.use(helmet.contentSecurityPolicy({
     scriptSrc: [
       "'self'",
       "'unsafe-inline'",
+      "'unsafe-eval'",
       'code.jquery.com',
       'stackpath.bootstrapcdn.com',
       'apis.google.com',
