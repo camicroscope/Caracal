@@ -4,7 +4,7 @@ RUN mkdir /root/src
 COPY . /root/src
 WORKDIR /root/src
 RUN npm install
-ARG viewer
+ARG viewer="v3.7.7"
 ARG fork
 RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
 EXPOSE 8010
