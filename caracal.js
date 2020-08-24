@@ -26,7 +26,7 @@ var PORT = process.env.PORT || 4010;
 
 const app = express();
 app.use(cookieParser());
-app.use(helmet.contentSecurityPolicy({
+/**app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: [
       "'self'",
@@ -57,7 +57,7 @@ app.use(helmet.contentSecurityPolicy({
       "'self'",
     ],
   },
-}));
+}));**/
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
