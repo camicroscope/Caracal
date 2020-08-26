@@ -13,4 +13,6 @@ EXPOSE 8010
 RUN chgrp -R 0 /root && \
     chmod -R g+rwX /root
 
+USER 1001
+
 CMD node caracal.js
