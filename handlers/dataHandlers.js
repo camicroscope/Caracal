@@ -124,9 +124,9 @@ function mongoAggregate(database, collection, pipeline) {
           rej(err);
         } else {
           var dbo = db.db(database);
-          if (query['_id']) {
-            query['_id'] = new mongo.ObjectID(query['_id']);
-          }
+          // if (query['_id']) {
+          //   query['_id'] = new mongo.ObjectID(query['_id']);
+          // }
           dbo.collection(collection).aggregate(pipeline, function(err, result) {
             if (err) {
               rej(err);
