@@ -124,19 +124,16 @@ function mongoAggregate(database, collection, pipeline) {
           rej(err);
         } else {
           var dbo = db.db(database);
-          // if (query['_id']) {
-          //   query['_id'] = new mongo.ObjectID(query['_id']);
-          // }
-          console.log(database)
-          console.log(collection)
-          console.log(pipeline)
-          dbo.collection(collection).aggregate(pipeline, function(err, result) {
+          dbo.collection(collection).aggregate(pipeline).toArray(function(err, result) {
             if (err) {
               rej(err);
             }
-            delete result.connection;
-            console.log('~~~~~~~ rs ~~~~~~')
-            console.log(result)
+            // compatible wiht bindaas odd format
+            // result.forEach((x) => {
+            //   x['_id'] = {
+            //     '$oid': x['_id'],
+            //   };
+            // });
             res(result);
             db.close();
           });
@@ -394,7 +391,6 @@ Mark.findMarkTypes = function(req, res, next) {
     delete query.name;
   }
   delete query.token;
-  console.log(query);
   const pipeline = [
     {
       "$match": query,
@@ -421,9 +417,7 @@ Mark.findMarkTypes = function(req, res, next) {
       },
     },
   ];
-  console.log(pipeline);
   mongoAggregate('camic', 'mark', pipeline).then((x) => {
-    console.log(x)
     req.data = x;
     next();
   }).catch((e) => next(e));
