@@ -381,11 +381,11 @@ Mark.multi = function(req, res, next) {
 Mark.findMarkTypes = function(req, res, next) {
   var query = req.query;
   if (query.slide) {
-    query['provenance.image.slide'] = slide;
+    query['provenance.image.slide'] = query.slide;
     delete query.slide;
   }
   if (query.name) {
-    query['provenance.analysis.execution_id'] = name;
+    query['provenance.analysis.execution_id'] = query.name;
     delete query.name;
   }
   delete query.token;
