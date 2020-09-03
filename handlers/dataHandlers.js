@@ -127,11 +127,16 @@ function mongoAggregate(database, collection, pipeline) {
           // if (query['_id']) {
           //   query['_id'] = new mongo.ObjectID(query['_id']);
           // }
+          console.log(database)
+          console.log(collection)
+          console.log(pipeline)
           dbo.collection(collection).aggregate(pipeline, function(err, result) {
             if (err) {
               rej(err);
             }
             delete result.connection;
+            console.log('~~~~~~~ rs ~~~~~~')
+            console.log(result)
             res(result);
             db.close();
           });
