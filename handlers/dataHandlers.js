@@ -389,6 +389,7 @@ Mark.findMarkTypes = function(req, res, next) {
     delete query.name;
   }
   delete query.token;
+  console.log(query);
   const pipeline = [
     {
       "$match": query,
@@ -415,7 +416,9 @@ Mark.findMarkTypes = function(req, res, next) {
       },
     },
   ];
+  console.log(pipeline);
   mongoAggregate('camic', 'mark', pipeline).then((x) => {
+    console.log(x)
     req.data = x;
     next();
   }).catch((e) => next(e));
