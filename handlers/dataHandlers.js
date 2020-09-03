@@ -380,11 +380,11 @@ Mark.multi = function(req, res, next) {
 
 Mark.findMarkTypes = function(req, res, next) {
   var query = req.query;
-  if(query.slide) {
+  if (query.slide) {
     query['provenance.image.slide'] = slide;
     delete query.slide;
   }
-  if(query.name) {
+  if (query.name) {
     query['provenance.analysis.execution_id'] = name;
     delete query.name;
   }
@@ -414,7 +414,7 @@ Mark.findMarkTypes = function(req, res, next) {
         },
       },
     },
-    ]
+  ];
   mongoAggregate('camic', 'mark', pipeline).then((x) => {
     req.data = x;
     next();
