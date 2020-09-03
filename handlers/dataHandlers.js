@@ -116,6 +116,34 @@ function mongoDelete(database, collection, query) {
   });
 }
 
+function mongoAggregate(database, collection, pipeline) {
+  return new Promise(function(res, rej) {
+    mongo.MongoClient.connect(MONGO_URI, function(err, db) {
+      try {
+        if (err) {
+          rej(err);
+        } else {
+          var dbo = db.db(database);
+          if (query['_id']) {
+            query['_id'] = new mongo.ObjectID(query['_id']);
+          }
+          dbo.collection(collection).aggregate(pipeline, function(err, result) {
+            if (err) {
+              rej(err);
+            }
+            delete result.connection;
+            res(result);
+            db.close();
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        rej(error);
+      }
+    });
+  });
+}
+
 function mongoUpdate(database, collection, query, newVals) {
   return new Promise(function(res, rej) {
     try {
@@ -345,6 +373,48 @@ Mark.multi = function(req, res, next) {
     };
   }
   mongoFind('camic', 'mark', query).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+Mark.findMarkTypes = function(req, res, next) {
+  var query = req.query;
+  if (query.slide) {
+    query['provenance.image.slide'] = slide;
+    delete query.slide;
+  }  
+  if (query.name) {
+    query['provenance.analysis.execution_id'] = name;
+    delete query.name;
+  }
+  delete query.token;
+  const pipeline = [
+    {
+      "$match": query,
+    },{
+      "$group": {
+        "_id": {
+          "creator": "$creator",
+          "analysis": "$provenance.analysis",
+          "shape": "$geometries.features.geometry.type",
+        }
+      }
+    }, {
+      "$project": {
+        "_id": 0,
+        "creator": "$_id.creator",
+        "source": "$_id.analysis.source",
+        "execution_id": "$_id.analysis.execution_id",
+        "name": "$_id.analysis.name",
+        "type": "$_id.analysis.type",
+        "isGrid": "$_id.analysis.isGrid",
+        "shape": {
+          "$arrayElemAt": ["$_id.shape", 0],
+        }
+      }
+    }]
+  mongoAggregate('camic', 'mark', pipeline).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));

@@ -107,6 +107,9 @@ var HANDLERS = {
   "markSpatial": function() {
     return dataHandlers.Mark.spatial;
   },
+  "findMarkTypes": function() {
+    return dataHandlers.Mark.findMarkTypes;
+  },
   "heatmapTypes": function() {
     return dataHandlers.Heatmap.types;
   },

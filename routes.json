@@ -154,6 +154,12 @@
       {"function":"markSpatial", "args": []}
     ]
   },{
+    "route":"/data/Mark/findMarkTypes",
+    "method":"get",
+    "handlers":[
+      {"function":"findMarkTypes", "args": []}
+    ]
+  },{
     "route":"/data/Presetlabels/add",
     "method":"post",
     "handlers":[
