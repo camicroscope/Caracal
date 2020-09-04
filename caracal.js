@@ -5,6 +5,8 @@ const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
+var helmet = require('helmet');
+const fs = require('fs');
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
@@ -14,15 +16,48 @@ const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
+const DataSet = require('./handlers/datasetHandler.js');
+const Model = require('./handlers/modelTrainer.js');
 // TODO validation of data
 
 var WORKERS = process.env.NUM_THREADS || 4;
 
 var PORT = process.env.PORT || 4010;
 
-
 const app = express();
 app.use(cookieParser());
+/** app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: [
+      "'self'",
+    ],
+    scriptSrc: [
+      "'self'",
+      "'unsafe-inline'",
+      "'unsafe-eval'",
+      'code.jquery.com',
+      'stackpath.bootstrapcdn.com',
+      'apis.google.com',
+      'ajax.googleapis.com',
+      'cdn.jsdelivr.net',
+    ],
+    styleSrc: [
+      "'self'",
+      "'unsafe-inline'",
+      'fonts.googleapis.com',
+      'use.fontawesome.com',
+      'stackpath.bootstrapcdn.com',
+      'cdnjs.cloudflare.com',
+    ],
+    fontSrc: [
+      "'self'",
+      'use.fontawesome.com',
+    ],
+    imgSrc: [
+      "'self'",
+    ],
+  },
+}));**/
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
@@ -59,6 +94,10 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  "getDataset": DataSet.getDataset,
+  "trainModel": Model.trainModel,
+  "deleteDataset": DataSet.deleteData,
+  "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
     return iipHandler;
   },
@@ -68,11 +107,23 @@ var HANDLERS = {
   "markSpatial": function() {
     return dataHandlers.Mark.spatial;
   },
+  "findMarkTypes": function() {
+    return dataHandlers.Mark.findMarkTypes;
+  },
   "heatmapTypes": function() {
     return dataHandlers.Heatmap.types;
   },
   "wcido": function() {
     return dataHandlers.User.wcido;
+  },
+  "addPresetlabels": function() {
+    return dataHandlers.Presetlabels.add;
+  },
+  "updatePresetlabels": function() {
+    return dataHandlers.Presetlabels.update;
+  },
+  "removePresetlabels": function() {
+    return dataHandlers.Presetlabels.remove;
   },
 };
 
@@ -139,7 +190,24 @@ app.use(function(err, req, res, next) {
 
 var startApp = function(app) {
   return function() {
-    app.listen(PORT, () => console.log('listening on ' + PORT));
+    // Prepare for SSL/HTTPS
+    var httpsOptions = {};
+    try {
+      var sslPkPath = "./ssl/privatekey.pem";
+      var sslCertPath = "./ssl/certificate.pem";
+      if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
+        console.info("Starting in HTTPS Mode mode");
+        httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
+        httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    if (httpsOptions.key && httpsOptions.cert) {
+      https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
+    } else {
+      app.listen(PORT, () => console.log('listening on ' + PORT));
+    }
   };
 };
 

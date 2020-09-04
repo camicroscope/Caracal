@@ -44,7 +44,8 @@ Handlers are the specific functions designed for use by routes. They should have
 
 
 ## files used
-key/key and key/key.pub are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own
+`key/key` and `key/key.pub` are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own.
+`./ssl/privatekey.pem` and `./ssl/certificate.pem` are used to enable SSL; if these are present, this application will start in SSL/HTTPS mode.
 
 ## User property variables
 These are set in userFunction and injected into the token.

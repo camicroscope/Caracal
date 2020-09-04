@@ -116,6 +116,36 @@ function mongoDelete(database, collection, query) {
   });
 }
 
+function mongoAggregate(database, collection, pipeline) {
+  return new Promise(function(res, rej) {
+    mongo.MongoClient.connect(MONGO_URI, function(err, db) {
+      try {
+        if (err) {
+          rej(err);
+        } else {
+          var dbo = db.db(database);
+          dbo.collection(collection).aggregate(pipeline).toArray(function(err, result) {
+            if (err) {
+              rej(err);
+            }
+            // compatible wiht bindaas odd format
+            // result.forEach((x) => {
+            //   x['_id'] = {
+            //     '$oid': x['_id'],
+            //   };
+            // });
+            res(result);
+            db.close();
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        rej(error);
+      }
+    });
+  });
+}
+
 function mongoUpdate(database, collection, query, newVals) {
   return new Promise(function(res, rej) {
     try {
@@ -213,6 +243,73 @@ General.delete = function(db, collection) {
   };
 };
 
+var Presetlabels = {};
+// add a label
+Presetlabels.add = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  var labels = JSON.parse(req.body);
+  mongoUpdate('camic', 'configuration', {'config_name': 'preset_label'}, {$push: {configuration: labels}}).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+// update a label
+Presetlabels.update = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  var labels = JSON.parse(req.body);
+
+  // initial data
+  var newVals = {
+    $set: {
+      'configuration.$.id': labels.id,
+      'configuration.$.type': labels.type,
+      'configuration.$.mode': labels.mode,
+      'configuration.$.color': labels.color,
+    },
+  };
+
+  // $unset/$set size
+  if (labels.size) {
+    newVals['$set']['configuration.$.size'] = labels.size;
+  } else {
+    if (!newVals['$unset']) newVals['$unset'] = {};
+    newVals['$unset']['configuration.$.size'] = 1;
+  }
+
+  // $unset/$set key
+  if (labels.key) {
+    newVals['$set']['configuration.$.key'] = labels.key;
+  } else {
+    if (!newVals['$unset']) newVals['$unset'] = {};
+    newVals['$unset']['configuration.$.key'] = 1;
+  }
+
+  mongoUpdate('camic', 'configuration',
+      {
+        'config_name': 'preset_label',
+        'configuration.id': query.id,
+      }, newVals).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+// remove a label by key
+Presetlabels.remove = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  mongoUpdate('camic', 'configuration',
+      {
+        'config_name': 'preset_label',
+      }, {$pull: {configuration: {id: query.id}}}).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
 var Mark = {};
 // special routes
 Mark.spatial = function(req, res, next) {
@@ -283,6 +380,49 @@ Mark.multi = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
+Mark.findMarkTypes = function(req, res, next) {
+  var query = req.query;
+  if (query.slide) {
+    query['provenance.image.slide'] = query.slide;
+    delete query.slide;
+  }
+  if (query.name) {
+    query['provenance.analysis.execution_id'] = query.name;
+    delete query.name;
+  }
+  delete query.token;
+  const pipeline = [
+    {
+      "$match": query,
+    }, {
+      "$group": {
+        "_id": {
+          "creator": "$creator",
+          "analysis": "$provenance.analysis",
+          "shape": "$geometries.features.geometry.type",
+        },
+      },
+    }, {
+      "$project": {
+        "_id": 0,
+        "creator": "$_id.creator",
+        "source": "$_id.analysis.source",
+        "execution_id": "$_id.analysis.execution_id",
+        "name": "$_id.analysis.name",
+        "type": "$_id.analysis.type",
+        "isGrid": "$_id.analysis.isGrid",
+        "shape": {
+          "$arrayElemAt": ["$_id.shape", 0],
+        },
+      },
+    },
+  ];
+  mongoAggregate('camic', 'mark', pipeline).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
 var Heatmap = {};
 Heatmap.types = function(req, res, next) {
   var query = req.query;
@@ -340,5 +480,7 @@ dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
+dataHandlers.Presetlabels = Presetlabels;
+
 dataHandlers.General = General;
 module.exports = dataHandlers;

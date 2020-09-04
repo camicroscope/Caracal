@@ -153,8 +153,31 @@
     "handlers":[
       {"function":"markSpatial", "args": []}
     ]
+  },{
+    "route":"/data/Mark/findMarkTypes",
+    "method":"get",
+    "handlers":[
+      {"function":"findMarkTypes", "args": []}
+    ]
+  },{
+    "route":"/data/Presetlabels/add",
+    "method":"post",
+    "handlers":[
+      {"function":"addPresetlabels", "args": []}
+    ]
+  },{
+    "route":"/data/Presetlabels/update",
+    "method":"post",
+    "handlers":[
+      {"function":"updatePresetlabels", "args": []}
+    ]
+  },{
+    "route":"/data/Presetlabels/remove",
+    "method":"post",
+    "handlers":[
+      {"function":"removePresetlabels", "args": []}
+    ]
   },
-
   {
     "route":"/data/Template/find",
     "method":"get",
@@ -345,6 +368,34 @@
     "method":"get",
     "handlers":[
       {"function":"wcido", "args": []}
+    ]
+  },{
+    "route":"/workbench/uploadDataset",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"getDataset", "args": []}
+    ]
+  },{
+    "route":"/workbench/trainModel",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"trainModel", "args": []}
+    ]
+  },{
+    "route":"/workbench/deleteUserData",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"deleteDataset", "args": []}
+    ]
+  },{
+    "route":"/workbench/modelDownload",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"sendTrainedModel", "args": []}
     ]
   }
 ]

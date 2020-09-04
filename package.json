@@ -20,9 +20,13 @@
   },
   "homepage": "https://github.com/camicroscope/caboodle#readme",
   "dependencies": {
+    "@tensorflow/tfjs-node": "^2.3.0",
+    "adm-zip": "^0.4.16",
     "atob": "^2.1.2",
     "express": "^4.17.1",
+    "helmet": "^4.1.0",
     "http-proxy-middleware": "^0.20.0",
+    "inkjet": "^2.1.2",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.6.0",
     "mongodb": "^3.3.5",
@@ -33,6 +37,7 @@
     "chai-http": "^4.3.0",
     "cookie-parser": "^1.4.4",
     "eslint": "^6.8.0",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-security": "^1.4.0"
   }
 }
