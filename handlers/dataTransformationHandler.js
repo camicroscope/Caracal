@@ -85,7 +85,9 @@ class DataTransformationHandler {
               const config = rs[0];
               const list = [];
               if (config.configuration && Array.isArray(config.configuration)) {
-                config.configuration.forEach((node) => {this.extractNode(node, list)});
+                config.configuration.forEach((node) => {
+                  this.extractNode(node, list);
+                });
               }
               config.configuration = list;
               config.version = '1.0.0';
