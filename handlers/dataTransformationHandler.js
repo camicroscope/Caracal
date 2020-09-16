@@ -10,6 +10,7 @@ class DataTransformationHandler {
     this.max = 300;
     this.id = 1;
     this.idLength = 6;
+    this.isProcessing = false;
   }
 
   startHandler() {
@@ -17,7 +18,7 @@ class DataTransformationHandler {
     this.counter = 0;
     this.max = 300;
     this.id = 1;
-    this.handler = setInterval(this.connect.bind(this), 5000);
+    this.handler = setInterval(this.connect.bind(this), 10000);
   }
 
   loadDefaultData() {
@@ -37,10 +38,13 @@ class DataTransformationHandler {
   }
 
   connect() {
+    if(this.isProcessing)
+      return;
     if (this.counter++ == this.max) {
       this.cleanHandler();
       return;
     }
+    this.isProcessing = true;
     const query = { config_name: "preset_label" };
     client
       .connect(this.url, { useNewUrlParser: true })
@@ -48,6 +52,7 @@ class DataTransformationHandler {
         const collection = dbc.db("camic").collection("configuration");
         collection.find(query).toArray((err, rs) => {
           if (err) {
+            this.isProcessing = false;
             console.error(
               `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
             );
@@ -56,13 +61,12 @@ class DataTransformationHandler {
           // add default data
           if (rs.length < 1) {
             // read default data from json
-            console.log("insert default");
             const defaultData = this.loadDefaultData();
-            console.log(defaultData);
 
             // insert default data
             collection.insertOne(defaultData, (err, result) => {
               if (err) {
+                this.isProcessing = false;
                 console.error(
                   `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
                 );
@@ -87,6 +91,7 @@ class DataTransformationHandler {
             config.configuration = list;
             collection.deleteOne(query, (err, result) => {
               if (err) {
+                this.isProcessing = false;
                 console.log(
                   `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
                 );
@@ -95,13 +100,14 @@ class DataTransformationHandler {
               }
               collection.insertOne(config, (err, result) => {
                 if (err) {
+                  this.isProcessing = false;
                   console.log(
                     `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
                   );
                   console.log(err);
                   dbc.close();
                 }
-
+                this.isProcessing = false;
                 console.log(
                   `||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`
                 );
@@ -115,6 +121,7 @@ class DataTransformationHandler {
       .catch((err) => {
         console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
         console.log(err.message);
+        this.isProcessing = false;
         if (this.max == this.counter) this.cleanHandler();
       });
   }
@@ -139,6 +146,7 @@ class DataTransformationHandler {
     this.counter = 0;
     this.max = 300;
     this.id = 1;
+    this.isProcessing = false;
     clearInterval(this.handler);
   }
 }
