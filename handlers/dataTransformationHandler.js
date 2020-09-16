@@ -57,7 +57,7 @@ class DataTransformationHandler {
               console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
               console.log(err);
               dbc.close();
-              this.cleanHandler();            
+              this.cleanHandler();
               return;
             }
             // add default data
@@ -85,19 +85,15 @@ class DataTransformationHandler {
               const config = rs[0];
               const list = [];
               if (config.configuration && Array.isArray(config.configuration)) {
-                config.configuration.forEach((node) =>
-                  this.extractNode(node, list)
-                );
+                config.configuration.forEach((node) => {this.extractNode(node, list)});
               }
               config.configuration = list;
               config.version = '1.0.0';
-              if(!(list && list.length)) return;
+              if (!(list && list.length)) return;
               collection.deleteOne(query, (err, result) => {
                 if (err) {
                   this.isProcessing = false;
-                  console.log(
-                    `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-                  );
+                  console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
                   console.log(err);
                   dbc.close();
                   this.cleanHandler();
@@ -127,7 +123,7 @@ class DataTransformationHandler {
           if (this.max == this.counter) {
             this.cleanHandler();
           }
-      });
+        });
   }
   extractNode(node, list) {
     if (node.children && Array.isArray(node.children)) {
@@ -141,7 +137,7 @@ class DataTransformationHandler {
       node.data !== null
     ) {
       const id = zeroFill(this.id++, this.idLength);
-      list.push({ id, ...node.data });
+      list.push({id, ...node.data});
     }
   }
 
