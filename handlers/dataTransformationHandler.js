@@ -54,9 +54,7 @@ class DataTransformationHandler {
           collection.find(query).toArray((err, rs) => {
             if (err) {
               this.isProcessing = false;
-              console.log(
-                `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-              );
+              console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
               console.log(err);
               dbc.close();
               this.cleanHandler();            
@@ -70,9 +68,7 @@ class DataTransformationHandler {
               collection.insertOne(defaultData, (err, result) => {
                 if (err) {
                   this.isProcessing = false;
-                  console.log(
-                    `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-                  );
+                  console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
                   console.log(err);
                   dbc.close();
                   this.cleanHandler();
@@ -110,30 +106,27 @@ class DataTransformationHandler {
                 collection.insertOne(config, (err, result) => {
                   if (err) {
                     this.isProcessing = false;
-                    console.log(
-                      `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-                    );
+                    console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
                     console.log(err);
                     dbc.close();
                     this.cleanHandler();
                     return;
                   }
                   this.isProcessing = false;
-                  console.log(
-                    `||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`
-                  );
+                  console.log(`||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`);
                   dbc.close();
                   this.cleanHandler();
                 });
               });
             }
           });
-        })
-        .catch((err) => {
+        }).catch((err) => {
           console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
           console.log(err.message);
           this.isProcessing = false;
-          if (this.max == this.counter) this.cleanHandler();
+          if (this.max == this.counter) {
+            this.cleanHandler();
+          }
       });
   }
   extractNode(node, list) {
