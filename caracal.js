@@ -216,7 +216,7 @@ var startApp = function(app) {
 
 throng(WORKERS, startApp(app));
 
-const  handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json')
-handler.startHandler()
+const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+handler.startHandler();
 
 module.exports = app; // for tests

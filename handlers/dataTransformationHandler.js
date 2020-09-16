@@ -21,7 +21,8 @@ class DataTransformationHandler {
   }
 
   loadDefaultData() {
-    let rawdata, config;
+    let rawdata;
+    let config;
     try {
       rawdata = fs.readFileSync(this.filePath);
       config = JSON.parse(rawdata);
