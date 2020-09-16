@@ -38,75 +38,36 @@ class DataTransformationHandler {
   }
 
   connect() {
-    if(this.isProcessing)
+    if (this.isProcessing) {
       return;
+    }
     if (this.counter++ == this.max) {
       this.cleanHandler();
       return;
     }
     this.isProcessing = true;
-    const query = { config_name: "preset_label" };
+    const query = {config_name: "preset_label"};
     client
-      .connect(this.url, { useNewUrlParser: true })
-      .then((dbc) => {
-        const collection = dbc.db("camic").collection("configuration");
-        collection.find(query).toArray((err, rs) => {
-          if (err) {
-            this.isProcessing = false;
-            console.log(
-              `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-            );
-            console.log(err);
-            dbc.close();
-            this.cleanHandler();            
-            return;
-          }
-          // add default data
-          if (rs.length < 1) {
-            // read default data from json
-            const defaultData = this.loadDefaultData();
-            // insert default data
-            collection.insertOne(defaultData, (err, result) => {
-              if (err) {
-                this.isProcessing = false;
-                console.log(
-                  `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-                );
-                console.log(err);
-                dbc.close();
-                this.cleanHandler();
-                return;
-              }
-              dbc.close();
-              // clear handler
-              this.cleanHandler();
-            });
-            return;
-          }
-
-          if (rs.length > 0 && rs[0].version != "1.0.0") {
-            const config = rs[0];
-            const list = [];
-            if (config.configuration && Array.isArray(config.configuration)) {
-              config.configuration.forEach((node) =>
-                this.extractNode(node, list)
+        .connect(this.url, {useNewUrlParser: true})
+        .then((dbc) => {
+          const collection = dbc.db("camic").collection("configuration");
+          collection.find(query).toArray((err, rs) => {
+            if (err) {
+              this.isProcessing = false;
+              console.log(
+                `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
               );
+              console.log(err);
+              dbc.close();
+              this.cleanHandler();            
+              return;
             }
-            config.configuration = list;
-            config.version = '1.0.0';
-            if(!(list && list.length)) return;
-            collection.deleteOne(query, (err, result) => {
-              if (err) {
-                this.isProcessing = false;
-                console.log(
-                  `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
-                );
-                console.log(err);
-                dbc.close();
-                this.cleanHandler();
-                return;
-              }
-              collection.insertOne(config, (err, result) => {
+            // add default data
+            if (rs.length < 1) {
+              // read default data from json
+              const defaultData = this.loadDefaultData();
+              // insert default data
+              collection.insertOne(defaultData, (err, result) => {
                 if (err) {
                   this.isProcessing = false;
                   console.log(
@@ -117,22 +78,62 @@ class DataTransformationHandler {
                   this.cleanHandler();
                   return;
                 }
-                this.isProcessing = false;
-                console.log(
-                  `||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`
-                );
                 dbc.close();
+                // clear handler
                 this.cleanHandler();
               });
-            });
-          }
-        });
-      })
-      .catch((err) => {
-        console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-        console.log(err.message);
-        this.isProcessing = false;
-        if (this.max == this.counter) this.cleanHandler();
+              return;
+            }
+
+            if (rs.length > 0 && rs[0].version != "1.0.0") {
+              const config = rs[0];
+              const list = [];
+              if (config.configuration && Array.isArray(config.configuration)) {
+                config.configuration.forEach((node) =>
+                  this.extractNode(node, list)
+                );
+              }
+              config.configuration = list;
+              config.version = '1.0.0';
+              if(!(list && list.length)) return;
+              collection.deleteOne(query, (err, result) => {
+                if (err) {
+                  this.isProcessing = false;
+                  console.log(
+                    `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
+                  );
+                  console.log(err);
+                  dbc.close();
+                  this.cleanHandler();
+                  return;
+                }
+                collection.insertOne(config, (err, result) => {
+                  if (err) {
+                    this.isProcessing = false;
+                    console.log(
+                      `||-- The 'Preset Labels' Document Upgrade Is Failed --||`
+                    );
+                    console.log(err);
+                    dbc.close();
+                    this.cleanHandler();
+                    return;
+                  }
+                  this.isProcessing = false;
+                  console.log(
+                    `||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`
+                  );
+                  dbc.close();
+                  this.cleanHandler();
+                });
+              });
+            }
+          });
+        })
+        .catch((err) => {
+          console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+          console.log(err.message);
+          this.isProcessing = false;
+          if (this.max == this.counter) this.cleanHandler();
       });
   }
   extractNode(node, list) {
