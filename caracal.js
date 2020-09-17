@@ -18,11 +18,14 @@ const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataSet = require('./handlers/datasetHandler.js');
 const Model = require('./handlers/modelTrainer.js');
+const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 // TODO validation of data
 
 var WORKERS = process.env.NUM_THREADS || 4;
 
 var PORT = process.env.PORT || 4010;
+
+var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 const app = express();
 app.use(cookieParser());
@@ -212,5 +215,8 @@ var startApp = function(app) {
 };
 
 throng(WORKERS, startApp(app));
+
+const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+handler.startHandler();
 
 module.exports = app; // for tests
