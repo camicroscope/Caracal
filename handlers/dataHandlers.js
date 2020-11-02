@@ -386,41 +386,36 @@ Mark.findMarkTypes = function(req, res, next) {
     query['provenance.image.slide'] = query.slide;
     delete query.slide;
   }
-  if (query.name) {
-    query['provenance.analysis.execution_id'] = query.name;
-    delete query.name;
+  if (query.type) {
+    query['provenance.analysis.source'] = query.type;
+    delete query.type;
   }
   delete query.token;
-  const pipeline = [
-    {
-      "$match": query,
-    }, {
-      "$group": {
-        "_id": {
-          "creator": "$creator",
-          "analysis": "$provenance.analysis",
-          "shape": "$geometries.features.geometry.type",
+  
+  if (query['provenance.analysis.source'] == 'human') {
+    const pipeline = [
+      {
+        "$match": query,
+      }, {
+        "$group": {
+          "_id": {
+            "creator": "$creator",
+            "analysis": "$provenance.analysis",
+            "shape": "$geometries.features.geometry.type",
+          },
         },
       },
-    }, {
-      "$project": {
-        "_id": 0,
-        "creator": "$_id.creator",
-        "source": "$_id.analysis.source",
-        "execution_id": "$_id.analysis.execution_id",
-        "name": "$_id.analysis.name",
-        "type": "$_id.analysis.type",
-        "isGrid": "$_id.analysis.isGrid",
-        "shape": {
-          "$arrayElemAt": ["$_id.shape", 0],
-        },
-      },
-    },
-  ];
-  mongoAggregate('camic', 'mark', pipeline).then((x) => {
-    req.data = x;
-    next();
-  }).catch((e) => next(e));
+    ];
+    mongoAggregate('camic', 'mark', pipeline).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  } else {
+    mongoDistinct('camic', 'mark', 'provenance.analysis', query).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  }
 };
 
 var Heatmap = {};
