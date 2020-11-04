@@ -391,7 +391,7 @@ Mark.findMarkTypes = function(req, res, next) {
     delete query.type;
   }
   delete query.token;
-  
+
   if (query['provenance.analysis.source'] == 'human') {
     const pipeline = [
       {
