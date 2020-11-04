@@ -1,20 +1,28 @@
+var mongo = require('mongodb');
+
+var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 // handle monitoring checks
 
 let monitor = {};
 
 monitor.check = function(type) {
-  let checkMsg = False;
   if (type == "basic") {
-    checkMsg = {"status": "up", "checkType": "basic"};
-  }
-  // send the message
-  return new Promise(function(res, rej) {
-    if (checkMsg) {
+    return new Promise(function(res, rej) {
+      let checkMsg = {"status": "up", "checkType": "basic"};
       res(checkMsg);
-    } else {
-      rej(new Error("Check type not implemented"));
-    }
-  });
+    });
+  }
+  if (type == "mongo") {
+    return new Promise(function(res, rej) {
+      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
+        if (err) {
+          rej(err);
+        } else {
+          res({"status": "up", "checkType": "mongo"});
+        }
+      });
+    });
+  }
 };
 
 
