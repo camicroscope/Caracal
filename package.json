@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/camicroscope/caboodle#readme",
   "dependencies": {
-    "@tensorflow/tfjs-node": "^2.3.0",
+    "@tensorflow/tfjs-node": "^2.7.0",
     "adm-zip": "^0.4.16",
     "atob": "^2.1.2",
     "express": "^4.17.1",

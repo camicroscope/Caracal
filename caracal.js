@@ -10,6 +10,7 @@ const fs = require('fs');
 
 // handlers
 const auth = require('./handlers/authHandlers.js');
+const monitor = require('./handlers/monitorHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
 const iipHandler = require('./handlers/iipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
@@ -88,6 +89,7 @@ var HANDLERS = {
   "sanitizeBody": function() {
     return sanitizeBody;
   },
+  "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,
   "mongoAdd": dataHandlers.General.add,
   "mongoUpdate": dataHandlers.General.update,
