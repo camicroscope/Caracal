@@ -341,6 +341,13 @@
       {"function":"mongoFind", "args": ["camic", "collection"]}
     ]
   },{
+    "route":"/data/Collection/post",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"mongoAdd", "args": ["camic", "collection"]}
+    ]
+  },{
     "route":"/data/Collection/update",
     "method":"post",
     "handlers":[
