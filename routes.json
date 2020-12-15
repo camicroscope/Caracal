@@ -24,7 +24,7 @@
     "method":"use",
     "route": "/loader/",
     "handlers":[
-      {"function":"proxyHandler", "args": ["http://ca-load:4000/"]}
+      {"function":"proxyHandler", "args": ["http://test-load:4000/"]}
     ]
   },
 
@@ -333,6 +333,26 @@
     "handlers":[
       {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"mongoUpdate", "args": ["camic", "configuration"]}
+    ]
+  },{
+    "route":"/data/Collection/find",
+    "method":"get",
+    "handler":[
+      {"function":"mongoFind", "args": ["camic", "collection"]}
+    ]
+  },{
+    "route":"/data/Collection/update",
+    "method":"post",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"mongoUpdate", "args": ["camic", "collection"]}
+    ]
+  },{
+    "route":"/data/Collection/delete",
+    "method":"delete",
+    "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"mongoDelete", "args": ["camic", "collection"]}
     ]
   },
 
