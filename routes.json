@@ -24,7 +24,7 @@
     "method":"use",
     "route": "/loader/",
     "handlers":[
-      {"function":"proxyHandler", "args": ["http://test-load:4000/"]}
+      {"function":"proxyHandler", "args": ["http://ca-load:4000/"]}
     ]
   },
 
@@ -337,7 +337,7 @@
   },{
     "route":"/data/Collection/find",
     "method":"get",
-    "handler":[
+    "handlers":[
       {"function":"mongoFind", "args": ["camic", "collection"]}
     ]
   },{
