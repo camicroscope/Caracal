@@ -28,7 +28,7 @@
     "http-proxy-middleware": "^0.20.0",
     "inkjet": "^2.1.2",
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.6.0",
+    "jwks-rsa": "^1.12.1",
     "mongodb": "^3.3.5",
     "throng": "^4.0.0"
   },
