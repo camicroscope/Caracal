@@ -345,6 +345,13 @@ Mark.spatial = function(req, res, next) {
 
 Mark.multi = function(req, res, next) {
   var query = req.query;
+  
+  // handle notes
+  if (query.notes) {
+    query['properties.annotations.notes'] = query.notes;
+    delete query.notes;
+  }
+  
   if (query.nameList) {
     query['provenance.analysis.execution_id'] = {
       '$in': JSON.parse(query.nameList),
