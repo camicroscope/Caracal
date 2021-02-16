@@ -346,6 +346,12 @@ Mark.spatial = function(req, res, next) {
 Mark.multi = function(req, res, next) {
   var query = req.query;
   
+  // handle source
+  if (query.source){
+    query['provenance.analysis.source'] = query.source;
+    delete query.source;
+  }
+
   // handle notes
   if (query.notes) {
     query['properties.annotations.notes'] = query.notes;
