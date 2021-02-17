@@ -344,49 +344,45 @@ Mark.spatial = function(req, res, next) {
 };
 
 Mark.multi = function(req, res, next) {
-  var query = req.query;
-  
+  var query = {};
+
+  var postQuery = JSON.parse(req.body);
+
   // handle source
-  if (query.source){
-    query['provenance.analysis.source'] = query.source;
-    delete query.source;
+  if (postQuery.source) {
+    query['provenance.analysis.source'] = postQuery.source;
   }
 
   // handle notes
-  if (query.notes) {
-    query['properties.annotations.notes'] = query.notes;
-    delete query.notes;
+  if (postQuery.notes) {
+    query['properties.annotations.notes'] = postQuery.notes;
   }
-  
-  if (query.nameList) {
-    query['provenance.analysis.execution_id'] = {
-      '$in': JSON.parse(query.nameList),
-    };
-    delete query.nameList;
+
+  if (postQuery.ids) {
+    query['provenance.analysis.execution_id'] = {'$in': postQuery.ids};
   }
-  delete query.token;
+
   // handle  x0, y0, x1, y1, footprint
-  if (req.query.x0 && req.query.x1) {
+  if (postQuery.x0 && postQuery.x1) {
     query.x = {
-      '$gt': parseFloat(req.query.x0),
-      '$lt': parseFloat(req.query.x1),
+      '$gt': parseFloat(postQuery.x0),
+      '$lt': parseFloat(postQuery.x1),
     };
   }
-  delete query.x0;
-  delete query.x1;
-  if (req.query.y0 && req.query.y1) {
+
+  if (postQuery.y0 && postQuery.y1) {
     query.y = {
-      '$gt': parseFloat(req.query.y0),
-      '$lt': parseFloat(req.query.y1),
+      '$gt': parseFloat(postQuery.y0),
+      '$lt': parseFloat(postQuery.y1),
     };
   }
-  delete query.y0;
-  delete query.y1;
-  if (query.footprint) {
+
+  if (postQuery.footprint) {
     query.footprint = {
-      '$gt': parseFloat(query.footprint),
+      '$gt': parseFloat(postQuery.footprint),
     };
   }
+
   mongoFind('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
