@@ -2,7 +2,7 @@
   "name": "Caracal",
   "version": "1.0.0",
   "description": "Conslidated Backend, Auth, and Security Services",
-  "main": "index.js",
+  "main": "caracal.js",
   "scripts": {
     "test": "mocha test/* --exit",
     "lint": "eslint *.js handlers/*.js test/**/*.js",
