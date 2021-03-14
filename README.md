@@ -26,6 +26,8 @@ Routes are setup in this method primarily so that caMicroscope deployments can b
 Handlers are the specific functions designed for use by routes. They should have pattern `handler(...args) = function(req, res, next)`
 
 ## Environment variables Used
+All possible configuration variables are listed in `.env.example`. Renaming the file to `.env`  will inject all the environment variables.
+
 |variable | Description | default |
 |---|---|---|
 | WORKERS | number of child processes | 4 |
