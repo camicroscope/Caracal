@@ -30,11 +30,16 @@ var PORT = process.env.PORT || 4010;
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
+var DISABLE_CSP = process.env.DISABLE_CSP || false;
+
 const app = express();
 app.use(cookieParser());
-app.use(helmet.contentSecurityPolicy({
-  directives: cspConfig
-}));
+
+if (!DISABLE_CSP){
+  app.use(helmet.contentSecurityPolicy({
+    directives: cspConfig
+  }));
+}
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {

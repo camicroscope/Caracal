@@ -4,8 +4,8 @@
 ],
 "scriptSrc": [
   "'self'",
-  "unsafe-inline",
-  "unsafe-eval",
+  "'unsafe-inline'",
+  "'unsafe-eval'",
   "code.jquery.com",
   "stackpath.bootstrapcdn.com",
   "apis.google.com",
@@ -14,7 +14,7 @@
 ],
 "styleSrc": [
   "'self'",
-  "unsafe-inline",
+  "'unsafe-inline'",
   "fonts.googleapis.com",
   "use.fontawesome.com",
   "stackpath.bootstrapcdn.com",
@@ -22,7 +22,9 @@
 ],
 "fontSrc": [
   "'self'",
-  "use.fontawesome.com"
+  "use.fontawesome.com",
+  "fonts.gstatic.com",
+  "cdnjs.cloudflare.com"
 ],
 "imgSrc": [
   "'self'"
