@@ -1,6 +1,6 @@
 {
   "defaultSrc": [
-  "self",
+  "self"
 ],
 "scriptSrc": [
   "self",
@@ -10,7 +10,7 @@
   "stackpath.bootstrapcdn.com",
   "apis.google.com",
   "ajax.googleapis.com",
-  "cdn.jsdelivr.net",
+  "cdn.jsdelivr.net"
 ],
 "styleSrc": [
   "self",
@@ -18,14 +18,14 @@
   "fonts.googleapis.com",
   "use.fontawesome.com",
   "stackpath.bootstrapcdn.com",
-  "cdnjs.cloudflare.com",
+  "cdnjs.cloudflare.com"
 ],
 "fontSrc": [
   "self",
-  "use.fontawesome.com",
+  "use.fontawesome.com"
 ],
 "imgSrc": [
-  "self",
+  "self"
 ],
 "frameSrc": [
  "self",
