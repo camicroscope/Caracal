@@ -1,9 +1,9 @@
 {
   "defaultSrc": [
-  "self"
+  "'self'"
 ],
 "scriptSrc": [
-  "self",
+  "'self'",
   "unsafe-inline",
   "unsafe-eval",
   "code.jquery.com",
@@ -13,7 +13,7 @@
   "cdn.jsdelivr.net"
 ],
 "styleSrc": [
-  "self",
+  "'self'",
   "unsafe-inline",
   "fonts.googleapis.com",
   "use.fontawesome.com",
@@ -21,14 +21,14 @@
   "cdnjs.cloudflare.com"
 ],
 "fontSrc": [
-  "self",
+  "'self'",
   "use.fontawesome.com"
 ],
 "imgSrc": [
-  "self"
+  "'self'"
 ],
 "frameSrc": [
- "self",
+ "'self'",
  "accounts.google.com"
 ]
 }
