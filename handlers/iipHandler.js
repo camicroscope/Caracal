@@ -1,6 +1,7 @@
 var proxy = require('http-proxy-middleware');
 
 var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
+const {logger} = require('../service/logger/winston');
 
 iipHandler = function(req, res, next) {
   if (req.query) {
@@ -22,7 +23,7 @@ iipHandler = function(req, res, next) {
   proxy({
     secure: false,
     onError(err, req, res) {
-      console.log(err);
+      logger.error(err);
       err.statusCode = 500;
       next(err);
     },

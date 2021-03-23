@@ -6,12 +6,13 @@ const tf = require('@tensorflow/tfjs-node');
 
 const Data = require('./datasetHandler.js');
 const AdmZip = require('adm-zip');
+const {logger} = require('../service/logger/winston');
 
 let Layers = [];
 let Params = {};
 
 function getModel(Layers, Params, res) {
-  // console.log(Params)
+  // logger.info(Params)
   let model;
   try {
     model = tf.sequential({
@@ -32,6 +33,7 @@ function getModel(Layers, Params, res) {
       });
     }
   } catch (error) {
+    logger.error(error);
     res.status(400).json({message: error.message});
     // res.send(error);
   }
@@ -66,7 +68,7 @@ async function train(model, data, Params) {
     validationData: [testXs, testYs],
     epochs: Number(Params.epochs),
     shuffle: Params.shuffle,
-    // callbacks: console.log(1),
+    // callbacks: logger.info(1),
   }).then(() => {
     tf.dispose([trainXs, trainYs, testXs, testYs, d2, d1]);
   });
@@ -89,7 +91,7 @@ async function run(Layers, Params, res, userFolder) {
     model.summary();
 
     trained = await train(model, data, Params);
-    console.log('TRAINING DONE');
+    logger.info('TRAINING DONE');
 
     await model.save('file://./dataset/' + userFolder + '/');
 
@@ -103,7 +105,7 @@ async function run(Layers, Params, res, userFolder) {
 
     res.json({status: 'done'});
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     tf.dispose([model, trained, data.xs, data.labels]);
     tf.disposeVariables();
     res.status(400).json({message: error.message});
@@ -153,10 +155,10 @@ function makeLayers(layers, res, userFolder) {
         delete layers[i].layer;
         Layers.splice(Layers.length - 1, 0, tf.layers.globalMaxPooling2d(layers[i]));
       }
-      // console.log(layers[i]);
+      // logger.info(layers[i]);
     }
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(400).json({message: error.message});
     return;
   }

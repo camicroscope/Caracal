@@ -2,6 +2,7 @@ var mongo = require('mongodb');
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
+const {logger} = require('../service/logger/winston');
 
 
 function mongoFind(database, collection, query) {
@@ -54,7 +55,7 @@ function mongoDistinct(database, collection, upon, query) {
         }
       });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       rej(error);
     }
   });
@@ -82,7 +83,7 @@ function mongoAdd(database, collection, data) {
         }
       });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       rej(error);
     }
   });
@@ -109,7 +110,7 @@ function mongoDelete(database, collection, query) {
           });
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         rej(error);
       }
     });
@@ -139,7 +140,7 @@ function mongoAggregate(database, collection, pipeline) {
           });
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         rej(error);
       }
     });
@@ -159,7 +160,7 @@ function mongoUpdate(database, collection, query, newVals) {
           }
           dbo.collection(collection).updateOne(query, newVals, function(err, result) {
             if (err) {
-              console.log(err);
+              logger.info(err);
               rej(err);
             }
             delete result.connection;

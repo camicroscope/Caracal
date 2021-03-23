@@ -21,6 +21,10 @@ const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataSet = require('./handlers/datasetHandler.js');
 const Model = require('./handlers/modelTrainer.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
+
+// services
+const {logger} = require('./service/logger/winston');
+
 // TODO validation of data
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -139,12 +143,12 @@ for (let i in routeConfig) {
   if (Object.prototype.hasOwnProperty.call(routeConfig, i)) {
     let rule = routeConfig[i];
     if (!rule.method) {
-      console.error('rule number '+ i +' has no "method"');
+      logger.error('rule number '+ i +' has no "method"');
       process.exit(1);
     }
     if (rule.method == 'static') {
       if (!rule.use) {
-        console.error('rule number '+ i +' is static and has no "use"');
+        logger.error('rule number '+ i +' is static and has no "use"');
         process.exit(1);
       }
       app.use(express.static(rule.use));
@@ -153,15 +157,15 @@ for (let i in routeConfig) {
         if (Object.prototype.hasOwnProperty.call(rule.handlers, j)) {
           let handler = rule.handlers[j];
           if (!rule.route) {
-            console.error('rule number '+ i +' has no "route"');
+            logger.error('rule number '+ i +' has no "route"');
             process.exit(1);
           }
           if (!handler.function) {
-            console.error('rule number '+ i +' handler ' + j + ' has no "function"');
+            logger.error('rule number '+ i +' handler ' + j + ' has no "function"');
             process.exit(1);
           }
           if (! HANDLERS.hasOwnProperty(handler.function)) {
-            console.error('handler named "'+ handler.function + '" not found (rule '+ i +' handler ' + j + ')');
+            logger.error('handler named "'+ handler.function + '" not found (rule '+ i +' handler ' + j + ')');
             process.exit(1);
           }
           let args = handler.args || [];
@@ -187,9 +191,9 @@ app.use(function(err, req, res, next) {
   // wrap strings in a json
   if (typeof err === 'string' || err instanceof String) {
     err = {'error': err};
-    console.error(err);
+    logger.error(err);
   } else {
-    console.error(err.error || err.message || err.toString());
+    logger.error(err.error || err.message || err.toString());
   }
   res.status(statusCode).json(err);
 });
@@ -202,17 +206,17 @@ var startApp = function(app) {
       var sslPkPath = "./ssl/privatekey.pem";
       var sslCertPath = "./ssl/certificate.pem";
       if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
-        console.info("Starting in HTTPS Mode mode");
+        logger.info("Starting in HTTPS Mode mode");
         httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
         httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
       }
     } catch (err) {
-      console.error(err);
+      logger.error(err);
     }
     if (httpsOptions.key && httpsOptions.cert) {
-      https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
+      https.createServer(httpsOptions, app).listen(PORT, () => logger.info('listening HTTPS on ' + PORT));
     } else {
-      app.listen(PORT, () => console.log('listening on ' + PORT));
+      app.listen(PORT, () => logger.info('listening on ' + PORT));
     }
   };
 };

@@ -10,6 +10,8 @@ const crypto = require("crypto");
 const AdmZip = require('adm-zip');
 const path = require('path');
 
+const {logger} = require('../service/logger/winston');
+
 let LABELS_PATH = null;
 let IMAGES_SPRITE_PATH = null;
 
@@ -32,7 +34,7 @@ class Data {
   async load() {
     let This = this;
     const imgRequest = new Promise((resolve) => {
-      // console.log(this.IMAGES_SPRITE_PATH);
+      // logger.info(this.IMAGES_SPRITE_PATH);
       inkjet.decode(fs.readFileSync(this.IMAGES_SPRITE_PATH), function(err, decoded) {
         const pixels = Float32Array.from(decoded.data).map((pixel) => {
           return pixel / 255;
@@ -126,7 +128,7 @@ class Data {
 function getDataset() {
   return function(req, res) {
     let data = JSON.parse(req.body);
-    // console.log(req.body.ar);
+    // logger.info(req.body.ar);
     let userFolder = crypto.randomBytes(20).toString('hex');
     if (!fs.existsSync('dataset')) {
       fs.mkdirSync('dataset/');
@@ -155,7 +157,7 @@ function deleteData() {
       if (err) {
         throw err;
       }
-      console.log(`Temp folder deleted!`);
+      logger.info(`Temp folder deleted!`);
     });
     res.json({status: 'Temp folder deleted!'});
   };
