@@ -31,7 +31,7 @@ var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 const app = express();
 app.use(cookieParser());
-/** app.use(helmet.contentSecurityPolicy({
+app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: [
       "'self'",
@@ -62,7 +62,7 @@ app.use(cookieParser());
       "'self'",
     ],
   },
-}));**/
+}));
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {
