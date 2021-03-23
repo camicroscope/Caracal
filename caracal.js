@@ -6,7 +6,7 @@ const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
-var cspConfig = require("./contentSecurityPolicy.json")
+var cspConfig = require("./contentSecurityPolicy.json");
 var helmet = require('helmet');
 const fs = require('fs');
 
@@ -35,9 +35,9 @@ var DISABLE_CSP = process.env.DISABLE_CSP || false;
 const app = express();
 app.use(cookieParser());
 
-if (!DISABLE_CSP){
+if (!DISABLE_CSP) {
   app.use(helmet.contentSecurityPolicy({
-    directives: cspConfig
+    directives: cspConfig,
   }));
 }
 
