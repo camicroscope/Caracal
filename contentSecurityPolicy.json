@@ -10,7 +10,8 @@
   "stackpath.bootstrapcdn.com",
   "apis.google.com",
   "ajax.googleapis.com",
-  "cdn.jsdelivr.net"
+  "cdn.jsdelivr.net",
+  "unpkg.com"
 ],
 "styleSrc": [
   "'self'",
