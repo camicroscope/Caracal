@@ -4,6 +4,7 @@ const jwksClient = require('jwks-rsa');
 var atob = require('atob');
 var fs = require('fs');
 var filterFunction = require('./filterFunction.js');
+const {logger} = require("../services/logger/winston");
 
 const {execSync} = require('child_process');
 const preCommand = "openssl req -subj ";
@@ -24,7 +25,7 @@ if (!fs.existsSync('./keys/key') && !fs.existsSync('./keys/key.pub') && GENERATE
   try {
     execSync(`${preCommand}'/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US'${postCommand}`);
   } catch (err) {
-    console.log({err: err});
+    logger.info({err: err});
   }
 }
 
@@ -35,13 +36,13 @@ try {
   } else {
     if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PRIKEY = '';
-      console.warn('prikey null since DISABLE_SEC and no prikey provided');
+      logger.warn('prikey null since DISABLE_SEC and no prikey provided');
     } else {
-      console.error('prikey does not exist');
+      logger.error('prikey does not exist');
     }
   }
 } catch (err) {
-  console.error(err);
+  logger.error(err);
 }
 
 try {
@@ -51,13 +52,13 @@ try {
   } else {
     if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PUBKEY = '';
-      console.warn('pubkey null since DISABLE_SEC and no prikey provided');
+      logger.warn('pubkey null since DISABLE_SEC and no prikey provided');
     } else {
-      console.error('pubkey does not exist');
+      logger.error('pubkey does not exist');
     }
   }
 } catch (err) {
-  console.error(err);
+  logger.error(err);
 }
 
 if (DISABLE_SEC && !JWK_URL) {
@@ -69,7 +70,7 @@ if (DISABLE_SEC && !JWK_URL) {
     jwksUri: JWK_URL,
   });
 } else {
-  console.error('need JWKS URL (JWK_URL)');
+  logger.error('need JWKS URL (JWK_URL)');
   process.exit(1);
 }
 
@@ -104,9 +105,9 @@ function jwkTokenTrade(jwksClient, signKey, userFunction) {
       res.status(401).send('{"err":"no token found"}');
     }
     jwksClient.getSigningKey(getJwtKid(THISTOKEN), (err, key) => {
-      // console.log(key);
+      // logger.info(key);
       if (err) {
-        console.error(err);
+        logger.error(err);
         res.status(401).send({
           'err': err,
         });
@@ -131,7 +132,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
     }
     jwt.verify(THISTOKEN, checkKey, jwtOptions, function(err, token) {
       if (err) {
-        console.error(err);
+        logger.error(err);
         res.status(401).send({
           'err': err,
         });
@@ -143,7 +144,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
           });
         } else {
           userFunction(token).then((x) => {
-            // console.log(x);
+            // logger.info(x);
             if (x === false) {
               res.status(401).send({
                 'err': 'User Unauthorized',
@@ -161,7 +162,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
               });
             }
           }).catch((e) => {
-            console.log(e);
+            logger.info(e);
             res.status(401).send(e);
           });
         }
@@ -177,7 +178,7 @@ function loginHandler(checkKey) {
       try {
         token = jwt.decode(getToken(req)) || {};
       } catch (e) {
-        console.warn(e);
+        logger.warn(e);
       }
       req.tokenInfo = token;
       req.userType = token.userType || DEFAULT_USER_TYPE || 'Null';
@@ -193,7 +194,7 @@ function loginHandler(checkKey) {
       }
       jwt.verify(getToken(req), checkKey, jwtOptions, function(err, token) {
         if (err) {
-          console.error(err);
+          logger.error(err);
           res.status(401).send({
             'err': err,
           });

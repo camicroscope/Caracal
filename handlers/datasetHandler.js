@@ -10,6 +10,8 @@ const crypto = require("crypto");
 const AdmZip = require('adm-zip');
 const path = require('path');
 
+const {logger} = require("../services/logger/winston");
+
 let LABELS_PATH = null;
 let IMAGES_SPRITE_PATH = null;
 
@@ -155,7 +157,7 @@ function deleteData() {
       if (err) {
         throw err;
       }
-      console.log(`Temp folder deleted!`);
+      logger.info(`Temp folder deleted!`);
     });
     res.json({status: 'Temp folder deleted!'});
   };

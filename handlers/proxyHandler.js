@@ -1,4 +1,5 @@
 var proxy = require('http-proxy-middleware');
+const {logger} = require("../services/logger/winston");
 
 proxyHandler = function(target, n) {
   n = n || 2;
@@ -6,15 +7,15 @@ proxyHandler = function(target, n) {
     proxy({
       secure: false,
       onError(err, req, res) {
-        console.log(err);
+        logger.info(err);
         err.statusCode = 500;
         next(err);
       },
       changeOrigin: true,
       target: target,
       pathRewrite: function(path, req) {
-        console.log(target);
-        console.log(path);
+        logger.info(target);
+        logger.info(path);
         // NOTE -- this may need to change if the original url has more subdirs or so added
         var splitPath = path.split('/');
         return '/' + splitPath.slice(n, splitPath.length).join('/');

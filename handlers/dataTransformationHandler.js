@@ -1,5 +1,6 @@
 const client = require("mongodb").MongoClient;
 const fs = require("fs");
+const {logger} = require("../services/logger/winston");
 
 class DataTransformationHandler {
   constructor(url, path) {
@@ -14,7 +15,7 @@ class DataTransformationHandler {
   }
 
   startHandler() {
-    console.log("||-- Start --||");
+    logger.info("||-- Start --||");
     this.counter = 0;
     this.max = 300;
     this.id = 1;
@@ -29,7 +30,7 @@ class DataTransformationHandler {
       config = JSON.parse(rawdata);
     } catch (err) {
       if (err.code == "ENOENT") {
-        console.log(`'${this.filePath}' File Fot Found!`);
+        logger.info(`'${this.filePath}' File Fot Found!`);
       } else {
         throw err;
       }
@@ -54,8 +55,8 @@ class DataTransformationHandler {
           collection.find(query).toArray((err, rs) => {
             if (err) {
               this.isProcessing = false;
-              console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-              console.log(err);
+              logger.info(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+              logger.info(err);
               dbc.close();
               this.cleanHandler();
               return;
@@ -68,8 +69,8 @@ class DataTransformationHandler {
               collection.insertOne(defaultData, (err, result) => {
                 if (err) {
                   this.isProcessing = false;
-                  console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-                  console.log(err);
+                  logger.info(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+                  logger.info(err);
                   dbc.close();
                   this.cleanHandler();
                   return;
@@ -95,8 +96,8 @@ class DataTransformationHandler {
               collection.deleteOne(query, (err, result) => {
                 if (err) {
                   this.isProcessing = false;
-                  console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-                  console.log(err);
+                  logger.info(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+                  logger.info(err);
                   dbc.close();
                   this.cleanHandler();
                   return;
@@ -104,14 +105,14 @@ class DataTransformationHandler {
                 collection.insertOne(config, (err, result) => {
                   if (err) {
                     this.isProcessing = false;
-                    console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-                    console.log(err);
+                    logger.info(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+                    logger.info(err);
                     dbc.close();
                     this.cleanHandler();
                     return;
                   }
                   this.isProcessing = false;
-                  console.log(`||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`);
+                  logger.info(`||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`);
                   dbc.close();
                   this.cleanHandler();
                 });
@@ -119,8 +120,8 @@ class DataTransformationHandler {
             }
           });
         }).catch((err) => {
-          console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-          console.log(err.message);
+          logger.info(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+          logger.info(err.message);
           this.isProcessing = false;
           if (this.max == this.counter) {
             this.cleanHandler();
@@ -144,7 +145,7 @@ class DataTransformationHandler {
   }
 
   cleanHandler() {
-    console.log("||-- Done --||");
+    logger.info("||-- Done --||");
     this.counter = 0;
     this.max = 300;
     this.id = 1;
