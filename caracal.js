@@ -6,6 +6,7 @@ const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
 var routeConfig = require("./routes.json");
+var cspConfig = require("./contentSecurityPolicy.json");
 var helmet = require('helmet');
 const fs = require('fs');
 
@@ -29,40 +30,16 @@ var PORT = process.env.PORT || 4010;
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
+var DISABLE_CSP = process.env.DISABLE_CSP || false;
+
 const app = express();
 app.use(cookieParser());
-/** app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: [
-      "'self'",
-    ],
-    scriptSrc: [
-      "'self'",
-      "'unsafe-inline'",
-      "'unsafe-eval'",
-      'code.jquery.com',
-      'stackpath.bootstrapcdn.com',
-      'apis.google.com',
-      'ajax.googleapis.com',
-      'cdn.jsdelivr.net',
-    ],
-    styleSrc: [
-      "'self'",
-      "'unsafe-inline'",
-      'fonts.googleapis.com',
-      'use.fontawesome.com',
-      'stackpath.bootstrapcdn.com',
-      'cdnjs.cloudflare.com',
-    ],
-    fontSrc: [
-      "'self'",
-      'use.fontawesome.com',
-    ],
-    imgSrc: [
-      "'self'",
-    ],
-  },
-}));**/
+
+if (!DISABLE_CSP) {
+  app.use(helmet.contentSecurityPolicy({
+    directives: cspConfig,
+  }));
+}
 
 // handle non-json raw body for post
 app.use(function(req, res, next) {

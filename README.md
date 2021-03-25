@@ -37,6 +37,7 @@ All possible configuration variables are listed in `.env.example`. Renaming the 
 |ISS | jwt issuer to accept |(if unset, does not check)|
 |EXPIRY | expire in time for jwks| 1d |
 |DISABLE_SEC | set truthy to disable permission and login handlers | false |
+|DISABLE_CSP | set truthy to disable content security policy headers | false |
 |ALLOW_PUBLIC | set truthy to allow public users | false |
 |IIP_PATH | IIP server location | http://ca-iip |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
@@ -48,6 +49,7 @@ All possible configuration variables are listed in `.env.example`. Renaming the 
 ## files used
 `key/key` and `key/key.pub` are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own.
 `./ssl/privatekey.pem` and `./ssl/certificate.pem` are used to enable SSL; if these are present, this application will start in SSL/HTTPS mode.
+The CSP headers are generated from `contentSecurityPolicy.json`.
 
 ## User property variables
 These are set in userFunction and injected into the token.
