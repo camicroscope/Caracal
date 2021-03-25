@@ -1,30 +1,27 @@
 module.exports = {
-  'env': {
-    'browser': true,
-    'node': true,
-    'es6': true,
+  env: {
+    commonjs: true,
+    es6: true,
+    node: true,
   },
-  'extends': [
-    'google',
-    'plugin:security/recommended'
-  ],
-  plugins: [
-    'security'
-  ],
-  'globals': {
-    'Atomics': 'readonly',
-    'SharedArrayBuffer': 'readonly',
+  extends: ['google'],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
   },
-  'parserOptions': {
-    'ecmaVersion': 2018,
+  parserOptions: {
+    ecmaVersion: 2018,
   },
-  'rules': {
-    "require-jsdoc" : 0,
-    "valid-jsdoc" : 0,
-    "max-len" : ["error", { "code": 125 ,"ignoreTemplateLiterals": true},],
-    "no-unused-vars" : 0,
-    "no-var" : 0,
-    "prefer-const":0,
-    "quotes": 0
+  rules: {
+    'prettier/prettier': 'error',
+    'object-curly-spacing': 'off',
+    'require-jsdoc': 0,
+    'space-before-function-paren': 'off',
+    'quote-props': 'off',
+    indent: 'off',
+    'comma-dangle': 'off',
+    'max-len': ['error', { code: 125, ignoreTemplateLiterals: true }],
   },
+  plugins: ['prettier', 'security'],
+  extends: ['plugin:security/recommended'],
 };

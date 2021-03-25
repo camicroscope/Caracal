@@ -1,9 +1,9 @@
-var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
-var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") || false;
+const DISABLE_SEC = process.env.DISABLE_SEC === 'true' || false;
+const ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : '') || false;
 
-function permissionHandler(permissionList, test=false) {
-  return function(req, res, next) {
-    if (!test && DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
+function permissionHandler(permissionList, test = false) {
+  return function (req, res, next) {
+    if ((!test && DISABLE_SEC) || (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now())) {
       req.permission_ok = true;
       next();
     } else {
@@ -12,7 +12,7 @@ function permissionHandler(permissionList, test=false) {
         next();
       } else {
         req.permission_ok = false;
-        let errorMessage = {'statusCode': 401};
+        const errorMessage = { statusCode: 401 };
         errorMessage.error = 'Permission not granted';
         next(errorMessage);
       }

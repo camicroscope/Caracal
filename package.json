@@ -5,10 +5,17 @@
   "main": "caracal.js",
   "scripts": {
     "test": "mocha test/* --exit",
+    "format": " prettier --write  caracal.js handlers/* test/**/*.js",
     "lint": "eslint *.js handlers/*.js test/**/*.js",
     "lint-fix": "eslint *.js handlers/*.js test/**/*.js --fix",
-    "start": "node caracal.js"
+    "start": "node caracal.js",
+    "precommit-msg": "echo 'Running commit hooks...'"
   },
+  "pre-commit": [
+    "precommit-msg",
+    "format",
+    "lint-fix"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/camicroscope/caboodle.git"
@@ -37,8 +44,11 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "cookie-parser": "^1.4.4",
-    "eslint": "^6.8.0",
+    "eslint": "^7.22.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-security": "^1.4.0"
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-security": "^1.4.0",
+    "pre-commit": "^1.2.2",
+    "prettier": "^2.2.1"
   }
 }

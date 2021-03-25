@@ -1,9 +1,9 @@
 function filterFunction(filter, data, attr, wildcard) {
-  if (typeof filter==="string") {
+  if (typeof filter === 'string') {
     try {
       filter = JSON.parse(filter.replace(/'/g, '"'));
     } catch (err) {
-      filter=[filter]; // make an array of the filter
+      filter = [filter]; // make an array of the filter
     }
   }
   if (filter.indexOf(wildcard) == -1) {
@@ -16,10 +16,11 @@ function filterFunction(filter, data, attr, wildcard) {
           return true;
         }
         try {
-          list=JSON.parse(x[attr].replace(/'/g, '"'));
-          return list.some((e) =>filter.indexOf(e) >= 0);
-        } catch (err) { // when list is not an array, but a string
-          list=x[attr];
+          list = JSON.parse(x[attr].replace(/'/g, '"'));
+          return list.some((e) => filter.indexOf(e) >= 0);
+        } catch (err) {
+          // when list is not an array, but a string
+          list = x[attr];
           return filter.indexOf(x[attr]) >= 0;
         }
       });
@@ -29,13 +30,14 @@ function filterFunction(filter, data, attr, wildcard) {
       } else {
         let list;
         try {
-          list=JSON.parse(data[attr].replace(/'/g, '"'));
+          list = JSON.parse(data[attr].replace(/'/g, '"'));
           if (list.some((e) => filter.indexOf(e) >= 0)) {
             return data;
           } else {
             return {};
           }
-        } catch (err) { // when list is not an array, but a string
+        } catch (err) {
+          // when list is not an array, but a string
           if (filter.indexOf(data[attr]) >= 0) {
             return data;
           } else {
@@ -47,6 +49,5 @@ function filterFunction(filter, data, attr, wildcard) {
   }
   return data;
 }
-
 
 module.exports = filterFunction;
