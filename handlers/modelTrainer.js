@@ -32,7 +32,7 @@ function getModel(Layers, Params, res) {
       });
     }
   } catch (error) {
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
     // res.send(error);
   }
 
@@ -40,40 +40,39 @@ function getModel(Layers, Params, res) {
 }
 
 async function train(model, data, Params) {
-  let TRAIN_DATA_SIZE = Params.trainDataSize;
-  let TEST_DATA_SIZE = Params.testDataSize;
-  let WIDTH = Params.width;
-  let HEIGHT = Params.height;
-  let d1; let d2;
+  const TRAIN_DATA_SIZE = Params.trainDataSize;
+  const TEST_DATA_SIZE = Params.testDataSize;
+  const WIDTH = Params.width;
+  const HEIGHT = Params.height;
+  let d1;
+  let d2;
   const [trainXs, trainYs] = tf.tidy(() => {
     d1 = data.nextTrainBatch(TRAIN_DATA_SIZE);
-    return [
-      d1.xs.reshape([TRAIN_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]),
-      d1.labels,
-    ];
+    return [d1.xs.reshape([TRAIN_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]), d1.labels];
   });
 
   const [testXs, testYs] = tf.tidy(() => {
     d2 = data.nextTestBatch(TEST_DATA_SIZE);
-    return [
-      d2.xs.reshape([TEST_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]),
-      d2.labels,
-    ];
+    return [d2.xs.reshape([TEST_DATA_SIZE, HEIGHT, WIDTH, data.NUM_CHANNELS]), d2.labels];
   });
 
-  return model.fit(trainXs, trainYs, {
-    batchSize: Number(Params.batchSize),
-    validationData: [testXs, testYs],
-    epochs: Number(Params.epochs),
-    shuffle: Params.shuffle,
-    // callbacks: console.log(1),
-  }).then(() => {
-    tf.dispose([trainXs, trainYs, testXs, testYs, d2, d1]);
-  });
+  return model
+    .fit(trainXs, trainYs, {
+      batchSize: Number(Params.batchSize),
+      validationData: [testXs, testYs],
+      epochs: Number(Params.epochs),
+      shuffle: Params.shuffle,
+      // callbacks: console.log(1),
+    })
+    .then(() => {
+      tf.dispose([trainXs, trainYs, testXs, testYs, d2, d1]);
+    });
 }
 
 async function run(Layers, Params, res, userFolder) {
-  let model; let trained; let data;
+  let model;
+  let trained;
+  let data;
   try {
     data = new Data.Data();
     data.IMAGE_SIZE = Params.height * Params.width;
@@ -96,27 +95,24 @@ async function run(Layers, Params, res, userFolder) {
     tf.dispose([model, trained, data.xs, data.labels]);
     tf.disposeVariables();
 
-    let zip = new AdmZip();
+    const zip = new AdmZip();
     zip.addLocalFile('./dataset/' + userFolder + '/model.json');
     zip.addLocalFile('./dataset/' + userFolder + '/weights.bin');
     zip.writeZip('./dataset/' + userFolder + '/' + Params.modelName + '.zip');
 
-    res.json({status: 'done'});
+    res.json({ status: 'done' });
   } catch (error) {
     console.log(error);
     tf.dispose([model, trained, data.xs, data.labels]);
     tf.disposeVariables();
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
   }
 }
 
 function makeLayers(layers, res, userFolder) {
   delete layers[0].layer;
   delete layers[layers.length - 1].layer;
-  Layers = [
-    tf.layers.conv2d(layers[0]),
-    tf.layers.dense(layers[layers.length - 1]),
-  ];
+  Layers = [tf.layers.conv2d(layers[0]), tf.layers.dense(layers[layers.length - 1])];
   try {
     for (let i = 1; i < layers.length - 1; i++) {
       if (layers[i].layer == 'dense') {
@@ -157,7 +153,7 @@ function makeLayers(layers, res, userFolder) {
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
     return;
   }
 
@@ -165,23 +161,23 @@ function makeLayers(layers, res, userFolder) {
 }
 
 function trainModel() {
-  return function(req, res) {
-    let data = JSON.parse(req.body);
+  return function (req, res) {
+    const data = JSON.parse(req.body);
     Params = data.Params;
     makeLayers(data.Layers, res, data.userFolder);
   };
 }
 
 function sendTrainedModel() {
-  return function(req, res) {
-    let data = JSON.parse(req.body);
-    let downloadURL = '/workbench/download/' + data.userFolder;
-    let app = require('../caracal.js');
+  return function (req, res) {
+    const data = JSON.parse(req.body);
+    const downloadURL = '/workbench/download/' + data.userFolder;
+    const app = require('../caracal.js');
     app.get(downloadURL, (req1, res1) =>
-      res1.download('./dataset/' + data.userFolder + '/' + data.Params.modelName + '.zip'),
+      res1.download('./dataset/' + data.userFolder + '/' + data.Params.modelName + '.zip')
     );
-    res.json({url: downloadURL});
+    res.json({ url: downloadURL });
   };
 }
 
-module.exports = {trainModel: trainModel, sendTrainedModel: sendTrainedModel};
+module.exports = { trainModel: trainModel, sendTrainedModel: sendTrainedModel };

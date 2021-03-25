@@ -1,8 +1,8 @@
-var proxy = require('http-proxy-middleware');
+const proxy = require('http-proxy-middleware');
 
-var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
+const IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
 
-iipHandler = function(req, res, next) {
+iipHandler = function (req, res, next) {
   if (req.query) {
     if (req.query.DeepZoom) {
       if (req.query.DeepZoom.endsWith('.dzi')) {
@@ -28,12 +28,12 @@ iipHandler = function(req, res, next) {
     },
     changeOrigin: true,
     target: IIP_PATH,
-    pathRewrite: function(path, req) {
+    pathRewrite: function (path, req) {
       // NOTE -- this may need to change if the original url has more subdirs or so added
-      var splitPath = path.split('/');
+      const splitPath = path.split('/');
       return '/' + splitPath.slice(2, splitPath.length).join('/');
     },
-    onProxyReq: function(proxyReq, req, res) {
+    onProxyReq: function (proxyReq, req, res) {
       if (req.method == 'POST') {
         proxyReq.write(req.body);
         proxyReq.end();
@@ -41,6 +41,5 @@ iipHandler = function(req, res, next) {
     },
   })(req, res, next);
 };
-
 
 module.exports = iipHandler;

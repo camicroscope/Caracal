@@ -1,12 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 
-var proxy = require('http-proxy-middleware');
 const https = require('https');
-var cookieParser = require('cookie-parser');
-var throng = require('throng');
-var routeConfig = require("./routes.json");
-var helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const throng = require('throng');
+const routeConfig = require('./routes.json');
+// const helmet = require('helmet');
 const fs = require('fs');
 
 // handlers
@@ -23,11 +22,11 @@ const Model = require('./handlers/modelTrainer.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 // TODO validation of data
 
-var WORKERS = process.env.NUM_THREADS || 4;
+const WORKERS = process.env.NUM_THREADS || 4;
 
-var PORT = process.env.PORT || 4010;
+const PORT = process.env.PORT || 4010;
 
-var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 const app = express();
 app.use(cookieParser());
@@ -65,13 +64,13 @@ app.use(cookieParser());
 }));**/
 
 // handle non-json raw body for post
-app.use(function(req, res, next) {
-  var data = '';
+app.use(function (req, res, next) {
+  let data = '';
   req.setEncoding(null);
-  req.on('data', function(chunk) {
+  req.on('data', function (chunk) {
     data += chunk;
   });
-  req.on('end', function() {
+  req.on('end', function () {
     req.body = data;
     next();
   });
@@ -83,88 +82,88 @@ app.get('/auth/Token/renew', auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunct
 app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
 
 // TODO way to populate this semi-automatically?
-var HANDLERS = {
-  "loginHandler": function() {
+const HANDLERS = {
+  loginHandler: function () {
     return auth.loginHandler(auth.PUBKEY);
   },
-  "sanitizeBody": function() {
+  sanitizeBody: function () {
     return sanitizeBody;
   },
-  "monitorCheck": monitor.check,
-  "mongoFind": dataHandlers.General.find,
-  "mongoAdd": dataHandlers.General.add,
-  "mongoUpdate": dataHandlers.General.update,
-  "mongoDelete": dataHandlers.General.delete,
-  "mongoDistinct": dataHandlers.General.distinct,
-  "filterHandler": auth.filterHandler,
-  "permissionHandler": permissionHandler,
-  "editHandler": auth.editHandler,
-  "proxyHandler": proxyHandler,
-  "getDataset": DataSet.getDataset,
-  "trainModel": Model.trainModel,
-  "deleteDataset": DataSet.deleteData,
-  "sendTrainedModel": Model.sendTrainedModel,
-  "iipHandler": function() {
+  monitorCheck: monitor.check,
+  mongoFind: dataHandlers.General.find,
+  mongoAdd: dataHandlers.General.add,
+  mongoUpdate: dataHandlers.General.update,
+  mongoDelete: dataHandlers.General.delete,
+  mongoDistinct: dataHandlers.General.distinct,
+  filterHandler: auth.filterHandler,
+  permissionHandler: permissionHandler,
+  editHandler: auth.editHandler,
+  proxyHandler: proxyHandler,
+  getDataset: DataSet.getDataset,
+  trainModel: Model.trainModel,
+  deleteDataset: DataSet.deleteData,
+  sendTrainedModel: Model.sendTrainedModel,
+  iipHandler: function () {
     return iipHandler;
   },
-  "markMulti": function() {
+  markMulti: function () {
     return dataHandlers.Mark.multi;
   },
-  "markSpatial": function() {
+  markSpatial: function () {
     return dataHandlers.Mark.spatial;
   },
-  "findMarkTypes": function() {
+  findMarkTypes: function () {
     return dataHandlers.Mark.findMarkTypes;
   },
-  "heatmapTypes": function() {
+  heatmapTypes: function () {
     return dataHandlers.Heatmap.types;
   },
-  "wcido": function() {
+  wcido: function () {
     return dataHandlers.User.wcido;
   },
-  "addPresetlabels": function() {
+  addPresetlabels: function () {
     return dataHandlers.Presetlabels.add;
   },
-  "updatePresetlabels": function() {
+  updatePresetlabels: function () {
     return dataHandlers.Presetlabels.update;
   },
-  "removePresetlabels": function() {
+  removePresetlabels: function () {
     return dataHandlers.Presetlabels.remove;
   },
 };
 
 // register configurable services
 // TODO verify all
-for (let i in routeConfig) {
+for (const i in routeConfig) {
   if (Object.prototype.hasOwnProperty.call(routeConfig, i)) {
-    let rule = routeConfig[i];
+    const rule = routeConfig[i];
     if (!rule.method) {
-      console.error('rule number '+ i +' has no "method"');
+      console.error('rule number ' + i + ' has no "method"');
       process.exit(1);
     }
     if (rule.method == 'static') {
       if (!rule.use) {
-        console.error('rule number '+ i +' is static and has no "use"');
+        console.error('rule number ' + i + ' is static and has no "use"');
         process.exit(1);
       }
       app.use(express.static(rule.use));
     } else {
-      for (let j in rule.handlers) {
+      for (const j in rule.handlers) {
         if (Object.prototype.hasOwnProperty.call(rule.handlers, j)) {
-          let handler = rule.handlers[j];
+          const handler = rule.handlers[j];
           if (!rule.route) {
-            console.error('rule number '+ i +' has no "route"');
+            console.error('rule number ' + i + ' has no "route"');
             process.exit(1);
           }
           if (!handler.function) {
-            console.error('rule number '+ i +' handler ' + j + ' has no "function"');
+            console.error('rule number ' + i + ' handler ' + j + ' has no "function"');
             process.exit(1);
           }
-          if (! HANDLERS.hasOwnProperty(handler.function)) {
-            console.error('handler named "'+ handler.function + '" not found (rule '+ i +' handler ' + j + ')');
+          if (!HANDLERS.hasOwnProperty(handler.function)) {
+            console.error('handler named "' + handler.function + '" not found (rule ' + i + ' handler ' + j + ')');
             process.exit(1);
           }
-          let args = handler.args || [];
+          const args = handler.args || [];
           // handler.function needs to be in handlers
           app[rule.method](rule.route, HANDLERS[handler.function](...args));
         }
@@ -174,7 +173,7 @@ for (let i in routeConfig) {
 }
 
 // render mongo returns/data
-app.use('/data', function(req, res, next) {
+app.use('/data', function (req, res, next) {
   if (!req.data) {
     res.status(404).json({});
   }
@@ -182,11 +181,11 @@ app.use('/data', function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  let statusCode = err.statusCode || 500;
+app.use(function (err, req, res, next) {
+  const statusCode = err.statusCode || 500;
   // wrap strings in a json
   if (typeof err === 'string' || err instanceof String) {
-    err = {'error': err};
+    err = { error: err };
     console.error(err);
   } else {
     console.error(err.error || err.message || err.toString());
@@ -194,15 +193,15 @@ app.use(function(err, req, res, next) {
   res.status(statusCode).json(err);
 });
 
-var startApp = function(app) {
-  return function() {
+const startApp = function (app) {
+  return function () {
     // Prepare for SSL/HTTPS
-    var httpsOptions = {};
+    const httpsOptions = {};
     try {
-      var sslPkPath = "./ssl/privatekey.pem";
-      var sslCertPath = "./ssl/certificate.pem";
+      const sslPkPath = './ssl/privatekey.pem';
+      const sslCertPath = './ssl/certificate.pem';
       if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
-        console.info("Starting in HTTPS Mode mode");
+        console.info('Starting in HTTPS Mode mode');
         httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
         httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
       }
