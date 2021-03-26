@@ -1,29 +1,21 @@
-var mongo = require('mongodb');
+const {getConnection} = require("../service/database/connector");
 
-var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
-// handle monitoring checks
-
-let monitor = {};
-
-monitor.check = function(type) {
-  if (type == "basic") {
-    return new Promise(function(res, rej) {
-      let checkMsg = {"status": "up", "checkType": "basic"};
-      res(checkMsg);
-    });
-  }
-  if (type == "mongo") {
-    return new Promise(function(res, rej) {
-      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-        if (err) {
-          rej(err);
-        } else {
-          res({"status": "up", "checkType": "mongo"});
-        }
-      });
-    });
-  }
+/**
+ * @param {string} type Monitor to check status of database connection
+ * @returns {Promise<{status:string, checkType:string}>} status of service
+ */
+const check = function(type) {
+  return new Promise((resolve, reject) => {
+    if (type === "basic") {
+      resolve({status: "up", checkType: "basic"});
+    } else if (type === "mongo") {
+      if (getConnection() === undefined) {
+        const error = new Error("Error connecting to database");
+        reject(error);
+      }
+      resolve({status: "up", checkType: "mongo"});
+    }
+  });
 };
 
-
-module.exports = monitor;
+module.exports = {check};

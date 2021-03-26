@@ -1,5 +1,5 @@
-const client = require("mongodb").MongoClient;
 const fs = require("fs");
+const mongoDB = require("../service/database");
 
 class DataTransformationHandler {
   constructor(url, path) {
@@ -37,7 +37,7 @@ class DataTransformationHandler {
     return config;
   }
 
-  connect() {
+  async connect() {
     if (this.isProcessing) {
       return;
     }
@@ -45,88 +45,48 @@ class DataTransformationHandler {
       this.cleanHandler();
       return;
     }
+
     this.isProcessing = true;
     const query = {config_name: "preset_label"};
-    client
-        .connect(this.url, {useNewUrlParser: true})
-        .then((dbc) => {
-          const collection = dbc.db("camic").collection("configuration");
-          collection.find(query).toArray((err, rs) => {
-            if (err) {
-              this.isProcessing = false;
-              console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-              console.log(err);
-              dbc.close();
-              this.cleanHandler();
-              return;
-            }
-            // add default data
-            if (rs.length < 1) {
-              // read default data from json
-              const defaultData = this.loadDefaultData();
-              // insert default data
-              collection.insertOne(defaultData, (err, result) => {
-                if (err) {
-                  this.isProcessing = false;
-                  console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-                  console.log(err);
-                  dbc.close();
-                  this.cleanHandler();
-                  return;
-                }
-                dbc.close();
-                // clear handler
-                this.cleanHandler();
-              });
-              return;
-            }
+    try {
+      /** fetch saved configurations */
+      const rs = await mongoDB.find("camic", "configuration", query, false);
 
-            if (rs.length > 0 && rs[0].version != "1.0.0") {
-              const config = rs[0];
-              const list = [];
-              if (config.configuration && Array.isArray(config.configuration)) {
-                config.configuration.forEach((node) => {
-                  this.extractNode(node, list);
-                });
-              }
-              config.configuration = list;
-              config.version = '1.0.0';
-              if (!(list && list.length)) return;
-              collection.deleteOne(query, (err, result) => {
-                if (err) {
-                  this.isProcessing = false;
-                  console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-                  console.log(err);
-                  dbc.close();
-                  this.cleanHandler();
-                  return;
-                }
-                collection.insertOne(config, (err, result) => {
-                  if (err) {
-                    this.isProcessing = false;
-                    console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-                    console.log(err);
-                    dbc.close();
-                    this.cleanHandler();
-                    return;
-                  }
-                  this.isProcessing = false;
-                  console.log(`||-- The Document At The 'configuration' Collection Has Been Upgraded To Version 1.0.0 --||`);
-                  dbc.close();
-                  this.cleanHandler();
-                });
-              });
-            }
+      /** read default data and write to database */
+      if (rs.length < 1) {
+        const defaultData = this.loadDefaultData();
+        await mongoDB.add("camic", "configuration", defaultData);
+      }
+
+      /** if not default configuration */
+      if (rs.length > 0 && rs[0].version != "1.0.0") {
+        const config = rs[0];
+        const list = [];
+        if (config.configuration && Array.isArray(config.configuration)) {
+          config.configuration.forEach((node) => {
+            this.extractNode(node, list);
           });
-        }).catch((err) => {
-          console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
-          console.log(err.message);
-          this.isProcessing = false;
-          if (this.max == this.counter) {
-            this.cleanHandler();
-          }
-        });
+        }
+
+        config.configuration = list;
+        config.version = "1.0.0";
+        if (!(list && list.length)) {
+          return;
+        }
+
+        /** delete old stored object and insert new one */
+        await mongoDB.delete("camic", "configuration", query);
+        await mongoDB.add("camic", "configuration", config);
+        this.isProcessing = false;
+        this.cleanHandler();
+      }
+    } catch (err) {
+      console.log(`||-- The 'Preset Labels' Document Upgrade Is Failed --||`);
+      console.log(err);
+      this.cleanHandler();
+    }
   }
+
   extractNode(node, list) {
     if (node.children && Array.isArray(node.children)) {
       node.children.forEach((n) => {
