@@ -15,9 +15,9 @@ class MongoDBConnector {
    */
   constructor() {
     /** connection specifics */
-    const connectionString = process.env.MONGO_URI || "127.0.0.1:27017";
+    const connectionString = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
     const databaseName = process.env.MONGO_DB || "camic";
-    const url = `mongodb://${connectionString}/${databaseName}`;
+    const url = `${connectionString}/${databaseName}`;
 
     /** connection configurations */
     const configs = {
