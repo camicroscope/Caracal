@@ -4,8 +4,7 @@
 
 # Caracal
 
-Conslidated Backend, Auth, and Security Services
-
+Conslidated Attribute Registry, Access Control, and Loader proxy
 
 ## routes
 The routes.json sets up each route functionally as a list, executed on startup in order.
@@ -14,13 +13,6 @@ Other routes require method to be set to the required supported http method (e.g
 Each handler should have args set to the initialization arguments for the handler, and "function" set to the handler's registered name.
 
 Routes are setup in this method primarily so that caMicroscope deployments can be customized, but this means that caracal can be used for entirely different projects.
-
-### Default Route (routes.json) Rationale
-- camicroscope is served as static files on /
-- auth login and check are in /auth/
-- iip images are used within /iip/
-- mongo data interactions are within /data/
-
 
 ## Handlers
 Handlers are the specific functions designed for use by routes. They should have pattern `handler(...args) = function(req, res, next)`
