@@ -11,7 +11,8 @@
   "apis.google.com",
   "ajax.googleapis.com",
   "cdn.jsdelivr.net",
-  "unpkg.com"
+  "unpkg.com",
+  "http://openseadragon.github.io"
 ],
 "styleSrc": [
   "'self'",
