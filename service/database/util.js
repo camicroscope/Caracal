@@ -11,11 +11,15 @@ const { ObjectID } = require("mongodb");
  * @link https://docs.mongodb.com/manual/reference/method/ObjectId/
  */
 const transformIdToObjectId = (query) => {
-  if (query["_id"]) {
-    query["_id"] = new ObjectID(query["_id"]);
+  const payload = { ...query };
+  try {
+    if (payload["_id"]) {
+      payload["_id"] = new ObjectID(payload["_id"]);
+    }
+    return payload;
+  } catch (e) {
+    return query;
   }
-
-  return query;
 };
 
 module.exports = { transformIdToObjectId };
