@@ -37,6 +37,7 @@ class Mongo {
 
       return data;
     } catch (e) {
+      console.error(e);
       return e;
     }
   }
@@ -59,6 +60,7 @@ class Mongo {
       const data = await collection.distinct(upon, query);
       return data;
     } catch (e) {
+      console.error(e);
       return [];
     }
   }
@@ -81,9 +83,10 @@ class Mongo {
 
     try {
       const collection = getConnection(database).collection(collectionName);
-      const data = await collection.insertMany(data);
-      return data;
+      const res = await collection.insertMany(data);
+      return res;
     } catch (e) {
+      console.error(e);
       return [];
     }
   }
@@ -107,7 +110,8 @@ class Mongo {
       delete result.connection;
 
       return result;
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
       return [];
     }
   }
@@ -127,7 +131,8 @@ class Mongo {
       const collection = getConnection(database).collection(collectionName);
       const result = await collection.aggregate(pipeline).toArray();
       return result;
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
       return [];
     }
   }
@@ -153,6 +158,7 @@ class Mongo {
       delete result.connection;
       return result;
     } catch (e) {
+      console.error(e);
       return e;
     }
   }
