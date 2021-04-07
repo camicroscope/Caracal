@@ -4,8 +4,7 @@
 
 # Caracal
 
-Conslidated Backend, Auth, and Security Services
-
+Conslidated Attribute Registry, Access Control, and Loader proxy
 
 ## routes
 The routes.json sets up each route functionally as a list, executed on startup in order.
@@ -15,17 +14,12 @@ Each handler should have args set to the initialization arguments for the handle
 
 Routes are setup in this method primarily so that caMicroscope deployments can be customized, but this means that caracal can be used for entirely different projects.
 
-### Default Route (routes.json) Rationale
-- camicroscope is served as static files on /
-- auth login and check are in /auth/
-- iip images are used within /iip/
-- mongo data interactions are within /data/
-
-
 ## Handlers
 Handlers are the specific functions designed for use by routes. They should have pattern `handler(...args) = function(req, res, next)`
 
 ## Environment variables Used
+All possible configuration variables are listed in `.env.example`. Renaming the file to `.env`  will inject all the environment variables.
+
 |variable | Description | default |
 |---|---|---|
 | WORKERS | number of child processes | 4 |
@@ -35,6 +29,7 @@ Handlers are the specific functions designed for use by routes. They should have
 |ISS | jwt issuer to accept |(if unset, does not check)|
 |EXPIRY | expire in time for jwks| 1d |
 |DISABLE_SEC | set truthy to disable permission and login handlers | false |
+|DISABLE_CSP | set truthy to disable content security policy headers | false |
 |ALLOW_PUBLIC | set truthy to allow public users | false |
 |IIP_PATH | IIP server location | http://ca-iip |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
@@ -46,6 +41,7 @@ Handlers are the specific functions designed for use by routes. They should have
 ## files used
 `key/key` and `key/key.pub` are used for internal jwts for this service. You can use key/make_key.sh to generate these, or otherwise add your own.
 `./ssl/privatekey.pem` and `./ssl/certificate.pem` are used to enable SSL; if these are present, this application will start in SSL/HTTPS mode.
+The CSP headers are generated from `contentSecurityPolicy.json`.
 
 ## User property variables
 These are set in userFunction and injected into the token.
