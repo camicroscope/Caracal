@@ -18,3 +18,4 @@ jobs:
           ./Dockerfile
         build-args: |
           viewer=develop
+          fork=camicroscope
