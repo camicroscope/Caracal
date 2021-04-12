@@ -5,7 +5,7 @@ var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
-    mongoDB.add(db, collection, query).then((x) => {
+    mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));

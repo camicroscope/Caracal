@@ -1,8 +1,8 @@
 const chai = require("chai");
-const { ObjectID } = require("mongodb");
+const {ObjectID} = require("mongodb");
 var should = chai.should();
 
-const { getConnection } = require("./../../service/database/connector");
+const {getConnection} = require("./../../service/database/connector");
 const MongoDB = require("./../../service/database/index");
 const Util = require("./../../service/database/util");
 
@@ -140,7 +140,7 @@ describe("service/database", () => {
 
     /** clear database after each unit */
     afterEach(async () => {
-      await getConnection().collection(DB.COLLECTION).deleteMany({ age: 20 });
+      await getConnection().collection(DB.COLLECTION).deleteMany({age: 20});
     });
 
     /** ensures that service always provides all database functionality */
