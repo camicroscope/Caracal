@@ -54,3 +54,10 @@ userFilter -- list of values which must be present in given field in filtered da
 \*\* -- immune to filters (can see everything)
 Public -- users with no userFilter are assigned this filter
 An item with no filter value is returned in all cases, and is thus also public.
+
+## Local Development Environment
+In order to quickly setup a development environment, make use of the `setup_script.sh` script. This will setup the project, initialize and seed the database configurations, import routes and initialize environment config files and generate the keys required.
+
+Run the script with  `./setup_script` or `bash ./setup_script.sh`
+
+The script is configured to load a database named "`camic`" from server at "`127.0.0.1`". In order to specify different name and host, simply pass the two while calling the script, like `./setup_script custom_host custom_database_name`
