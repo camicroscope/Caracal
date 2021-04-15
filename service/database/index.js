@@ -38,7 +38,7 @@ class Mongo {
       return data;
     } catch (e) {
       console.error(e);
-      return e;
+      throw e;
     }
   }
 
@@ -61,7 +61,7 @@ class Mongo {
       return data;
     } catch (e) {
       console.error(e);
-      return [];
+      throw e;
     }
   }
 
@@ -87,7 +87,7 @@ class Mongo {
       return res;
     } catch (e) {
       console.error(e);
-      return [];
+      throw e;
     }
   }
 
@@ -112,7 +112,7 @@ class Mongo {
       return result;
     } catch (e) {
       console.error(e);
-      return [];
+      throw e;
     }
   }
 
@@ -133,7 +133,7 @@ class Mongo {
       return result;
     } catch (e) {
       console.error(e);
-      return [];
+      throw e;
     }
   }
 
@@ -153,13 +153,15 @@ class Mongo {
     try {
       filter = transformIdToObjectId(filter);
 
-      const collection = await getConnection(database).collection(collectionName);
+      const collection = await getConnection(database).collection(
+        collectionName
+      );
       const result = await collection.updateOne(filter, updates);
       delete result.connection;
       return result;
     } catch (e) {
       console.error(e);
-      return e;
+      throw e;
     }
   }
 }
