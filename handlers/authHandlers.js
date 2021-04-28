@@ -45,13 +45,13 @@ try {
 }
 
 try {
-  const prikeyPath = './keys/key.pub';
-  if (fs.existsSync(prikeyPath)) {
-    var PUBKEY = fs.readFileSync(prikeyPath, 'utf8');
+  const pubkeyPath = './keys/key.pub';
+  if (fs.existsSync(pubkeyPath)) {
+    var PUBKEY = fs.readFileSync(pubkeyPath, 'utf8');
   } else {
     if (DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       PUBKEY = '';
-      console.warn('pubkey null since DISABLE_SEC and no prikey provided');
+      console.warn('pubkey null since DISABLE_SEC and no pubkey provided');
     } else {
       console.error('pubkey does not exist');
     }
