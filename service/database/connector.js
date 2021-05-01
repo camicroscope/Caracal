@@ -15,7 +15,8 @@ class MongoDBConnector {
    */
   constructor() {
     /** connection specifics */
-    const connectionString = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
+    const connectionString =
+      process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
     const databaseName = process.env.MONGO_DB || "camic";
     const url = `${connectionString}/${databaseName}`;
 
@@ -42,10 +43,6 @@ class MongoDBConnector {
 
 /** initialize an instance of mongoDB connection and kill process if connection fails */
 const connector = new MongoDBConnector();
-connector.init().catch((e) => {
-  console.error("error connecting to database");
-  process.exit(1);
-});
 
 /**
  * to load connection instances in database operations
@@ -58,4 +55,6 @@ const getConnection = (databaseName = "camic") => {
 /** export the connector to be used by utility functions */
 module.exports = {
   getConnection,
+  connector,
 };
+
