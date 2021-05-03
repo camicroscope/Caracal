@@ -24,6 +24,8 @@ const Model = require('./handlers/modelTrainer.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 // TODO validation of data
 
+const {connector} = require("./service/database/connector")
+
 var WORKERS = process.env.NUM_THREADS || 4;
 
 var PORT = process.env.PORT || 4010;
@@ -196,7 +198,13 @@ var startApp = function(app) {
 
 throng(WORKERS, startApp(app));
 
-const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
-handler.startHandler();
+/** initialize DataTransformationHandler only after database is ready */
+connector.init().then(() => {
+  const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+  handler.startHandler();
+}).catch((e) => {
+  console.error("error connecting to database");
+  process.exit(1);
+});
 
 module.exports = app; // for tests
