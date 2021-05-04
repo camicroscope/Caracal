@@ -85,7 +85,7 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
-  "pathdbIip": function(){
+  "pathdbIip": function() {
     return pdbIipHandler;
   },
   "markMulti": function() {
