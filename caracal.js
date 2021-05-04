@@ -15,6 +15,7 @@ const auth = require('./handlers/authHandlers.js');
 const monitor = require('./handlers/monitorHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
 const iipHandler = require('./handlers/iipHandler.js');
+const pdbIipHandler = require('./handlers/pathdbIipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
@@ -83,6 +84,9 @@ var HANDLERS = {
   "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
     return iipHandler;
+  },
+  "pathdbIip": function(){
+    return pdbIipHandler;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
