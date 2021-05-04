@@ -39,10 +39,10 @@ fi
 ###
 echo "Checking for required files"
 
-if [[ ! -d ../Distro/db ]]
-then echo "../Distro/db does not exist"
-     exit
-fi
+#if [[ ! -d ../Distro/db ]]
+#then echo "../Distro/db does not exist"
+#     exit
+#fi
 
 if [[ ! -d ../Distro/config ]]
 then echo "../Distro/config does not exist"
