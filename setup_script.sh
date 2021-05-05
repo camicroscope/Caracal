@@ -63,11 +63,11 @@ echo "Required files exist."
 
 echo "Copying files..." 
 
-if [[ ! -d ../data ]]
-then 
-    mkdir ../data
-    cp -r ../Distro/db ../data/
-fi
+#if [[ ! -d ../data ]]
+#then 
+#    mkdir ../data
+#    cp -r ../Distro/db ../data/
+#fi
 
 if [[ ! -d ../config ]]
 then 
