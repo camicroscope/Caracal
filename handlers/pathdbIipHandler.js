@@ -1,5 +1,5 @@
 const proxy = require('http-proxy-middleware');
-const fetch = require('node-fetch');
+var axios = require('axios');
 
 var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
 
@@ -12,7 +12,7 @@ pdbIipHandler = function(req, res, next) {
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
     console.log(lookupUrl)
     // LOOK AT - headers may need transform??
-    fetch(lookupUrl, {headers: req.headers}).then((x)=>x.json()).then((x)=>{
+    axios.get(lookupUrl, {headers: req.headers}).then((x)=>{
       // get path
       if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
         let filepath = x['field_iip_path']['value'];
