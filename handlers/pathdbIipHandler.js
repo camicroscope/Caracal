@@ -2,14 +2,15 @@ const proxy = require('http-proxy-middleware');
 const fetch = require('node-fetch');
 
 var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
-var PDB_URL = process.env.PDB_URL ||`https://quip-pathdb/`;
 
 pdbIipHandler = function(req, res, next) {
   if (req.query && req.query.slide && req.query.tsq) {
     // expected query args:
     // - slide - pathdb slide node id
     // - tsq - tile server "query"
+    const PDB_URL = process.env.PDB_URL ||`https://quip-pathdb/`;
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
+    console.log(lookupUrl)
     // LOOK AT - headers may need transform??
     fetch(lookupUrl, {headers: req.headers}).then((x)=>x.json()).then((x)=>{
       // get path
