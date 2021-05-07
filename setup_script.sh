@@ -35,6 +35,78 @@ if ! command -v "node" &>/dev/null; then
 fi
 
 ###
+# check for the existence of required files in the Distro and camicroscope repository
+###
+echo "Checking for required files"
+
+#if [[ ! -d ../Distro/db ]]
+#then echo "../Distro/db does not exist"
+#     exit
+#fi
+
+if [[ ! -d ../Distro/config ]]
+then echo "../Distro/config does not exist"
+     exit
+fi
+
+if [[ ! -d ../Distro/jwt_keys ]]
+then echo "../Distro/jwt_keys does not exist"
+     exit
+fi
+
+if [[ ! -d ../caMicroscope ]]
+then echo "../caMicroscope does not exist"
+     exit
+fi
+
+echo "Required files exist."
+
+echo "Copying files..." 
+
+#if [[ ! -d ../data ]]
+#then 
+#    mkdir ../data
+#    cp -r ../Distro/db ../data/
+#fi
+
+if [[ ! -d ../config ]]
+then 
+    mkdir ../config
+    cp -r ../Distro/config ../config/
+fi
+
+if [[ ! -d ./static ]]
+then
+    mkdir ./static
+    cp ../Distro/config/login.html ./static/login.html
+fi
+
+if [[ ! -d ./keys/jwt_keys ]]
+then
+    cp -r ../Distro/jwt_keys ./keys/
+fi
+
+if [[ ! -f ./contentSecurityPolicy.json ]]
+then
+    cp ../Distro/config/contentSecurityPolicy.json ./contentSecurityPolicy.json
+fi
+
+if [[ ! -f ./static/additional_links.json ]]
+then
+    cp ../Distro/config/additional_links.json ./static/additional_links.json
+fi
+
+if [[ ! -d ./camicroscope ]]
+then 
+    cp -r ../caMicroscope ./camicroscope
+fi
+
+echo "Copying files complete!"
+
+
+
+
+###
 ## try connecting to mongodb instance
 ###
 until mongo --host "${HOST}" --eval "print(\"Connected!\")" >/dev/null; do
