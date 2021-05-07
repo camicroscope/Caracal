@@ -43,10 +43,6 @@ class MongoDBConnector {
 
 /** initialize an instance of mongoDB connection and kill process if connection fails */
 const connector = new MongoDBConnector();
-// connector.init().catch((e) => {
-//   console.error("error connecting to database");
-//   process.exit(1);
-// });
 
 /**
  * to load connection instances in database operations
@@ -61,3 +57,4 @@ module.exports = {
   getConnection,
   connector,
 };
+

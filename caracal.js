@@ -24,7 +24,7 @@ const Model = require('./handlers/modelTrainer.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 // TODO validation of data
 
-const {connector} = require("./service/database/connector")
+const {connector} = require("./service/database/connector");
 
 var WORKERS = process.env.NUM_THREADS || 4;
 
@@ -208,3 +208,4 @@ connector.init().then(() => {
 });
 
 module.exports = app; // for tests
+
