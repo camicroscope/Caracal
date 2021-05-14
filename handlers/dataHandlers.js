@@ -1,5 +1,6 @@
 var mongo = require('mongodb');
-var path = require('path');
+const path = require('path');
+const fs = require('fs');
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 
