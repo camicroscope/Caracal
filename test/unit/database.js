@@ -2,7 +2,10 @@ const chai = require("chai");
 const {ObjectID} = require("mongodb");
 var should = chai.should();
 
-const {getConnection} = require("./../../service/database/connector");
+const {
+  getConnection,
+  connector,
+} = require("./../../service/database/connector");
 const MongoDB = require("./../../service/database/index");
 const Util = require("./../../service/database/util");
 
@@ -24,7 +27,14 @@ describe("service/database", () => {
   before(async () => {
     const connection = () =>
       new Promise((resolve) => {
-        setTimeout(resolve(true), 1000 * 2);
+        connector
+            .init()
+            .then(() => {
+              resolve(true);
+            })
+            .catch(() => {
+              console.error("Error connecting to database");
+            });
       });
     await connection();
   });
@@ -141,6 +151,9 @@ describe("service/database", () => {
     /** clear database after each unit */
     afterEach(async () => {
       await getConnection().collection(DB.COLLECTION).deleteMany({age: 20});
+      await getConnection()
+          .collection(DB.COLLECTION)
+          .deleteMany({for: "aggregate"});
     });
 
     /** ensures that service always provides all database functionality */
@@ -157,7 +170,7 @@ describe("service/database", () => {
 
     describe(".add", () => {
       /** if it's callable, it means it's defined. */
-      it("should be callable", () => {
+      it("should be defined and callable", () => {
         (typeof MongoDB.add).should.be.equal("function");
       });
 
@@ -207,10 +220,167 @@ describe("service/database", () => {
     /**
      * @todo: unit tests for following methods
      * .aggregate()
-     * .delete()
-     * .find()
-     * .update()
-     * .distinct()
      */
+    describe(".delete", () => {
+      /** if its callable, means its defined */
+      it("should be defined and callable", () => {
+        (typeof MongoDB.delete).should.be.equal("function");
+      });
+
+      it("should delete a single document by id", async () => {
+        const res = await MongoDB.delete(DB.NAME, DB.COLLECTION, {
+          _id: USERS[0]._id,
+        });
+        res.result.ok.should.be.equal(1);
+        res.deletedCount.should.be.equal(1);
+      });
+
+      it("should only delete one document even if filter matches many", async () => {
+        const res = await MongoDB.delete(DB.NAME, DB.COLLECTION, {
+          age: 20,
+        });
+        res.result.ok.should.be.equal(1);
+        res.deletedCount.should.be.equal(1);
+      });
+
+      it("should not throw error if filter returns empty data", async () => {
+        const res = await MongoDB.delete(DB.NAME, DB.COLLECTION, {
+          age: 50,
+        });
+        res.result.ok.should.be.equal(1);
+        res.deletedCount.should.be.equal(0);
+      });
+    });
+
+    describe(".find", () => {
+      /** if its callable, means its defined */
+      it("should be defined and callable", () => {
+        (typeof MongoDB.find).should.be.equal("function");
+      });
+
+      it("should list all data when empty filter provided", async () => {
+        const result = await MongoDB.find(DB.NAME, DB.COLLECTION, {});
+        result.length.should.be.equal(2);
+      });
+
+      it("should list all data matching given filter", async () => {
+        const result = await MongoDB.find(DB.NAME, DB.COLLECTION, {age: 20});
+        result.length.should.be.equal(2);
+      });
+
+      it("should list specific document when filtered via unique id", async () => {
+        const result = await MongoDB.find(DB.NAME, DB.COLLECTION, {
+          _id: USERS[0]._id,
+        });
+        result.length.should.be.equal(1);
+        result[0].name.should.equal(USERS[0].name);
+      });
+
+      it("should return empty array if no data matches given filter", async () => {
+        const result = await MongoDB.find(DB.NAME, DB.COLLECTION, {age: 21});
+        result.length.should.be.equal(0);
+      });
+    });
+
+    describe(".update", () => {
+      it("should be defined and callable", () => {
+        (typeof MongoDB.update).should.be.equal("function");
+      });
+
+      it("should update a single document even when filter matches multiple items", async () => {
+        const res = await MongoDB.update(
+            DB.NAME,
+            DB.COLLECTION,
+            {age: 20},
+            {
+              $set: {name: "new name"},
+            },
+        );
+        res.modifiedCount.should.equal(1);
+        res.matchedCount.should.equal(1);
+      });
+
+      it("should not update any document when filters do not match any document", async () => {
+        const res = await MongoDB.update(
+            DB.NAME,
+            DB.COLLECTION,
+            {age: 50},
+            {
+              $set: {name: "new name"},
+            },
+        );
+        res.modifiedCount.should.equal(0);
+        res.matchedCount.should.equal(0);
+      });
+    });
+
+    describe(".distinct", () => {
+      it("should be defined and callable", () => {
+        (typeof MongoDB.distinct).should.be.equal("function");
+      });
+
+      it("should return array of distinct values of passed filter", async () => {
+        const res = await MongoDB.distinct(DB.NAME, DB.COLLECTION, "age", {});
+        res.length.should.be.equal(1);
+        res[0].should.be.equal(20);
+      });
+
+      it("should return all elements if none repeated in passed filter", async () => {
+        const res = await MongoDB.distinct(DB.NAME, DB.COLLECTION, "name", {});
+        res.length.should.be.equal(2);
+      });
+    });
+
+    describe(".aggregate", () => {
+      it("should be defined and callable", () => {
+        (typeof MongoDB.aggregate).should.be.equal("function");
+      });
+
+      it("should run a function pipeline on data", async () => {
+        await MongoDB.add(DB.NAME, DB.COLLECTION, [
+          {
+            _id: new ObjectID(),
+            name: "user 1",
+            type: "a",
+            by: "bot",
+            price: 10,
+            for: "aggregate",
+          },
+          {
+            _id: new ObjectID(),
+            name: "user 2",
+            type: "a",
+            by: "bot",
+            price: 20,
+            for: "aggregate",
+          },
+          {
+            _id: new ObjectID(),
+            name: "user 3",
+            type: "b",
+            by: "human",
+            price: 30,
+            for: "aggregate",
+          },
+          {
+            _id: new ObjectID(),
+            name: "user 4",
+            type: "b",
+            by: "human",
+            price: 40,
+            for: "aggregate",
+          },
+        ]);
+
+        const res = await MongoDB.aggregate(DB.NAME, DB.COLLECTION, [
+          {$match: {type: "a"}},
+          {$group: {_id: "$by", total: {$sum: "$price"}}},
+          {$sort: {total: -1}},
+        ]);
+
+        res.length.should.be.equal(1);
+        res[0]._id.should.be.equal("bot");
+      });
+    });
   });
 });
