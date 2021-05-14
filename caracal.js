@@ -108,6 +108,9 @@ var HANDLERS = {
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
   },
+  "metadata": function() {
+    return dataHandlers.SlideMetadata.get;
+  },
 };
 
 // register configurable services

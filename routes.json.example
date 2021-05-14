@@ -50,14 +50,18 @@
       {"function":"loginHandler", "args": []},
       {"function":"sanitizeBody", "args": []}
     ]
-  },
-
-  {
+  },{
     "route":"/data/Slide/find",
     "method":"get",
     "handlers":[
       {"function":"mongoFind", "args": ["camic", "slide"]},
       {"function":"filterHandler", "args": ["data", "userFilter", "filter"]}
+    ]
+  },{
+    "route":"/data/Slide/metadata",
+    "method":"get",
+    "handlers":[
+      {"function":"metadata", "args": []}
     ]
   },{
     "route":"/data/Slide/post",

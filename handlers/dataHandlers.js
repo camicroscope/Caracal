@@ -1,5 +1,5 @@
 var mongo = require('mongodb');
-
+var path = require('path');
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 
@@ -479,12 +479,52 @@ User.wcido = function(req, res, next) {
     res.send(error);
   }
 };
+var SlideMetadata = {};
+SlideMetadata.get = function(req, res, next) {
+  const strPath = req.query.path;
+  console.log('SlideMetadata', strPath);
+  try {
+    if (fs.existsSync(strPath)) {
+      var ext = path.extname(strPath);
+      switch (ext) {
+        case '.json':
+          fs.readFile(strPath, (err, data) => {
+            if (err) throw err;
+            console.log('json', data);
+            res.json(JSON.parse(data));
+          });
+          break;
+        case '.csv':
+          fs.readFile(strPath, (err, data) => {
+            if (err) throw err;
+            const baseName = path.extname(strPath);
+            res.header('Content-Type', 'text/csv');
+            res.attachment(baseName);
+            console.log('csv', data);
+            res.send(data);
+          });
+          break;
+        default:
+          console.error(`Metadata format doesn't support.`);
+          res.json({hasError: true, error: `Metadata format doesn't support.`});
+          break;
+      }
+    } else {
+      console.error(`Metadata file doesn't exsit.`);
+      res.json({hasError: true, error: `Metadata file doesn't exsit.`});
+    }
+  } catch (err) {
+    console.error(err);
+    res.json({hasError: true, error: err});
+  }
+};
 
 dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
+dataHandlers.SlideMetadata = SlideMetadata;
 
 dataHandlers.General = General;
 module.exports = dataHandlers;
