@@ -483,7 +483,6 @@ User.wcido = function(req, res, next) {
 var SlideMetadata = {};
 SlideMetadata.get = function(req, res, next) {
   const strPath = req.query.path;
-  console.log('SlideMetadata', strPath);
   try {
     if (fs.existsSync(strPath)) {
       var ext = path.extname(strPath);
@@ -491,7 +490,6 @@ SlideMetadata.get = function(req, res, next) {
         case '.json':
           fs.readFile(strPath, (err, data) => {
             if (err) throw err;
-            console.log('json', data);
             res.json(JSON.parse(data));
           });
           break;
@@ -501,7 +499,6 @@ SlideMetadata.get = function(req, res, next) {
             const baseName = path.extname(strPath);
             res.header('Content-Type', 'text/csv');
             res.attachment(baseName);
-            console.log('csv', data);
             res.send(data);
           });
           break;
