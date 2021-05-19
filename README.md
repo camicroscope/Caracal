@@ -54,3 +54,14 @@ userFilter -- list of values which must be present in given field in filtered da
 \*\* -- immune to filters (can see everything)
 Public -- users with no userFilter are assigned this filter
 An item with no filter value is returned in all cases, and is thus also public.
+
+## Local Development Environment
+In order to quickly setup a development environment, make use of the `setup_script.sh` script. This will setup the project, initialize and seed the database configurations, import routes and initialize environment config files and generate the keys required.
+
+First clone the <a href = "https://github.com/camicroscope/Caracal/tree/backup-dev">Caracal (backup-dev branch)</a>, <a href = "https://github.com/camicroscope/caMicroscope">caMicroscope</a> and the <a href = "https://github.com/camicroscope/Distro">Distro</a> repositories and make sure that all of them are in the same parent directory.
+
+Run the script with  `./setup_script` or `bash ./setup_script.sh`
+
+The script is configured to load a database named "`camic`" from server at "`127.0.0.1`". In order to specify different name and host, simply pass the two while calling the script, like `./setup_script custom_host custom_database_name`
+
+Run `npm start` to start the application and see it running at `localhost:4010`
