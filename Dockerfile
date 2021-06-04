@@ -6,8 +6,9 @@ WORKDIR /src
 RUN npm install
 ARG viewer
 ARG fork
-RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
+# RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
 EXPOSE 8010
+EXPOSE 4050
 
 RUN chgrp -R 0 /src && \
     chmod -R g+rwX /src

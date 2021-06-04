@@ -34,5 +34,9 @@
 "frameSrc": [
  "'self'",
  "accounts.google.com"
+],
+"connectSrc": [
+  "'self'", 
+  "ws://localhost:4010"
 ]
 }
