@@ -9,9 +9,12 @@ ARG fork
 # RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
 EXPOSE 8010
 EXPOSE 4050
+EXPOSE 5000
 
-RUN chgrp -R 0 /src && \
-    chmod -R g+rwX /src
+RUN ls
+
+# RUN chgrp -R 0 /src && \
+#     chmod -R g+rwX /src
 
 USER 1001
 

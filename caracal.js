@@ -25,6 +25,7 @@ const DataTransformationHandler = require('./handlers/dataTransformationHandler.
 // TODO validation of data
 
 const {connector} = require("./service/database/connector");
+const {socketHttpServer} = require('./socketio/init.sockets');
 // const { httpServer } = require('./socketio/init.sockets');
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -32,13 +33,12 @@ var WORKERS = process.env.NUM_THREADS || 4;
 var PORT = process.env.PORT || 4010;
 
 // Socket port
-var SOCKET_PORT = 4050;
+const SOCKET_PORT = process.env.SOCKET_PORT || 5000;
 
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 // var DISABLE_CSP = process.env.DISABLE_CSP || false; // change this to false
 var DISABLE_CSP = true; // change this to false
-
 
 const app = express();
 app.use(cookieParser());
@@ -199,33 +199,7 @@ var startApp = function(app) {
     } else {
       app.listen(PORT, () => console.log('listening on ' + PORT));
     }
-
-    const httpServer = require("http").createServer(app);
-    const io = require("socket.io")(httpServer, {
-      cors: {
-        origin: "*",
-      },
-    });
-    
-    io.on("connection", (socket) => {
-      socket.emit("connection_success", {
-        socketId: socket.id,
-      });
-      console.log('Socket connected with id: ', socket.id);
-    
-      socket.on('room', function(room) {
-        console.log('room:', room);
-        socket.join(room);
-      });
-
-      socket.on("message", (arg) => {
-        console.log("Message received: ", arg);
-        const {roomId} = arg;
-        io.to(roomId).emit("message", arg);
-        io.emit("message", arg);
-      });
-    });
-    httpServer.listen(SOCKET_PORT, () => {
+    socketHttpServer.listen(SOCKET_PORT, () => {
       console.log(`
       ============================================================================================================
       ============================================================================================================
@@ -234,6 +208,7 @@ var startApp = function(app) {
       ============================================================================================================
       `);
     });
+    
   };
 };
 

@@ -7,7 +7,7 @@
     "test": "mocha test/* --exit",
     "lint": "eslint *.js handlers/*.js test/**/*.js",
     "lint-fix": "eslint *.js handlers/*.js test/**/*.js --fix",
-    "start": "node caracal.js"
+    "start": "nodemon caracal.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "@tensorflow/tfjs-node": "^2.8.6",
     "adm-zip": "^0.4.16",
     "atob": "^2.1.2",
+    "axios": "^0.21.1",
     "dotenv": "^8.6.0",
     "express": "^4.17.1",
     "helmet": "^4.6.0",
@@ -41,6 +42,7 @@
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-security": "^1.4.0",
-    "mocha": "^8.4.0"
+    "mocha": "^8.4.0",
+    "nodemon": "^2.0.7"
   }
 }
