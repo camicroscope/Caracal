@@ -358,14 +358,16 @@
     "route":"/data/CollabRoom/update",
     "method":"post",
     "handlers":[
-      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"mongoFind", "args": ["camic", "collabRoom"]},
+      {"function":"permissionHandlerForCollabRooms", "args": [["admin", "general"]]},
       {"function":"mongoUpdate", "args": ["camic", "collabRoom"]}
     ]
   },{
     "route":"/data/CollabRoom/delete",
     "method":"delete",
     "handlers":[
-      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
+      {"function":"mongoFind", "args": ["camic", "collabRoom"]},
+      {"function":"permissionHandlerForCollabRooms", "args": [["Admin"]]},
       {"function":"mongoDelete", "args": ["camic", "collabRoom"]}
     ]
   },

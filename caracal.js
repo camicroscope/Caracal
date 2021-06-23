@@ -17,6 +17,7 @@ const userFunction = require('./handlers/userFunction.js');
 const iipHandler = require('./handlers/iipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
+const CollabRoomHandlers = require('./handlers/CollabRoomHandlers.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataSet = require('./handlers/datasetHandler.js');
@@ -83,6 +84,9 @@ var HANDLERS = {
   "mongoDistinct": dataHandlers.General.distinct,
   "filterHandler": auth.filterHandler,
   "permissionHandler": permissionHandler,
+  "permissionHandlerForCollabRooms": CollabRoomHandlers.permissionHandlerForCollabRooms,
+  "addDefaultCollabRoomOnSlideCreate": CollabRoomHandlers.addDefaultCollabRoomOnSlideCreate,
+  "removeCollabRoomOnSlideDelete": CollabRoomHandlers.removeCollabRoomOnSlideDelete,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
   "getDataset": DataSet.getDataset,

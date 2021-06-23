@@ -6,7 +6,7 @@ const axios = require('axios');
 const AUD = process.env.AUD || false;
 const ISS = process.env.ISS || false;
 const DISABLE_SEC = process.env.DISABLE_SEC === 'false' ? false : true;
-const DISABLE_SOCKETS = process.env.DISABLE_SOCKETS || false;
+const DISABLE_SOCKETS = process.env.DISABLE_SOCKETS === 'false' ? false : true;
 
 // Socket port
 // const SOCKET_PORT = process.env.SOCKET_PORT || 4050;
@@ -26,94 +26,94 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.post('/', (req, res) => {
-  const data = (req.body);
-  console.log(data);
-
+app.get('/socketStatus', (req, res) => {
   res.send({
-    status: 200,
-    data,
+    socketStatus: DISABLE_SOCKETS,
   });
-});
+})
 
-
-const io = require("socket.io")(socketHttpServer, {
-  cors: {
-    origin: "*",
-  },
-});
-
-io.use((socket, next) => {
-  console.log('Disbale sec: ', DISABLE_SEC);
-  if (!DISABLE_SEC) {
-    if (socket.handshake.auth && socket.handshake.auth.token && socket.handshake.auth.slideId){
-      const {token, slideId} = socket.handshake.auth;
-      const jwtOptions = {
-        // algorithms: ['RS256']
-      };
-      if (AUD) {
-        jwtOptions.audience = AUD;
-      }
-      if (ISS) {
-        jwtOptions.issuer = ISS;
-      }
-      jwt.verify(token, auth.PUBKEY, function(err, decoded) {
-        if (err) {
-          console.log('JWT error: ', JSON.stringify(err));
-          return next(new Error('Authentication error: JWT token not valid.'));
-        }
-        socket.decoded = decoded;
-        // console.log('decoded:', decoded);
-        const headers = {
-          'Authorization': `Bearer ${token}`,
+if (!DISABLE_SOCKETS) {
+  const io = require("socket.io")(socketHttpServer, {
+    cors: {
+      origin: "*",
+    },
+  });
+  
+  io.use((socket, next) => {
+    if (!DISABLE_SEC) {
+      if (socket.handshake.auth && socket.handshake.auth.token && socket.handshake.auth.slideId){
+        const {token, slideId} = socket.handshake.auth;
+        const jwtOptions = {
+          // algorithms: ['RS256']
         };
-        
-        axios.get(`http://localhost:4010/data/CollabRoom/find?slideId=${slideId}`, {headers})
-          .then(response => {
-            const {members} = response.data[0];
-            axios.get(`http://localhost:4010/data/User/find?email=${decoded.email}`, {headers})
+        if (AUD) {
+          jwtOptions.audience = AUD;
+        }
+        if (ISS) {
+          jwtOptions.issuer = ISS;
+        }
+        jwt.verify(token, auth.PUBKEY, function(err, decoded) {
+          if (err) {
+            console.log('JWT error: ', JSON.stringify(err));
+            return next(new Error('Authentication error: JWT token not valid.'));
+          }
+          socket.decoded = decoded;
+          // console.log('decoded:', decoded);
+          const headers = {
+            'Authorization': `Bearer ${token}`,
+          };
+          
+          axios.get(`http://localhost:4010/data/CollabRoom/find?slideId=${slideId}`, {headers})
             .then(response => {
-              const userId = response.data[0]._id.$oid;
-              if (members.includes(userId)) {
-                next();
-              }              
+              const {members} = response.data[0];
+              axios.get(`http://localhost:4010/data/User/find?email=${decoded.email}`, {headers})
+              .then(response => {
+                const userId = response.data[0]._id.$oid;
+                if (members.includes(userId)) {
+                  next();
+                }              
+              })
+              .catch(error => {
+                console.error('Error in fetching user details: ', JSON.stringify(error));
+                return next(new Error('API error: Error in fetching user details.'));
+              });
             })
             .catch(error => {
-              console.error('Error in fetching user details: ', JSON.stringify(error));
+              console.error('Error in fetching collaboration room details: ', JSON.stringify(error));
+              return next(new Error('API error: Error in fetching collaboration room details.'));
             });
-          })
-          .catch(error => {
-            console.error('Error in fetching collaboration room details: ', JSON.stringify(error));
-          });
-      });
+        });
+      }
+      else {
+        next(new Error('Authentication error: No token or slide ID found'));
+      }
+    } else {
+      next();
     }
-    else {
-      next(new Error('Authentication error: No token or slide ID found'));
-    }
-  } else {
-    next();
-  }
-}).on("connection", (socket) => {
-  socket.emit("connection_success", {
-    socketId: socket.id,
+  }).on("connection", (socket) => {
+    socket.emit("connection_success", {
+      socketId: socket.id,
+    });
+    console.log('Socket connected with id as : ', socket.id);
+  
+    socket.on('room', function(room) {
+      console.log('room:', room);
+      socket.join(room);
+      socket.to(room).emit('user joined', socket.id);
+    });
+  
+    socket.on("message", (arg) => {
+      console.log("Message received: ", arg);
+      const {roomId} = arg;
+      console.log(roomId);
+      // io.emit("message", arg);
+      // socket.broadcast.emit("message", arg);
+      socket.to(roomId).emit("message", arg);
+    });
   });
-  console.log('Socket connected with id as : ', socket.id);
+}
 
-  socket.on('room', function(room) {
-    console.log('room:', room);
-    socket.join(room);
-    socket.to(room).emit('user joined', socket.id);
-  });
 
-  socket.on("message", (arg) => {
-    console.log("Message received: ", arg);
-    const {roomId} = arg;
-    console.log(roomId);
-    // io.emit("message", arg);
-    // socket.broadcast.emit("message", arg);
-    socket.to(roomId).emit("message", arg);
-  });
-});
 // socketHttpServer.listen(SOCKET_PORT, () => {
 //   console.log(`
 //   ============================================================================================================
