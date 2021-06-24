@@ -279,7 +279,7 @@ Collection.deleteMultiCollections = function(req, res, next) {
   console.log('------ multi delete start -------');
   console.log(postQuery, query);
   console.log('------ multi delete end -------');
-  mongoDB.delete('camic', 'collection', query).then((x) => {
+  mongoDB.deleteMany('camic', 'collection', query).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));

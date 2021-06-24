@@ -92,21 +92,45 @@ class Mongo {
   }
 
   /**
-   * Runs the delete operation on the first document that satisfies the filter conditions
+   * Runs the deleteOne operation on the first document that satisfies the filter conditions
    *
    * @async
    * @param {string} database Name of the database
    * @param {string} collectionName Name of collection to run operation on
    * @param {document} query Specifies deletion criteria using query operators
    *
-   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.delete/ Read MongoDB Reference}
+   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.deleteOne/ Read MongoDB Reference}
    */
   static async delete(database, collectionName, filter) {
     try {
       filter = transformIdToObjectId(filter);
 
       const collection = getConnection(database).collection(collectionName);
-      const result = await collection.delete(filter);
+      const result = await collection.deleteOne(filter);
+      delete result.connection;
+
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+  /**
+   * Runs the deleteOne operation on the first document that satisfies the filter conditions
+   *
+   * @async
+   * @param {string} database Name of the database
+   * @param {string} collectionName Name of collection to run operation on
+   * @param {document} query Specifies deletion criteria using query operators
+   *
+   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.deleteMany/ Read MongoDB Reference}
+   */
+  static async deleteMany(database, collectionName, filter) {
+    try {
+      filter = transformIdToObjectId(filter);
+
+      const collection = getConnection(database).collection(collectionName);
+      const result = await collection.deleteMany(filter);
       delete result.connection;
 
       return result;
@@ -146,7 +170,7 @@ class Mongo {
    * @param {document|pipeline} updates modifications to apply to filtered documents,
    * can be a document or a aggregation pipeline
    *
-   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.update/ Read MongoDB Reference}
+   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.update Read MongoDB Reference}
    */
   static async update(database, collectionName, filter, updates) {
     try {
@@ -171,6 +195,7 @@ module.exports = {
   find: Mongo.find,
   update: Mongo.update,
   delete: Mongo.delete,
+  deleteMany: Mongo.deleteMany,
   aggregate: Mongo.aggregate,
   distinct: Mongo.distinct,
 };
