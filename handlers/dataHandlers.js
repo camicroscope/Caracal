@@ -271,8 +271,8 @@ Heatmap.types = function(req, res, next) {
 
 var Collection = {};
 Collection.deleteMultiCollections = function(req, res, next) {
+  var query = {};
   var postQuery = req.query;
-
   if (postQuery.ids) {
     query['_id'] = {'$in': postQuery.ids.map((id)=>new ObjectID(id))};
   }
