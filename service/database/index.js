@@ -1,5 +1,5 @@
-const { getConnection } = require("./connector");
-const { transformIdToObjectId } = require("./util");
+const {getConnection} = require("./connector");
+const {transformIdToObjectId} = require("./util");
 
 /**
  * @class Mongo
@@ -99,14 +99,14 @@ class Mongo {
    * @param {string} collectionName Name of collection to run operation on
    * @param {document} query Specifies deletion criteria using query operators
    *
-   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.deleteOne/ Read MongoDB Reference}
+   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.delete/ Read MongoDB Reference}
    */
   static async delete(database, collectionName, filter) {
     try {
       filter = transformIdToObjectId(filter);
 
       const collection = getConnection(database).collection(collectionName);
-      const result = await collection.deleteOne(filter);
+      const result = await collection.delete(filter);
       delete result.connection;
 
       return result;
@@ -115,7 +115,6 @@ class Mongo {
       throw e;
     }
   }
-
   /**
    * Runs aggregate operation on given pipeline
    *
@@ -138,7 +137,7 @@ class Mongo {
   }
 
   /**
-   * Runs updateOne operation on documents that satisfy the filter condition.
+   * Runs update operation on documents that satisfy the filter condition.
    *
    * @async
    * @param {string} database Name of the database
@@ -147,16 +146,16 @@ class Mongo {
    * @param {document|pipeline} updates modifications to apply to filtered documents,
    * can be a document or a aggregation pipeline
    *
-   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/ Read MongoDB Reference}
+   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.update/ Read MongoDB Reference}
    */
   static async update(database, collectionName, filter, updates) {
     try {
       filter = transformIdToObjectId(filter);
 
       const collection = await getConnection(database).collection(
-        collectionName
+          collectionName,
       );
-      const result = await collection.updateOne(filter, updates);
+      const result = await collection.update(filter, updates);
       delete result.connection;
       return result;
     } catch (e) {
