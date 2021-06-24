@@ -272,14 +272,14 @@ Heatmap.types = function(req, res, next) {
 var Collection = {};
 Collection.deleteMultiCollections = function(req, res, next) {
   var query = {};
-  var postQuery = req.query;
+  var postQuery = JSON.parse(req.body);
   if (postQuery.ids) {
     query['_id'] = {'$in': postQuery.ids.map((id)=>new ObjectID(id))};
   }
   console.log('------ multi delete start -------');
   console.log(postQuery, query);
   console.log('------ multi delete end -------');
-  mongoDB.delete(db, collection, query).then((x) => {
+  mongoDB.delete('camic', 'collection', query).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
