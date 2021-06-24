@@ -86,6 +86,9 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
+  "collectionDeleteMulti": function() {
+    return dataHandlers.Collection.deleteMultiCollections;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },

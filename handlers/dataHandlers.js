@@ -3,7 +3,7 @@ const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 const mongoDB = require("../service/database");
 const fs = require("fs");
 const path = require("path");
-
+const {ObjectID} = require("mongodb");
 var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
@@ -269,8 +269,23 @@ Heatmap.types = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
-var User = {};
+var Collection = {};
+Collection.deleteMultiCollections = function(req, res, next) {
+  var postQuery = req.query;
 
+  if (postQuery.ids) {
+    query['_id'] = {'$in': postQuery.ids.map((id)=>new ObjectID(id))};
+  }
+  console.log('------ multi delete start -------');
+  console.log(postQuery, query);
+  console.log('------ multi delete end -------');
+  mongoDB.delete(db, collection, query).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+
+var User = {};
 User.forLogin = function(email) {
   return mongoDB.find('camic', 'user', {'email': email});
 };
