@@ -362,6 +362,7 @@ SlideMetadata.get = function(req, res, next) {
 
 dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
+dataHandlers.Collection = Collection;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
