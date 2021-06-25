@@ -276,9 +276,6 @@ Collection.deleteMultiCollections = function(req, res, next) {
   if (postQuery.ids) {
     query['_id'] = {'$in': postQuery.ids.map((id)=>new ObjectID(id))};
   }
-  console.log('------ multi delete start -------');
-  console.log(postQuery, query);
-  console.log('------ multi delete end -------');
   mongoDB.deleteMany('camic', 'collection', query).then((x) => {
     req.data = x;
     next();
