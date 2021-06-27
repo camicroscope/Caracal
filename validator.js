@@ -48,6 +48,20 @@ const schema = {
             type: "string",
           },
 
+          /** information related to access rights of the item */
+          access: {
+            type: "object",
+            properties: {
+
+              /** the category to which the operation belongs */
+              entity: {type: "string"},
+
+              /** slug to identify the operation */
+              operation: {type: "string"},
+            },
+            required: ["entity", "operation"],
+          },
+
           /** list of handlers / middleware layers attached to given route */
           handlers: {
             /** each route has multiple handles attached to it, therefore array */
@@ -57,7 +71,7 @@ const schema = {
               type: "object",
               properties: {
                 /** the name of the function that is attached from the codebase to the route */
-                function: { type: "string" },
+                function: {type: "string"},
 
                 /** array of arguments that are passed into the above specified function */
                 args: {
