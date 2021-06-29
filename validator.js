@@ -57,7 +57,7 @@ const schema = {
               type: "object",
               properties: {
                 /** the name of the function that is attached from the codebase to the route */
-                function: { type: "string" },
+                function: {type: "string"},
 
                 /** array of arguments that are passed into the above specified function */
                 args: {
