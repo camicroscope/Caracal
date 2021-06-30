@@ -306,8 +306,8 @@ Collection.addSlidesToCollection = async function(req, res, next) {
       mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
       mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
     ]);
-    req.collectionResponse = collectionResponse;
-    req.slideResponse = slideResponse;
+    console.log('end');
+    req.data = {collectionResponse, slideResponse};
     next();
   } catch (e) {
     next(e);
@@ -338,8 +338,8 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
       mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
       mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
     ]);
-    req.collectionResponse = collectionResponse;
-    req.slideResponse = slideResponse;
+    console.log('end');
+    req.data = {slideResponse, collectionResponse};
     next();
   } catch (e) {
     next(e);
