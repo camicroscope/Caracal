@@ -282,6 +282,71 @@ Collection.deleteMultiCollections = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
+Collection.addSlidesToCollection = async function(req, res, next) {
+  var postQuery = JSON.parse(req.body);
+  var collectionQuery = {};
+  var collectionUpdate = {};
+  var slideQuery = {};
+  var slideUpdate = {};
+
+  if (postQuery.cid) {
+    collectionQuery = {'_id': new ObjectID(postQuery.cid)};
+    slideUpdate = {$addToSet: {collections: postQuery.cid}};
+  }
+
+  if (postQuery.sids) {
+    slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
+    collectionUpdate = {$addToSet: {slides: {$each: sids}}};
+  }
+  console.log('---------------- add slides to collection ------------------');
+  console.log('collection', collectionQuery, collectionUpdate);
+  console.log('slide', slideQuery, slideUpdate);
+  try {
+    const [collectionResp, slideResp] = await Promise.all([
+      mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
+      mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
+    ]);
+    req.collectionResponse = collectionResponse;
+    req.slideResponse = slideResponse;
+    next();
+  } catch (e) {
+    next(e);
+  }
+};
+
+Collection.removeSlidesToCollection = async function(req, res, next) {
+  var postQuery = JSON.parse(req.body);
+  var collectionQuery = {};
+  var collectionUpdate = {};
+  var slideQuery = {};
+  var slideUpdate = {};
+
+  if (postQuery.cid) {
+    collectionQuery = {'_id': new ObjectID(postQuery.cid)};
+    slideUpdate = {$pull: {collections: postQuery.cid}};
+  }
+
+  if (postQuery.sids) {
+    slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
+    collectionUpdate = {$pull: {slides: {$each: sids}}};
+  }
+  console.log('---------------- remove slides to collection ------------------');
+  console.log('collection', collectionQuery, collectionUpdate);
+  console.log('slide', slideQuery, slideUpdate);
+  try {
+    const [collectionResp, slideResp] = await Promise.all([
+      mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
+      mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
+    ]);
+    req.collectionResponse = collectionResponse;
+    req.slideResponse = slideResponse;
+    next();
+  } catch (e) {
+    next(e);
+  }
+};
+
+
 var User = {};
 User.forLogin = function(email) {
   return mongoDB.find('camic', 'user', {'email': email});

@@ -89,6 +89,12 @@ var HANDLERS = {
   "collectionDeleteMulti": function() {
     return dataHandlers.Collection.deleteMultiCollections;
   },
+  "addSlidesToCollection": function() {
+    return dataHandlers.Collection.addSlidesToCollection;
+  },
+  "removeSlidesFromCollection": function() {
+    return dataHandlers.Collection.removeSlidesFromCollection;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },
