@@ -10,9 +10,9 @@
   {
     "method": "use",
     "route": "/loader/",
-    "access":{
-      "entity":"middleware",
-      "operation":"loader.login"
+    "access": {
+      "entity": "middleware",
+      "operation": "loader.login"
     },
     "handlers": [
       {
@@ -33,9 +33,9 @@
   {
     "method": "use",
     "route": "/loader/slide/delete",
-    "access":{
-      "entity":"middleware",
-      "operation":"loader.slide.delete"
+    "access": {
+      "entity": "middleware",
+      "operation": "loader.slide.delete"
     },
     "handlers": [
       {
@@ -51,9 +51,9 @@
   {
     "method": "use",
     "route": "/loader/",
-    "access":{
-      "entity":"middleware",
-      "operation":"loader.proxyHandler"
+    "access": {
+      "entity": "middleware",
+      "operation": "loader.proxyHandler"
     },
     "handlers": [
       {
@@ -67,9 +67,9 @@
   {
     "method": "use",
     "route": "/googleAuth/",
-    "access":{
-      "entity":"middleware",
-      "operation":"googleAuth"
+    "access": {
+      "entity": "middleware",
+      "operation": "googleAuth"
     },
     "handlers": [
       {
@@ -83,9 +83,9 @@
   {
     "method": "use",
     "route": "/img/IIP/raw/",
-    "access":{
-      "entity":"middleware",
-      "operation":"img.iip.raw"
+    "access": {
+      "entity": "middleware",
+      "operation": "img.iip.raw"
     },
     "handlers": [
       {
@@ -101,9 +101,9 @@
   {
     "route": "/data",
     "method": "use",
-    "access":{
-      "entity":"middleware",
-      "operation":"data"
+    "access": {
+      "entity": "middleware",
+      "operation": "data"
     },
     "handlers": [
       {
@@ -119,9 +119,9 @@
   {
     "route": "/data/Slide/find",
     "method": "get",
-    "access":{
-      "entity":"slide",
-      "operation":"read"
+    "access": {
+      "entity": "slide",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -144,9 +144,9 @@
   {
     "route": "/data/Slide/post",
     "method": "post",
-    "access":{
-      "entity":"slide",
-      "operation":"create"
+    "access": {
+      "entity": "slide",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -170,9 +170,9 @@
   {
     "route": "/data/Slide/delete",
     "method": "delete",
-    "access":{
-      "entity":"slide",
-      "operation":"delete"
+    "access": {
+      "entity": "slide",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -211,9 +211,9 @@
   {
     "route": "/data/Slide/update",
     "method": "post",
-    "access":{
-      "entity":"slide",
-      "operation":"update"
+    "access": {
+      "entity": "slide",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -252,9 +252,9 @@
   {
     "route": "/data/Request/find",
     "method": "get",
-    "access":{
-      "entity":"request",
-      "operation":"read"
+    "access": {
+      "entity": "request",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -278,9 +278,9 @@
   {
     "route": "/data/Request/post",
     "method": "post",
-    "access":{
-      "entity":"request",
-      "operation":"create"
+    "access": {
+      "entity": "request",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -295,9 +295,9 @@
   {
     "route": "/data/Request/delete",
     "method": "delete",
-    "access":{
-      "entity":"request",
-      "operation":"delete"
+    "access": {
+      "entity": "request",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -336,9 +336,9 @@
   {
     "route": "/data/Mark/find",
     "method": "get",
-    "access":{
-      "entity":"mark",
-      "operation":"read"
+    "access": {
+      "entity": "mark",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -353,9 +353,9 @@
   {
     "route": "/data/Mark/post",
     "method": "post",
-    "access":{
-      "entity":"mark",
-      "operation":"create"
+    "access": {
+      "entity": "mark",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -379,9 +379,9 @@
   {
     "route": "/data/Mark/delete",
     "method": "delete",
-    "access":{
-      "entity":"mark",
-      "operation":"delete"
+    "access": {
+      "entity": "mark",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -418,9 +418,9 @@
   {
     "route": "/data/Mark/update",
     "method": "post",
-    "access":{
-      "entity":"mark",
-      "operation":"update"
+    "access": {
+      "entity": "mark",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -457,9 +457,9 @@
   {
     "route": "/data/Mark/types",
     "method": "get",
-    "access":{
-      "entity":"mark",
-      "operation":"types"
+    "access": {
+      "entity": "mark",
+      "operation": "types"
     },
     "handlers": [
       {
@@ -475,9 +475,9 @@
   {
     "route": "/data/Mark/multi",
     "method": "post",
-    "access":{
-      "entity":"mark",
-      "operation":"multi"
+    "access": {
+      "entity": "mark",
+      "operation": "multi"
     },
     "handlers": [
       {
@@ -489,9 +489,9 @@
   {
     "route": "/data/Mark/spatial",
     "method": "get",
-    "access":{
-      "entity":"mark",
-      "operation":"spatial"
+    "access": {
+      "entity": "mark",
+      "operation": "spatial"
     },
     "handlers": [
       {
@@ -503,9 +503,9 @@
   {
     "route": "/data/Mark/findMarkTypes",
     "method": "get",
-    "access":{
-      "entity":"mark",
-      "operation":"findMarkTypes"
+    "access": {
+      "entity": "mark",
+      "operation": "findMarkTypes"
     },
     "handlers": [
       {
@@ -517,9 +517,9 @@
   {
     "route": "/data/Presetlabels/add",
     "method": "post",
-    "access":{
-      "entity":"presetLabel",
-      "operation":"create"
+    "access": {
+      "entity": "presetLabel",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -531,9 +531,9 @@
   {
     "route": "/data/Presetlabels/update",
     "method": "post",
-    "access":{
-      "entity":"presetLabel",
-      "operation":"update"
+    "access": {
+      "entity": "presetLabel",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -545,9 +545,9 @@
   {
     "route": "/data/Presetlabels/remove",
     "method": "post",
-    "access":{
-      "entity":"presetLabel",
-      "operation":"delete"
+    "access": {
+      "entity": "presetLabel",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -559,9 +559,9 @@
   {
     "route": "/data/Template/find",
     "method": "get",
-    "access":{
-      "entity":"template",
-      "operation":"read"
+    "access": {
+      "entity": "template",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -576,9 +576,9 @@
   {
     "route": "/data/Template/post",
     "method": "post",
-    "access":{
-      "entity":"template",
-      "operation":"create"
+    "access": {
+      "entity": "template",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -602,9 +602,9 @@
   {
     "route": "/data/Template/delete",
     "method": "delete",
-    "access":{
-      "entity":"template",
-      "operation":"delete"
+    "access": {
+      "entity": "template",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -628,9 +628,9 @@
   {
     "route": "/data/Template/update",
     "method": "post",
-    "access":{
-      "entity":"template",
-      "operation":"update"
+    "access": {
+      "entity": "template",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -653,9 +653,9 @@
   {
     "route": "/data/Heatmap/find",
     "method": "get",
-    "access":{
-      "entity":"heatmap",
-      "operation":"read"
+    "access": {
+      "entity": "heatmap",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -670,9 +670,9 @@
   {
     "route": "/data/Heatmap/types",
     "method": "get",
-    "access":{
-      "entity":"heatmap",
-      "operation":"types"
+    "access": {
+      "entity": "heatmap",
+      "operation": "types"
     },
     "handlers": [
       {
@@ -684,9 +684,9 @@
   {
     "route": "/data/Heatmap/post",
     "method": "post",
-    "access":{
-      "entity":"heatmap",
-      "operation":"create"
+    "access": {
+      "entity": "heatmap",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -710,9 +710,9 @@
   {
     "route": "/data/Heatmap/delete",
     "method": "delete",
-    "access":{
-      "entity":"heatmap",
-      "operation":"delete"
+    "access": {
+      "entity": "heatmap",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -749,9 +749,9 @@
   {
     "route": "/data/Heatmap/update",
     "method": "post",
-    "access":{
-      "entity":"heatmap",
-      "operation":"update"
+    "access": {
+      "entity": "heatmap",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -788,9 +788,9 @@
   {
     "route": "/data/HeatmapEdit/find",
     "method": "get",
-    "access":{
-      "entity":"heatmapEdit",
-      "operation":"read"
+    "access": {
+      "entity": "heatmapEdit",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -805,9 +805,9 @@
   {
     "route": "/data/HeatmapEdit/post",
     "method": "post",
-    "access":{
-      "entity":"heatmapEdit",
-      "operation":"create"
+    "access": {
+      "entity": "heatmapEdit",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -831,9 +831,9 @@
   {
     "route": "/data/HeatmapEdit/delete",
     "method": "delete",
-    "access":{
-      "entity":"heatmapEdit",
-      "operation":"delete"
+    "access": {
+      "entity": "heatmapEdit",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -870,9 +870,9 @@
   {
     "route": "/data/HeatmapEdit/update",
     "method": "post",
-    "access":{
-      "entity":"heatmapEdit",
-      "operation":"update"
+    "access": {
+      "entity": "heatmapEdit",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -909,9 +909,9 @@
   {
     "route": "/data/Log/find",
     "method": "get",
-    "access":{
-      "entity":"log",
-      "operation":"read"
+    "access": {
+      "entity": "log",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -926,9 +926,9 @@
   {
     "route": "/data/Log/post",
     "method": "post",
-    "access":{
-      "entity":"log",
-      "operation":"create"
+    "access": {
+      "entity": "log",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -943,9 +943,9 @@
   {
     "route": "/data/Log/delete",
     "method": "delete",
-    "access":{
-      "entity":"log",
-      "operation":"delete"
+    "access": {
+      "entity": "log",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -969,9 +969,9 @@
   {
     "route": "/data/Log/update",
     "method": "post",
-    "access":{
-      "entity":"log",
-      "operation":"update"
+    "access": {
+      "entity": "log",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -995,9 +995,9 @@
   {
     "route": "/data/Freeform/find",
     "method": "get",
-    "access":{
-      "entity":"freeform",
-      "operation":"read"
+    "access": {
+      "entity": "freeform",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -1012,9 +1012,9 @@
   {
     "route": "/data/Freeform/post",
     "method": "post",
-    "access":{
-      "entity":"freeform",
-      "operation":"create"
+    "access": {
+      "entity": "freeform",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -1029,9 +1029,9 @@
   {
     "route": "/data/Freeform/delete",
     "method": "delete",
-    "access":{
-      "entity":"freeform",
-      "operation":"delete"
+    "access": {
+      "entity": "freeform",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -1055,9 +1055,9 @@
   {
     "route": "/data/Freeform/update",
     "method": "post",
-    "access":{
-      "entity":"freeform",
-      "operation":"update"
+    "access": {
+      "entity": "freeform",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -1081,9 +1081,9 @@
   {
     "route": "/data/Configuration/find",
     "method": "get",
-    "access":{
-      "entity":"configuration",
-      "operation":"read"
+    "access": {
+      "entity": "configuration",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -1098,9 +1098,9 @@
   {
     "route": "/data/Configuration/post",
     "method": "post",
-    "access":{
-      "entity":"configuration",
-      "operation":"create"
+    "access": {
+      "entity": "configuration",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -1124,9 +1124,9 @@
   {
     "route": "/data/Configuration/delete",
     "method": "delete",
-    "access":{
-      "entity":"configuration",
-      "operation":"delete"
+    "access": {
+      "entity": "configuration",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -1150,9 +1150,9 @@
   {
     "route": "/data/Configuration/update",
     "method": "post",
-    "access":{
-      "entity":"configuration",
-      "operation":"update"
+    "access": {
+      "entity": "configuration",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -1176,9 +1176,9 @@
   {
     "route": "/data/Collection/find",
     "method": "get",
-    "access":{
-      "entity":"collection",
-      "operation":"read"
+    "access": {
+      "entity": "collection",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -1193,9 +1193,9 @@
   {
     "route": "/data/Collection/post",
     "method": "post",
-    "access":{
-      "entity":"collection",
-      "operation":"create"
+    "access": {
+      "entity": "collection",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -1219,9 +1219,9 @@
   {
     "route": "/data/Collection/update",
     "method": "post",
-    "access":{
-      "entity":"collection",
-      "operation":"update"
+    "access": {
+      "entity": "collection",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -1245,9 +1245,9 @@
   {
     "route": "/data/Collection/delete",
     "method": "delete",
-    "access":{
-      "entity":"collection",
-      "operation":"delete"
+    "access": {
+      "entity": "collection",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -1271,9 +1271,9 @@
   {
     "route": "/data/User/find",
     "method": "get",
-    "access":{
-      "entity":"user",
-      "operation":"read"
+    "access": {
+      "entity": "user",
+      "operation": "read"
     },
     "handlers": [
       {
@@ -1288,9 +1288,9 @@
   {
     "route": "/data/User/post",
     "method": "post",
-    "access":{
-      "entity":"user",
-      "operation":"create"
+    "access": {
+      "entity": "user",
+      "operation": "create"
     },
     "handlers": [
       {
@@ -1313,9 +1313,9 @@
   {
     "route": "/data/User/delete",
     "method": "delete",
-    "access":{
-      "entity":"user",
-      "operation":"delete"
+    "access": {
+      "entity": "user",
+      "operation": "delete"
     },
     "handlers": [
       {
@@ -1338,9 +1338,9 @@
   {
     "route": "/data/User/update",
     "method": "post",
-    "access":{
-      "entity":"user",
-      "operation":"update"
+    "access": {
+      "entity": "user",
+      "operation": "update"
     },
     "handlers": [
       {
@@ -1363,9 +1363,9 @@
   {
     "route": "/data/User/wcido",
     "method": "get",
-    "access":{
-      "entity":"user",
-      "operation":"wcido"
+    "access": {
+      "entity": "user",
+      "operation": "wcido"
     },
     "handlers": [
       {
@@ -1377,9 +1377,9 @@
   {
     "route": "/workbench/uploadDataset",
     "method": "post",
-    "access":{
-      "entity":"workbench",
-      "operation":"uploadDataset"
+    "access": {
+      "entity": "workbench",
+      "operation": "uploadDataset"
     },
     "handlers": [
       {
@@ -1400,9 +1400,9 @@
   {
     "route": "/workbench/trainModel",
     "method": "post",
-    "access":{
-      "entity":"workbench",
-      "operation":"trainModel"
+    "access": {
+      "entity": "workbench",
+      "operation": "trainModel"
     },
     "handlers": [
       {
@@ -1423,9 +1423,9 @@
   {
     "route": "/workbench/deleteUserData",
     "method": "post",
-    "access":{
-      "entity":"workbench",
-      "operation":"deleteUserData"
+    "access": {
+      "entity": "workbench",
+      "operation": "deleteUserData"
     },
     "handlers": [
       {
@@ -1446,9 +1446,9 @@
   {
     "route": "/workbench/modelDownload",
     "method": "post",
-    "access":{
-      "entity":"workbench",
-      "operation":"modelDownload"
+    "access": {
+      "entity": "workbench",
+      "operation": "modelDownload"
     },
     "handlers": [
       {
