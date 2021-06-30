@@ -302,8 +302,8 @@ Collection.addSlidesToCollection = async function(req, res, next) {
   console.log('slide', slideQuery, slideUpdate);
   try {
     const [collectionResponse, slideResponse] = await Promise.all([
-      mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
-      mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
+      mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
+      mongoDB.updateMany('camic', 'slide', slideQuery, slideUpdate),
     ]);
     req.data = {collectionResponse, slideResponse};
     next();
@@ -332,8 +332,8 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
   console.log('slide', slideQuery, slideUpdate);
   try {
     const [collectionResponse, slideResponse] = await Promise.all([
-      mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
-      mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
+      mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
+      mongoDB.updateMany('camic', 'slide', slideQuery, slideUpdate),
     ]);
     req.data = {slideResponse, collectionResponse};
     next();

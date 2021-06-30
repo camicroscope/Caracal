@@ -187,6 +187,21 @@ class Mongo {
       throw e;
     }
   }
+  static async updateMany(database, collectionName, filter, updates) {
+    try {
+      filter = transformIdToObjectId(filter);
+
+      const collection = await getConnection(database).collection(
+          collectionName,
+      );
+      const result = await collection.updateMany(filter, updates);
+      delete result.connection;
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 /** export to be import using the destructuring syntax */
@@ -194,6 +209,7 @@ module.exports = {
   add: Mongo.add,
   find: Mongo.find,
   update: Mongo.update,
+  update: Mongo.updateMany,
   delete: Mongo.delete,
   deleteMany: Mongo.deleteMany,
   aggregate: Mongo.aggregate,
