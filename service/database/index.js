@@ -209,7 +209,7 @@ module.exports = {
   add: Mongo.add,
   find: Mongo.find,
   update: Mongo.update,
-  update: Mongo.updateMany,
+  updateMany: Mongo.updateMany,
   delete: Mongo.delete,
   deleteMany: Mongo.deleteMany,
   aggregate: Mongo.aggregate,
