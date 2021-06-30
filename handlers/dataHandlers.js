@@ -296,7 +296,7 @@ Collection.addSlidesToCollection = async function(req, res, next) {
 
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$addToSet: {slides: {$each: sids}}};
+    collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}};
   }
   console.log('---------------- add slides to collection ------------------');
   console.log('collection', collectionQuery, collectionUpdate);
@@ -328,7 +328,7 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
 
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$pull: {slides: {$each: sids}}};
+    collectionUpdate = {$pull: {slides: {$each: postQuery.sids}}};
   }
   console.log('---------------- remove slides to collection ------------------');
   console.log('collection', collectionQuery, collectionUpdate);
