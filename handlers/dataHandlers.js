@@ -298,7 +298,6 @@ Collection.addSlidesToCollection = async function(req, res, next) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
     collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}};
   }
-  console.log('---------------- add slides to collection ------------------');
   console.log('collection', collectionQuery, collectionUpdate);
   console.log('slide', slideQuery, slideUpdate);
   try {
@@ -306,7 +305,6 @@ Collection.addSlidesToCollection = async function(req, res, next) {
       mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
       mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
     ]);
-    console.log('end');
     req.data = {collectionResponse, slideResponse};
     next();
   } catch (e) {
@@ -328,9 +326,8 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
 
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$pull: {slides: {$each: postQuery.sids}}};
+    collectionUpdate = {$pullAll: {slides: postQuery.sids}};
   }
-  console.log('---------------- remove slides to collection ------------------');
   console.log('collection', collectionQuery, collectionUpdate);
   console.log('slide', slideQuery, slideUpdate);
   try {
@@ -338,7 +335,6 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
       mongoDB.update('camic', 'collection', collectionQuery, collectionUpdate),
       mongoDB.update('camic', 'slide', slideQuery, slideUpdate),
     ]);
-    console.log('end');
     req.data = {slideResponse, collectionResponse};
     next();
   } catch (e) {
