@@ -270,16 +270,24 @@ Heatmap.types = function(req, res, next) {
 };
 
 var Collection = {};
-Collection.deleteMultiCollections = function(req, res, next) {
+Collection.deleteMultiCollections = async function(req, res, next) {
   var query = {};
+  var update = {};
   var postQuery = JSON.parse(req.body);
   if (postQuery.ids) {
     query['_id'] = {'$in': postQuery.ids.map((id)=>new ObjectID(id))};
+    update = {$pullAll: {collections: postQuery.ids}};
   }
-  mongoDB.deleteMany('camic', 'collection', query).then((x) => {
-    req.data = x;
+  try {
+    const [collectionResponse, slideResponse] = await Promise.all([
+      mongoDB.deleteMany('camic', 'collection', query),
+      mongoDB.updateMany('camic', 'slide', {}, update),
+    ]);
+    req.data = {collectionResponse, slideResponse};
     next();
-  }).catch((e) => next(e));
+  } catch (e) {
+    next(e);
+  }
 };
 
 Collection.addSlidesToCollection = async function(req, res, next) {
@@ -298,8 +306,6 @@ Collection.addSlidesToCollection = async function(req, res, next) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
     collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}};
   }
-  console.log('collection', collectionQuery, collectionUpdate);
-  console.log('slide', slideQuery, slideUpdate);
   try {
     const [collectionResponse, slideResponse] = await Promise.all([
       mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
@@ -328,8 +334,6 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
     collectionUpdate = {$pullAll: {slides: postQuery.sids}};
   }
-  console.log('collection', collectionQuery, collectionUpdate);
-  console.log('slide', slideQuery, slideUpdate);
   try {
     const [collectionResponse, slideResponse] = await Promise.all([
       mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
