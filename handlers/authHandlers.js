@@ -26,7 +26,9 @@ const {
  * ISS : the issuer of the token
  * EXPIRY : timestamp when jwks expires, default = 1d
  */
-const { AUD, ISS, EXPIRY, ENABLE_SECURITY_AT } = process.env;
+const {
+  AUD, ISS, EXPIRY, ENABLE_SECURITY_AT,
+} = process.env;
 
 /**
  * generate the keys if they are missing from /keys directory
@@ -54,8 +56,8 @@ const CLIENT = getJWKSClient();
 const getToken = function (req) {
   /** Authorization: Bearer tokenHere */
   if (
-    req.headers.authorization &&
-    req.headers.authorization.split(' ')[0] === 'Bearer'
+    req.headers.authorization
+    && req.headers.authorization.split(' ')[0] === 'Bearer'
   ) {
     return req.headers.authorization.split(' ')[1];
   }
@@ -165,8 +167,8 @@ function loginHandler(checkKey) {
   return function (req, res, next) {
     /** if security enabled after a timestamp */
     if (
-      DISABLE_SEC ||
-      (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now())
+      DISABLE_SEC
+      || (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now())
     ) {
       let token = {};
       try {

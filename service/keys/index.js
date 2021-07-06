@@ -22,8 +22,9 @@ const location = {
 /**
  * load system configurations
  */
-const { GENERATE_KEY_IF_MISSING, ENABLE_SECURITY_AT, DISABLE_SEC, JWK_URL } =
-  process.env;
+const {
+  GENERATE_KEY_IF_MISSING, ENABLE_SECURITY_AT, DISABLE_SEC, JWK_URL,
+} = process.env;
 const env = {
   DISABLE_SEC: DISABLE_SEC == 'true',
   ENABLE_SECURITY_AT: ENABLE_SECURITY_AT || false,
@@ -65,8 +66,8 @@ const generateKeysIfMissing = () => {
    * and the application config allows generation
    */
   if (
-    env.GENERATE_KEY_IF_MISSING &&
-    (!fs.existsSync(location.privateKey) || !fs.existsSync(location.publicKey))
+    env.GENERATE_KEY_IF_MISSING
+    && (!fs.existsSync(location.privateKey) || !fs.existsSync(location.publicKey))
   ) {
     try {
       execSync(

@@ -1,5 +1,6 @@
 const Ajv = require('ajv');
 const path = require('path');
+
 const ajv = new Ajv();
 require('ajv-keywords')(ajv);
 
