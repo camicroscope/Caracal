@@ -1,3 +1,5 @@
 {
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "singleQuote": true,
+  "trailingComma": "always"
 }
