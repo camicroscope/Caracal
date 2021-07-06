@@ -46,7 +46,7 @@ The CSP headers are generated from `contentSecurityPolicy.json`.
 ## User property variables
 These are set in userFunction and injected into the token.
 
-userType -- Null, Editor, Admin as userTypes (e.g. Admin can create users, Editor can create marks, Null can't create anything except logs)
+userType -- Null, Editor, Admin as user roles (e.g. Admin can create users, Editor can create marks, Null can't create anything except logs). The roles are hierarchical, i.e. a higher role has all rights that the roles of its juniors.
 
 userFilter -- list of values which must be present in given field in filtered data responses
 

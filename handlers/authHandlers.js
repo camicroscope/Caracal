@@ -17,6 +17,7 @@ const {
   getJWKSClient,
   readPrivateKey,
   readPublicKey,
+  isSecurityDisabled,
 } = require('../service/keys');
 
 /**
@@ -26,9 +27,7 @@ const {
  * ISS : the issuer of the token
  * EXPIRY : timestamp when jwks expires, default = 1d
  */
-const {
-  AUD, ISS, EXPIRY, ENABLE_SECURITY_AT,
-} = process.env;
+const { AUD, ISS, EXPIRY } = process.env;
 
 /**
  * generate the keys if they are missing from /keys directory
@@ -53,7 +52,7 @@ const CLIENT = getJWKSClient();
  * @param {Request} req incoming http request
  * @returns {string} token
  */
-const getToken = function (req) {
+const getToken = (req) => {
   /** Authorization: Bearer tokenHere */
   if (
     req.headers.authorization
@@ -137,7 +136,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
 }
 
 function jwkTokenTrade(jwksClient, signKey, userFunction) {
-  return function (req, res) {
+  return (req, res) => {
     const token = getToken(req);
     if (!token) {
       return res.status(401).send('{"err":"no token found"}');
@@ -164,12 +163,9 @@ function jwkTokenTrade(jwksClient, signKey, userFunction) {
  */
 function loginHandler(checkKey) {
   /** return a middle */
-  return function (req, res, next) {
+  return (req, res, next) => {
     /** if security enabled after a timestamp */
-    if (
-      DISABLE_SEC
-      || (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now())
-    ) {
+    if (isSecurityDisabled()) {
       let token = {};
       try {
         token = jwt.decode(getToken(req)) || {};
@@ -196,7 +192,7 @@ function loginHandler(checkKey) {
           });
         } else {
           req.tokenInfo = token;
-          req.userType = token.userType || DEFAULT_ROLE || 'Null';
+          req.userType = token.userType || DEFAULT_ROLE;
           req.userFilter = token.userFilter || ['Public'];
           next();
         }
@@ -207,7 +203,7 @@ function loginHandler(checkKey) {
 
 // use filter handler AFTER data handler
 function filterHandler(dataField, filterField, attrField) {
-  return function (req, res, next) {
+  return (req, res, next) => {
     req[dataField] = filterFunction(
       req[filterField],
       req[dataField],
@@ -220,7 +216,7 @@ function filterHandler(dataField, filterField, attrField) {
 
 // use edit handler AFTER a find route to populate data, but BEFORE the edit itself
 function editHandler(dataField, filterField, attrField) {
-  return function (req, res, next) {
+  return (req, res, next) => {
     if (filterField && attrField) {
       req[dataField] = filterFunction(
         req[filterField],
@@ -233,7 +229,7 @@ function editHandler(dataField, filterField, attrField) {
       req[dataField] = [req[dataField]];
     }
     // edit routes should operate on one object
-    if (req[dataField].length == 1) {
+    if (req[dataField].length === 1) {
       // DESTROY query
       for (const n in req.query) {
         if (req.query.hasOwnProperty(n)) {
@@ -242,7 +238,7 @@ function editHandler(dataField, filterField, attrField) {
       }
       req.query = { _id: req[dataField][0]._id.$oid };
       next();
-    } else if (req[dataField].length == 0) {
+    } else if (req[dataField].length === 0) {
       const errorMessage = {};
       errorMessage.error = 'Nothing applicable to change.';
       errorMessage.statusCode = 400;
@@ -258,8 +254,8 @@ function editHandler(dataField, filterField, attrField) {
 
 /** return true or false based on whether security is enabled or not */
 function firstSetupUserSignupExists() {
-  return function (req, res) {
-    if (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
+  return (req, res) => {
+    if (isSecurityDisabled()) {
       res.send({
         exists: true,
       });

@@ -145,4 +145,5 @@ module.exports = {
   readPublicKey,
   readPrivateKey,
   generateKeysIfMissing,
+  isSecurityDisabled,
 };
