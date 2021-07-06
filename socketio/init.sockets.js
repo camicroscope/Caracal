@@ -65,18 +65,13 @@ if (!DISABLE_SOCKETS) {
           
           axios.get(`http://localhost:4010/data/CollabRoom/find?slideId=${slideId}`, {headers})
             .then(response => {
-              const {members} = response.data[0];
-              axios.get(`http://localhost:4010/data/User/find?email=${decoded.email}`, {headers})
-              .then(response => {
-                const userId = response.data[0]._id.$oid;
-                if (members.includes(userId)) {
-                  next();
-                }              
-              })
-              .catch(error => {
-                console.error('Error in fetching user details: ', JSON.stringify(error));
-                return next(new Error('API error: Error in fetching user details.'));
-              });
+              const {members} = response.data[0];   
+                members.forEach(member => {
+                    if (member.email === decoded.email) {
+                        next();
+                    }
+                });
+                // return next(new Error('Auth error: User not included in the slide members.'));
             })
             .catch(error => {
               console.error('Error in fetching collaboration room details: ', JSON.stringify(error));
