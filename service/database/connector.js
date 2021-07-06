@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongodb");
+const { MongoClient } = require('mongodb');
 
 /**
  * @class MongoDBConnector
@@ -15,9 +15,8 @@ class MongoDBConnector {
    */
   constructor() {
     /** connection specifics */
-    const connectionString =
-      process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
-    const databaseName = process.env.MONGO_DB || "camic";
+    const connectionString = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
+    const databaseName = process.env.MONGO_DB || 'camic';
     const url = `${connectionString}/${databaseName}`;
 
     /** connection configurations */
@@ -48,13 +47,10 @@ const connector = new MongoDBConnector();
  * to load connection instances in database operations
  * @param {string} [databaseName=camic] Returns a connection to the said database
  */
-const getConnection = (databaseName = "camic") => {
-  return connector.db[databaseName];
-};
+const getConnection = (databaseName = 'camic') => connector.db[databaseName];
 
 /** export the connector to be used by utility functions */
 module.exports = {
   getConnection,
   connector,
 };
-

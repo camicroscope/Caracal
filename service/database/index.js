@@ -1,5 +1,5 @@
-const { getConnection } = require("./connector");
-const { transformIdToObjectId } = require("./util");
+const { getConnection } = require('./connector');
+const { transformIdToObjectId } = require('./util');
 
 /**
  * @class Mongo
@@ -29,8 +29,8 @@ class Mongo {
       /** allow caller method to toggle response transformation */
       if (transform) {
         data.forEach((x) => {
-          x["_id"] = {
-            $oid: x["_id"],
+          x._id = {
+            $oid: x._id,
           };
         });
       }
@@ -154,7 +154,7 @@ class Mongo {
       filter = transformIdToObjectId(filter);
 
       const collection = await getConnection(database).collection(
-        collectionName
+        collectionName,
       );
       const result = await collection.updateOne(filter, updates);
       delete result.connection;

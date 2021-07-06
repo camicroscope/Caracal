@@ -5,7 +5,7 @@
   "main": "caracal.js",
   "scripts": {
     "test": "mocha test/* --exit",
-    "lint": "eslint *.js handlers/*.js test/**/*.js",
+    "lint": "eslint handlers/*.js service/**/*.js test/**/*.js --fix",
     "lint-fix": "eslint *.js handlers/*.js test/**/*.js --fix",
     "start": "node caracal.js"
   },
@@ -40,9 +40,10 @@
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
     "cookie-parser": "^1.4.4",
-    "eslint": "^6.8.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-plugin-security": "^1.4.0",
-    "mocha": "^8.4.0"
+    "eslint": "^7.29.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "mocha": "^8.4.0",
+    "prettier": "^2.3.2"
   }
 }

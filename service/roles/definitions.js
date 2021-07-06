@@ -1,11 +1,11 @@
-const { AccessControl } = require("accesscontrol");
-const { ROLE } = require("./roles");
-const { RESOURCE } = require("./resources");
+const { AccessControl } = require('accesscontrol');
+const { ROLE } = require('./roles');
+const { RESOURCE } = require('./resources');
 
 const controller = new AccessControl();
 
 /** any un-authenticated user */
-controller.grant(ROLE.VISITOR).readAny("slide");
+controller.grant(ROLE.VISITOR).readAny('slide');
 
 /** roles of user in system */
 controller
@@ -27,8 +27,8 @@ controller
  * Displays the current configuration of roles and list all the resources on the console on startup
  */
 const roleStatusCheck = () => {
-  logger.info(`All roles: ${controller.getRoles()}`);
-  logger.info(`All resources: ${controller.getResources()}`);
+  console.log(`All roles: ${controller.getRoles()}`);
+  console.log(`All resources: ${controller.getResources()}`);
 };
 
 module.exports = { check: controller, roleStatusCheck };

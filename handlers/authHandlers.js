@@ -1,96 +1,50 @@
-// handle auth services
-var jwt = require("jsonwebtoken");
-const jwksClient = require("jwks-rsa");
-var atob = require("atob");
-var fs = require("fs");
-var filterFunction = require("./filterFunction.js");
+/** importing packages and modules */
+const atob = require('atob');
+const jwt = require('jsonwebtoken');
 
-const { execSync } = require("child_process");
-const preCommand = "openssl req -subj ";
-const postCommand =
-  " -x509 -nodes -newkey rsa:2048 -keyout ./keys/key -out ./keys/key.pub";
-var JWK_URL = process.env.JWK_URL;
-var DISABLE_SEC = process.env.DISABLE_SEC === "true" || false;
-var AUD = process.env.AUD || false;
-var ISS = process.env.ISS || false;
-var EXPIRY = process.env.EXPIRY || "1d";
-var DEFAULT_USER_TYPE = process.env.DEFAULT_USER_TYPE || "Null";
-var PUBKEY;
-var PRIKEY;
-var CLIENT;
-var GENERATE_KEY_IF_MISSING =
-  process.env.GENERATE_KEY_IF_MISSING === "true" || false;
-var ENABLE_SECURITY_AT =
-  (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") ||
-  false;
+/** import local dependencies and services */
+const filterFunction = require('./filterFunction');
 
 /**
- * generate kays if missing
+ * Loading services
+ *
+ * roles => to operate on roles and rights
+ * keys => to operate on keys and security
  */
-if (
-  !fs.existsSync("./keys/key") &&
-  !fs.existsSync("./keys/key.pub") &&
-  GENERATE_KEY_IF_MISSING
-) {
-  try {
-    execSync(
-      `${preCommand}'/CN=www.camicroscope.com/O=caMicroscope Local Instance Key./C=US'${postCommand}`
-    );
-  } catch (err) {
-    console.log({ err: err });
-  }
-}
+const { DEFAULT_ROLE } = require('../service/roles/roles');
+const {
+  generateKeysIfMissing,
+  getJWKSClient,
+  readPrivateKey,
+  readPublicKey,
+} = require('../service/keys');
 
-try {
-  const prikeyPath = "./keys/key";
-  if (fs.existsSync(prikeyPath)) {
-    PRIKEY = fs.readFileSync(prikeyPath, "utf8");
-  } else {
-    if (
-      DISABLE_SEC ||
-      (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now())
-    ) {
-      PRIKEY = "";
-      console.warn("prikey null since DISABLE_SEC and no prikey provided");
-    } else {
-      console.error("prikey does not exist");
-    }
-  }
-} catch (err) {
-  console.error(err);
-}
+/**
+ * Loading environment variables. for details about configurations, check .env.config
+ *
+ * AUD : the audience accepted by the service
+ * ISS : the issuer of the token
+ * EXPIRY : timestamp when jwks expires, default = 1d
+ */
+const { AUD, ISS, EXPIRY, ENABLE_SECURITY_AT } = process.env;
 
-try {
-  const pubkeyPath = "./keys/key.pub";
-  if (fs.existsSync(pubkeyPath)) {
-    var PUBKEY = fs.readFileSync(pubkeyPath, "utf8");
-  } else {
-    if (
-      DISABLE_SEC ||
-      (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now())
-    ) {
-      PUBKEY = "";
-      console.warn("pubkey null since DISABLE_SEC and no pubkey provided");
-    } else {
-      console.error("pubkey does not exist");
-    }
-  }
-} catch (err) {
-  console.error(err);
-}
+/**
+ * generate the keys if they are missing from /keys directory
+ */
+generateKeysIfMissing();
 
-if (DISABLE_SEC && !JWK_URL) {
-  CLIENT = jwksClient({
-    jwksUri: "https://www.googleapis.com/oauth2/v3/certs", // a default value
-  });
-} else if (JWK_URL) {
-  CLIENT = jwksClient({
-    jwksUri: JWK_URL,
-  });
-} else {
-  console.error("need JWKS URL (JWK_URL)");
-  process.exit(1);
-}
+/**
+ * Read public and private keys from local fs, giving due respect to security configurations.
+ */
+const keys = {
+  private: readPrivateKey(),
+  public: readPublicKey(),
+};
+
+/**
+ provides a JWKS client based on configurations which can be directly exported from the auth handler
+ */
+const CLIENT = getJWKSClient();
 
 /**
  * Returns the token parsed either from the authorization header, the query param, or a cookie
@@ -101,9 +55,9 @@ const getToken = function (req) {
   /** Authorization: Bearer tokenHere */
   if (
     req.headers.authorization &&
-    req.headers.authorization.split(" ")[0] === "Bearer"
+    req.headers.authorization.split(' ')[0] === 'Bearer'
   ) {
-    return req.headers.authorization.split(" ")[1];
+    return req.headers.authorization.split(' ')[1];
   }
 
   /** Token from query param */
@@ -118,45 +72,22 @@ const getToken = function (req) {
 };
 
 function getJwtKid(token) {
-  var base64Url = token.split(".")[0];
-  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  var jsonPayload = decodeURIComponent(
+  const base64Url = token.split('.')[0];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
     atob(base64)
-      .split("")
-      .map(function (c) {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join("")
+      .split('')
+      .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+      .join(''),
   );
 
   return JSON.parse(jsonPayload).kid;
 }
 
-function jwkTokenTrade(jwksClient, signKey, userFunction) {
-  return function (req, res) {
-    var THISTOKEN = getToken(req);
-    if (!THISTOKEN) {
-      res.status(401).send('{"err":"no token found"}');
-    }
-    jwksClient.getSigningKey(getJwtKid(THISTOKEN), (err, key) => {
-      // console.log(key);
-      if (err) {
-        console.error(err);
-        res.status(401).send({
-          err: err,
-        });
-      } else {
-        const useKey = key.publicKey || key.rsaPublicKey;
-        tokenTrade(useKey, signKey, userFunction)(req, res);
-      }
-    });
-  };
-}
-
 // curry these calls
 function tokenTrade(checkKey, signKey, userFunction) {
-  return function (req, res) {
-    var THISTOKEN = getToken(req);
+  return function middleware(req, res) {
+    const THISTOKEN = getToken(req);
     const jwtOptions = {};
     if (AUD) {
       jwtOptions.audience = AUD;
@@ -164,45 +95,62 @@ function tokenTrade(checkKey, signKey, userFunction) {
     if (ISS) {
       jwtOptions.issuer = ISS;
     }
-    jwt.verify(THISTOKEN, checkKey, jwtOptions, function (err, token) {
+    jwt.verify(THISTOKEN, checkKey, jwtOptions, (err, token) => {
       if (err) {
         console.error(err);
-        res.status(401).send({
-          err: err,
+        return res.status(401).send({ err });
+      }
+
+      if (!(token && (token.email || token.sub))) {
+        // jwt doesn't say who you are, so bye
+        res.send(401).send({
+          err: 'email and sub are unset from source token',
         });
       } else {
-        if (!(token && (token.email || token.sub))) {
-          // jwt doesn't say who you are, so bye
-          res.send(401).send({
-            err: "email and sub are unset from source token",
+        userFunction(token)
+          .then((x) => {
+            // console.log(x);
+            if (x === false) {
+              res.status(401).send({
+                err: 'User Unauthorized',
+              });
+            } else {
+              const data = x;
+              delete data.exp;
+              // sign using the mounted key
+              const newToken = jwt.sign(data, signKey, {
+                algorithm: 'RS256',
+                expiresIn: EXPIRY,
+              });
+              res.send({ token: newToken });
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+            res.status(401).send(e);
           });
-        } else {
-          userFunction(token)
-            .then((x) => {
-              // console.log(x);
-              if (x === false) {
-                res.status(401).send({
-                  err: "User Unauthorized",
-                });
-              } else {
-                data = x;
-                delete data["exp"];
-                // sign using the mounted key
-                var token = jwt.sign(data, signKey, {
-                  algorithm: "RS256",
-                  expiresIn: EXPIRY,
-                });
-                res.send({
-                  token: token,
-                });
-              }
-            })
-            .catch((e) => {
-              console.log(e);
-              res.status(401).send(e);
-            });
-        }
       }
+    });
+  };
+}
+
+function jwkTokenTrade(jwksClient, signKey, userFunction) {
+  return function (req, res) {
+    const token = getToken(req);
+    if (!token) {
+      return res.status(401).send('{"err":"no token found"}');
+    }
+
+    jwksClient.getSigningKey(getJwtKid(token), (err, key) => {
+      if (err) {
+        console.error(err);
+        return res.status(401).send({
+          err,
+        });
+      }
+
+      const useKey = key.publicKey || key.rsaPublicKey;
+      tokenTrade(useKey, signKey, userFunction)(req, res);
     });
   };
 }
@@ -227,8 +175,8 @@ function loginHandler(checkKey) {
         console.warn(e);
       }
       req.tokenInfo = token;
-      req.userType = token.userType || DEFAULT_USER_TYPE || "Null";
-      req.userFilter = token.userFilter || ["Public"];
+      req.userType = token.userType || DEFAULT_ROLE || 'Null';
+      req.userFilter = token.userFilter || ['Public'];
       next();
     } else {
       const jwtOptions = {};
@@ -238,16 +186,16 @@ function loginHandler(checkKey) {
       if (ISS) {
         jwtOptions.issuer = ISS;
       }
-      jwt.verify(getToken(req), checkKey, jwtOptions, function (err, token) {
+      jwt.verify(getToken(req), checkKey, jwtOptions, (err, token) => {
         if (err) {
           console.error(err);
           res.status(401).send({
-            err: err,
+            err,
           });
         } else {
           req.tokenInfo = token;
-          req.userType = token.userType || DEFAULT_USER_TYPE || "Null";
-          req.userFilter = token.userFilter || ["Public"];
+          req.userType = token.userType || DEFAULT_ROLE || 'Null';
+          req.userFilter = token.userFilter || ['Public'];
           next();
         }
       });
@@ -262,7 +210,7 @@ function filterHandler(dataField, filterField, attrField) {
       req[filterField],
       req[dataField],
       attrField,
-      "**"
+      '**',
     );
     next();
   };
@@ -276,7 +224,7 @@ function editHandler(dataField, filterField, attrField) {
         req[filterField],
         req[dataField],
         attrField,
-        "**"
+        '**',
       );
     }
     if (!Array.isArray(req[dataField])) {
@@ -285,27 +233,28 @@ function editHandler(dataField, filterField, attrField) {
     // edit routes should operate on one object
     if (req[dataField].length == 1) {
       // DESTROY query
-      for (let n in req.query) {
+      for (const n in req.query) {
         if (req.query.hasOwnProperty(n)) {
           delete req.query[n];
         }
       }
-      req.query = { _id: req[dataField][0]._id["$oid"] };
+      req.query = { _id: req[dataField][0]._id.$oid };
       next();
     } else if (req[dataField].length == 0) {
-      let errorMessage = {};
-      errorMessage.error = "Nothing applicable to change.";
+      const errorMessage = {};
+      errorMessage.error = 'Nothing applicable to change.';
       errorMessage.statusCode = 400;
       next(errorMessage);
     } else {
-      let errorMessage = {};
-      errorMessage.error = "At most one document may be changed at once.";
+      const errorMessage = {};
+      errorMessage.error = 'At most one document may be changed at once.';
       errorMessage.statusCode = 400;
       next(errorMessage);
     }
   };
 }
 
+/** return true or false based on whether security is enabled or not */
 function firstSetupUserSignupExists() {
   return function (req, res) {
     if (ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
@@ -320,15 +269,15 @@ function firstSetupUserSignupExists() {
   };
 }
 
-auth = {};
-auth.jwkTokenTrade = jwkTokenTrade;
-auth.tokenTrade = tokenTrade;
-auth.filterHandler = filterHandler;
-auth.loginHandler = loginHandler;
-auth.editHandler = editHandler;
-auth.firstSetupUserSignupExists = firstSetupUserSignupExists;
-auth.CLIENT = CLIENT;
-auth.PRIKEY = PRIKEY;
-auth.PUBKEY = PUBKEY;
-
-module.exports = auth;
+/** export authHandler functions */
+module.exports = {
+  jwkTokenTrade,
+  tokenTrade,
+  filterHandler,
+  loginHandler,
+  editHandler,
+  firstSetupUserSignupExists,
+  CLIENT,
+  PRIKEY: keys.private,
+  PUBKEY: keys.public,
+};

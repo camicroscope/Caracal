@@ -1,10 +1,10 @@
-var ALLOW_PUBLIC = (process.env.ALLOW_PUBLIC === 'true');
+const ALLOW_PUBLIC = (process.env.ALLOW_PUBLIC === 'true');
 
-var dataHandlers = require('./dataHandlers.js');
+const dataHandlers = require('./dataHandlers.js');
 // userFunction -- used for login given id provider token
 function userFunction(token) {
-  return new Promise(function(res, rej) {
-    dataHandlers.User.forLogin(token.email).then((x)=>{
+  return new Promise((res, rej) => {
+    dataHandlers.User.forLogin(token.email).then((x) => {
       if (x.length <= 0) {
         if (ALLOW_PUBLIC) {
           const publicToken = {};
@@ -30,6 +30,5 @@ function userFunction(token) {
     });
   });
 }
-
 
 module.exports = userFunction;

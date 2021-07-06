@@ -5,11 +5,11 @@
  */
 
 const ROLE = {
-  ADMIN: "admin",
-  EDITOR: "editor",
-  VISITOR: "visitor",
+  ADMIN: 'admin',
+  EDITOR: 'editor',
+  VISITOR: 'visitor',
 };
 
-const DEFAULT_ROLE = ROLES.VISITOR;
+const DEFAULT_ROLE = ROLE.VISITOR;
 
-module.exports = { ROLES, DEFAULT_ROLE };
+module.exports = { ROLE, DEFAULT_ROLE };

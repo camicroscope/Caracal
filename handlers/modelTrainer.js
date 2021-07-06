@@ -4,8 +4,8 @@ const tf = require('@tensorflow/tfjs-node');
 // proper nvidia drivers needs to be installed on both base machine and container for gpu training
 // const tf = require('@tensorflow/tfjs-node-gpu');
 
-const Data = require('./datasetHandler.js');
 const AdmZip = require('adm-zip');
+const Data = require('./datasetHandler.js');
 
 let Layers = [];
 let Params = {};
@@ -32,7 +32,7 @@ function getModel(Layers, Params, res) {
       });
     }
   } catch (error) {
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
     // res.send(error);
   }
 
@@ -40,10 +40,10 @@ function getModel(Layers, Params, res) {
 }
 
 async function train(model, data, Params) {
-  let TRAIN_DATA_SIZE = Params.trainDataSize;
-  let TEST_DATA_SIZE = Params.testDataSize;
-  let WIDTH = Params.width;
-  let HEIGHT = Params.height;
+  const TRAIN_DATA_SIZE = Params.trainDataSize;
+  const TEST_DATA_SIZE = Params.testDataSize;
+  const WIDTH = Params.width;
+  const HEIGHT = Params.height;
   let d1; let d2;
   const [trainXs, trainYs] = tf.tidy(() => {
     d1 = data.nextTrainBatch(TRAIN_DATA_SIZE);
@@ -91,22 +91,22 @@ async function run(Layers, Params, res, userFolder) {
     trained = await train(model, data, Params);
     console.log('TRAINING DONE');
 
-    await model.save('file://./dataset/' + userFolder + '/');
+    await model.save(`file://./dataset/${userFolder}/`);
 
     tf.dispose([model, trained, data.xs, data.labels]);
     tf.disposeVariables();
 
-    let zip = new AdmZip();
-    zip.addLocalFile('./dataset/' + userFolder + '/model.json');
-    zip.addLocalFile('./dataset/' + userFolder + '/weights.bin');
-    zip.writeZip('./dataset/' + userFolder + '/' + Params.modelName + '.zip');
+    const zip = new AdmZip();
+    zip.addLocalFile(`./dataset/${userFolder}/model.json`);
+    zip.addLocalFile(`./dataset/${userFolder}/weights.bin`);
+    zip.writeZip(`./dataset/${userFolder}/${Params.modelName}.zip`);
 
-    res.json({status: 'done'});
+    res.json({ status: 'done' });
   } catch (error) {
     console.log(error);
     tf.dispose([model, trained, data.xs, data.labels]);
     tf.disposeVariables();
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
   }
 }
 
@@ -157,7 +157,7 @@ function makeLayers(layers, res, userFolder) {
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
     return;
   }
 
@@ -165,23 +165,21 @@ function makeLayers(layers, res, userFolder) {
 }
 
 function trainModel() {
-  return function(req, res) {
-    let data = JSON.parse(req.body);
+  return function (req, res) {
+    const data = JSON.parse(req.body);
     Params = data.Params;
     makeLayers(data.Layers, res, data.userFolder);
   };
 }
 
 function sendTrainedModel() {
-  return function(req, res) {
-    let data = JSON.parse(req.body);
-    let downloadURL = '/workbench/download/' + data.userFolder;
-    let app = require('../caracal.js');
-    app.get(downloadURL, (req1, res1) =>
-      res1.download('./dataset/' + data.userFolder + '/' + data.Params.modelName + '.zip'),
-    );
-    res.json({url: downloadURL});
+  return function (req, res) {
+    const data = JSON.parse(req.body);
+    const downloadURL = `/workbench/download/${data.userFolder}`;
+    const app = require('../caracal.js');
+    app.get(downloadURL, (req1, res1) => res1.download(`./dataset/${data.userFolder}/${data.Params.modelName}.zip`));
+    res.json({ url: downloadURL });
   };
 }
 
-module.exports = {trainModel: trainModel, sendTrainedModel: sendTrainedModel};
+module.exports = { trainModel, sendTrainedModel };

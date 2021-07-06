@@ -1,10 +1,10 @@
 const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
-const mongoDB = require("../service/database");
+const mongoDB = require('../service/database');
 
-var General = {};
-General.find = function(db, collection) {
-  return function(req, res, next) {
-    var query = req.query;
+const General = {};
+General.find = function (db, collection) {
+  return function (req, res, next) {
+    const { query } = req;
     mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -12,20 +12,20 @@ General.find = function(db, collection) {
   };
 };
 
-General.get = function(db, collection) {
-  return function(req, res, next) {
-    var query = req.query;
+General.get = function (db, collection) {
+  return function (req, res, next) {
+    const { query } = req;
     delete query.token;
-    mongoDB.find(db, collection, {_id: req.query.id}).then((x) => {
+    mongoDB.find(db, collection, { _id: req.query.id }).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
   };
 };
 
-General.distinct = function(db, collection, upon) {
-  return function(req, res, next) {
-    var query = req.query;
+General.distinct = function (db, collection, upon) {
+  return function (req, res, next) {
+    const { query } = req;
     delete query.token;
     mongoDB.distinct(db, collection, upon, query).then((x) => {
       req.data = x;
@@ -34,9 +34,9 @@ General.distinct = function(db, collection, upon) {
   };
 };
 
-General.add = function(db, collection) {
-  return function(req, res, next) {
-    var data = JSON.parse(req.body);
+General.add = function (db, collection) {
+  return function (req, res, next) {
+    const data = JSON.parse(req.body);
     mongoDB.add(db, collection, data).then((x) => {
       req.data = x;
       next();
@@ -44,11 +44,11 @@ General.add = function(db, collection) {
   };
 };
 
-General.update = function(db, collection) {
-  return function(req, res, next) {
-    var query = req.query;
+General.update = function (db, collection) {
+  return function (req, res, next) {
+    const { query } = req;
     delete query.token;
-    var newVals = {
+    const newVals = {
       $set: JSON.parse(req.body),
     };
     mongoDB.update(db, collection, query, newVals).then((x) => {
@@ -58,9 +58,9 @@ General.update = function(db, collection) {
   };
 };
 
-General.delete = function(db, collection) {
-  return function(req, res, next) {
-    var query = req.query;
+General.delete = function (db, collection) {
+  return function (req, res, next) {
+    const { query } = req;
     delete query.token;
     mongoDB.delete(db, collection, query).then((x) => {
       req.data = x;
@@ -69,26 +69,26 @@ General.delete = function(db, collection) {
   };
 };
 
-var Presetlabels = {};
+const Presetlabels = {};
 // add a label
-Presetlabels.add = function(req, res, next) {
-  var query = req.query;
+Presetlabels.add = function (req, res, next) {
+  const { query } = req;
   delete query.token;
-  var labels = JSON.parse(req.body);
-  mongoDB.update('camic', 'configuration', {'config_name': 'preset_label'}, {$push: {configuration: labels}}).then((x) => {
+  const labels = JSON.parse(req.body);
+  mongoDB.update('camic', 'configuration', { config_name: 'preset_label' }, { $push: { configuration: labels } }).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
 };
 
 // update a label
-Presetlabels.update = function(req, res, next) {
-  var query = req.query;
+Presetlabels.update = function (req, res, next) {
+  const { query } = req;
   delete query.token;
-  var labels = JSON.parse(req.body);
+  const labels = JSON.parse(req.body);
 
   // initial data
-  var newVals = {
+  const newVals = {
     $set: {
       'configuration.$.id': labels.id,
       'configuration.$.type': labels.type,
@@ -99,68 +99,68 @@ Presetlabels.update = function(req, res, next) {
 
   // $unset/$set size
   if (labels.size) {
-    newVals['$set']['configuration.$.size'] = labels.size;
+    newVals.$set['configuration.$.size'] = labels.size;
   } else {
-    if (!newVals['$unset']) newVals['$unset'] = {};
-    newVals['$unset']['configuration.$.size'] = 1;
+    if (!newVals.$unset) newVals.$unset = {};
+    newVals.$unset['configuration.$.size'] = 1;
   }
 
   // $unset/$set key
   if (labels.key) {
-    newVals['$set']['configuration.$.key'] = labels.key;
+    newVals.$set['configuration.$.key'] = labels.key;
   } else {
-    if (!newVals['$unset']) newVals['$unset'] = {};
-    newVals['$unset']['configuration.$.key'] = 1;
+    if (!newVals.$unset) newVals.$unset = {};
+    newVals.$unset['configuration.$.key'] = 1;
   }
 
   mongoDB.update('camic', 'configuration',
-      {
-        'config_name': 'preset_label',
-        'configuration.id': query.id,
-      }, newVals).then((x) => {
+    {
+      config_name: 'preset_label',
+      'configuration.id': query.id,
+    }, newVals).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
 };
 
 // remove a label by key
-Presetlabels.remove = function(req, res, next) {
-  var query = req.query;
+Presetlabels.remove = function (req, res, next) {
+  const { query } = req;
   delete query.token;
   mongoDB.update('camic', 'configuration',
-      {
-        'config_name': 'preset_label',
-      }, {$pull: {configuration: {id: query.id}}}).then((x) => {
+    {
+      config_name: 'preset_label',
+    }, { $pull: { configuration: { id: query.id } } }).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
 };
 
-var Mark = {};
+const Mark = {};
 // special routes
-Mark.spatial = function(req, res, next) {
-  var query = req.query;
+Mark.spatial = function (req, res, next) {
+  const { query } = req;
   delete query.token;
   // handle  x0, y0, x1, y1, footprint
   if (req.query.x0 && req.query.x1) {
     query.x = {
-      '$gt': parseFloat(req.query.x0),
-      '$lt': parseFloat(req.query.x1),
+      $gt: parseFloat(req.query.x0),
+      $lt: parseFloat(req.query.x1),
     };
   }
   delete query.x0;
   delete query.x1;
   if (req.query.y0 && req.query.y1) {
     query.y = {
-      '$gt': parseFloat(req.query.y0),
-      '$lt': parseFloat(req.query.y1),
+      $gt: parseFloat(req.query.y0),
+      $lt: parseFloat(req.query.y1),
     };
   }
   delete query.y0;
   delete query.y1;
   if (query.footprint) {
     query.footprint = {
-      '$gt': parseFloat(query.footprint),
+      $gt: parseFloat(query.footprint),
     };
   }
   mongoDB.find('camic', 'mark', query).then((x) => {
@@ -169,10 +169,10 @@ Mark.spatial = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
-Mark.multi = function(req, res, next) {
-  var query = {};
+Mark.multi = function (req, res, next) {
+  const query = {};
 
-  var postQuery = JSON.parse(req.body);
+  const postQuery = JSON.parse(req.body);
 
   // handle source
   if (postQuery.source) {
@@ -185,27 +185,27 @@ Mark.multi = function(req, res, next) {
   }
 
   if (postQuery.ids) {
-    query['provenance.analysis.execution_id'] = {'$in': postQuery.ids};
+    query['provenance.analysis.execution_id'] = { $in: postQuery.ids };
   }
 
   // handle  x0, y0, x1, y1, footprint
   if (postQuery.x0 && postQuery.x1) {
     query.x = {
-      '$gt': parseFloat(postQuery.x0),
-      '$lt': parseFloat(postQuery.x1),
+      $gt: parseFloat(postQuery.x0),
+      $lt: parseFloat(postQuery.x1),
     };
   }
 
   if (postQuery.y0 && postQuery.y1) {
     query.y = {
-      '$gt': parseFloat(postQuery.y0),
-      '$lt': parseFloat(postQuery.y1),
+      $gt: parseFloat(postQuery.y0),
+      $lt: parseFloat(postQuery.y1),
     };
   }
 
   if (postQuery.footprint) {
     query.footprint = {
-      '$gt': parseFloat(postQuery.footprint),
+      $gt: parseFloat(postQuery.footprint),
     };
   }
 
@@ -215,8 +215,8 @@ Mark.multi = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
-Mark.findMarkTypes = function(req, res, next) {
-  var query = req.query;
+Mark.findMarkTypes = function (req, res, next) {
+  const { query } = req;
   if (query.slide) {
     query['provenance.image.slide'] = query.slide;
     delete query.slide;
@@ -230,13 +230,13 @@ Mark.findMarkTypes = function(req, res, next) {
   if (query['provenance.analysis.source'] == 'human') {
     const pipeline = [
       {
-        "$match": query,
+        $match: query,
       }, {
-        "$group": {
-          "_id": {
-            "creator": "$creator",
-            "analysis": "$provenance.analysis",
-            "shape": "$geometries.features.geometry.type",
+        $group: {
+          _id: {
+            creator: '$creator',
+            analysis: '$provenance.analysis',
+            shape: '$geometries.features.geometry.type',
           },
         },
       },
@@ -253,55 +253,55 @@ Mark.findMarkTypes = function(req, res, next) {
   }
 };
 
-var Heatmap = {};
-Heatmap.types = function(req, res, next) {
-  var query = req.query;
+const Heatmap = {};
+Heatmap.types = function (req, res, next) {
+  const { query } = req;
   delete query.token;
   mongoDB.find('camic', 'heatmap', query, {
-    'data': 0,
+    data: 0,
   }).then((x) => {
-    x.forEach((x)=>delete x.data);
+    x.forEach((x) => delete x.data);
     req.data = x;
     next();
   }).catch((e) => next(e));
 };
 
-var User = {};
+const User = {};
 
-User.forLogin = function(email) {
-  return mongoDB.find('camic', 'user', {'email': email});
+User.forLogin = function (email) {
+  return mongoDB.find('camic', 'user', { email });
 };
 
-User.wcido = function(req, res, next) {
-  var userType = req.query.ut;
-  var permissions = {
-    slide: {post: true, delete: true, update: true},
-    heatmap: {post: true, delete: true, update: true},
-    heatmapEdit: {post: true, delete: true, update: true},
-    user: {post: true, delete: true, update: true},
-    config: {post: true, delete: true, update: true},
-    mark: {post: true, delete: true, update: true},
-    template: {post: true, delete: true, update: true},
-    logs: {post: true, delete: true, update: true},
+User.wcido = function (req, res, next) {
+  const userType = req.query.ut;
+  const permissions = {
+    slide: { post: true, delete: true, update: true },
+    heatmap: { post: true, delete: true, update: true },
+    heatmapEdit: { post: true, delete: true, update: true },
+    user: { post: true, delete: true, update: true },
+    config: { post: true, delete: true, update: true },
+    mark: { post: true, delete: true, update: true },
+    template: { post: true, delete: true, update: true },
+    logs: { post: true, delete: true, update: true },
   };
   if (DISABLE_SEC || userType == 'Admin') {
     res.send(permissions);
   } else if (userType == 'Editor') {
-    permissions['user'] = {post: false, delete: false, update: false};
-    permissions['slide'] = {post: true, delete: false, update: true};
+    permissions.user = { post: false, delete: false, update: false };
+    permissions.slide = { post: true, delete: false, update: true };
     res.send(permissions);
   } else if (userType == 'Null') {
     for (const key in permissions) {
       if (permissions.hasOwnProperty(key)) {
-        permissions[key] = {post: false, delete: false, update: false};
+        permissions[key] = { post: false, delete: false, update: false };
         if (key == 'logs') {
-          permissions[key] = {post: true, delete: false, update: false};
+          permissions[key] = { post: true, delete: false, update: false };
         }
       }
     }
     res.send(permissions);
   } else {
-    var error = {error: 'undefined UserType'};
+    const error = { error: 'undefined UserType' };
     res.send(error);
   }
 };

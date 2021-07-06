@@ -1,4 +1,4 @@
-const { ObjectID } = require("mongodb");
+const { ObjectID } = require('mongodb');
 
 /**
  * Utility function to transform id from String format to ObjectID format
@@ -13,8 +13,8 @@ const { ObjectID } = require("mongodb");
 const transformIdToObjectId = (query) => {
   const payload = { ...query };
   try {
-    if (payload["_id"]) {
-      payload["_id"] = new ObjectID(payload["_id"]);
+    if (payload._id) {
+      payload._id = new ObjectID(payload._id);
     }
     return payload;
   } catch (e) {

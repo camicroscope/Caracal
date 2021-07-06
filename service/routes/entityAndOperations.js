@@ -1,11 +1,13 @@
-const fs = require("fs");
-
+const fs = require('fs');
+const path = require('path');
 /**
  * Returns all the entities defined in the application
  * along with the operations.
  */
 const listEntityAndOperations = async () => {
-  const rawData = await fs.readFileSync("./routes.json.example");
+  const rawData = await fs.readFileSync(
+    path.join(__dirname, '../../routes.json'),
+  );
   const data = JSON.parse(rawData);
 
   const entityList = {};
