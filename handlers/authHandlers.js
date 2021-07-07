@@ -55,8 +55,8 @@ const CLIENT = getJWKSClient();
 const getToken = (req) => {
   /** Authorization: Bearer tokenHere */
   if (
-    req.headers.authorization
-    && req.headers.authorization.split(' ')[0] === 'Bearer'
+    req.headers.authorization &&
+    req.headers.authorization.split(' ')[0] === 'Bearer'
   ) {
     return req.headers.authorization.split(' ')[1];
   }
@@ -173,7 +173,7 @@ function loginHandler(checkKey) {
         console.warn(e);
       }
       req.tokenInfo = token;
-      req.userType = token.userType || DEFAULT_ROLE || 'Null';
+      req.userType = token.userType || DEFAULT_ROLE;
       req.userFilter = token.userFilter || ['Public'];
       next();
     } else {
