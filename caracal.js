@@ -1,41 +1,86 @@
-require('dotenv').config();
-const express = require('express');
+/* eslint-disable object-shorthand */
+/* eslint-disable func-names */
+/**
+ * object-shorthand and func-names is disabled because arrow functions (preferred by eslint) and
+ * traditional functions are not the same. The main difference comes from the fact that arrow
+ * functions lexically.
+ *
+ * Therefore before due testing, it is not safe to migrate to shorthands with arrow functions.
+ *
+ * @link https://dmitripavlutin.com/differences-between-arrow-and-regular-functions/
+ */
 
-var proxy = require('http-proxy-middleware');
+/** load environment variables */
+require('dotenv').config();
+
+/**
+ * NodeJS Modules
+ */
 const https = require('https');
-var cookieParser = require('cookie-parser');
-var throng = require('throng');
-var routeConfig = require('./routes.json');
-var cspConfig = require('./contentSecurityPolicy.json');
-var helmet = require('helmet');
 const fs = require('fs');
 
-// handlers
-const auth = require('./handlers/authHandlers.js');
-const monitor = require('./handlers/monitorHandlers.js');
-const userFunction = require('./handlers/userFunction.js');
-const iipHandler = require('./handlers/iipHandler.js');
-const proxyHandler = require('./handlers/proxyHandler.js');
-const permissionHandler = require('./handlers/permssionHandler.js');
-const dataHandlers = require('./handlers/dataHandlers.js');
-const sanitizeBody = require('./handlers/sanitizeHandler.js');
-const DataSet = require('./handlers/datasetHandler.js');
-const Model = require('./handlers/modelTrainer.js');
-const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
-// TODO validation of data
+/**
+ * NPM Modules
+ *
+ * @todo: proxy configuraiton
+ */
+const throng = require('throng');
+const helmet = require('helmet');
+const express = require('express');
+// const proxy = require('http-proxy-middleware');
+const cookieParser = require('cookie-parser');
 
-/** load services */
+/**
+ * Route Mappings and Content Security Policy
+ */
+const cspConfig = require('./contentSecurityPolicy.json');
+const routeConfig = require('./routes.json');
+
+/**
+ * Certificate path configurations
+ */
+const sslPath = {
+  privateKey: './ssl/privatekey.pem',
+  certificate: './ssl/certificate.pem',
+};
+
+/**
+ * Application Handlers
+ *
+ * permissionHandlers => to be elimiated as RBAC is implemented
+ */
+const auth = require('./handlers/authHandlers');
+const monitor = require('./handlers/monitorHandlers');
+const userFunction = require('./handlers/userFunction');
+const iipHandler = require('./handlers/iipHandler');
+// const proxyHandler = require('./handlers/proxyHandler');
+// const permissionHandler = require('./handlers/permssionHandler');
+const dataHandlers = require('./handlers/dataHandlers');
+const sanitizeBody = require('./handlers/sanitizeHandler');
+const DataSet = require('./handlers/datasetHandler');
+const Model = require('./handlers/modelTrainer');
+const DataTransformationHandler = require('./handlers/dataTransformationHandler');
+
+/**
+ * Application Services
+ */
 const { connector } = require('./service/database/connector');
 const { roleStatusCheck } = require('./service/roles/definitions');
 
-var WORKERS = process.env.NUM_THREADS || 4;
+/**
+ * Application Constants based on environment
+ *
+ * PORT => to listen for HTTP requests
+ * WORKERS => Number of workers / instances of application that are launched
+ * MONGO_URI => connection string for mongodb database
+ * DISABLE_CSP => true to disable content security policy
+ */
+const PORT = process.env.PORT || 4010;
+const WORKERS = process.env.NUM_THREADS || 4;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
+const DISABLE_CSP = process.env.DISABLE_CSP || false;
 
-var PORT = process.env.PORT || 4010;
-
-var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
-
-var DISABLE_CSP = process.env.DISABLE_CSP || false;
-
+/** express.js configurations */
 const app = express();
 app.use(cookieParser());
 
@@ -47,20 +92,21 @@ if (!DISABLE_CSP) {
   );
 }
 
-// handle non-json raw body for post
-app.use(function (req, res, next) {
-  var data = '';
+/** parse binary data into request.body */
+app.use((req, res, next) => {
+  let data = '';
   req.setEncoding(null);
-  req.on('data', function (chunk) {
+  req.on('data', (chunk) => {
     data += chunk;
   });
-  req.on('end', function () {
+
+  req.on('end', () => {
     req.body = data;
     next();
   });
 });
 
-// auth related services
+/** routes for authentication */
 app.get(
   '/auth/Token/check',
   auth.jwkTokenTrade(auth.CLIENT, auth.PRIKEY, userFunction),
@@ -71,14 +117,12 @@ app.get(
 );
 app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
 
-// TODO way to populate this semi-automatically?
-var HANDLERS = {
-  loginHandler: function () {
-    return auth.loginHandler(auth.PUBKEY);
-  },
-  sanitizeBody: function () {
-    return sanitizeBody;
-  },
+/**
+ * Linking all handlers to bind to the application at runtime
+ *
+ * @todo : populate these semi-automatically
+ */
+const HANDLERS = {
   monitorCheck: monitor.check,
   mongoFind: dataHandlers.General.find,
   mongoAdd: dataHandlers.General.add,
@@ -86,13 +130,17 @@ var HANDLERS = {
   mongoDelete: dataHandlers.General.delete,
   mongoDistinct: dataHandlers.General.distinct,
   filterHandler: auth.filterHandler,
-  permissionHandler: permissionHandler,
   editHandler: auth.editHandler,
-  proxyHandler: proxyHandler,
   getDataset: DataSet.getDataset,
   trainModel: Model.trainModel,
   deleteDataset: DataSet.deleteData,
   sendTrainedModel: Model.sendTrainedModel,
+  loginHandler: function () {
+    return auth.loginHandler(auth.PUBKEY);
+  },
+  sanitizeBody: function () {
+    return sanitizeBody;
+  },
   iipHandler: function () {
     return iipHandler;
   },
@@ -122,102 +170,95 @@ var HANDLERS = {
   },
 };
 
-// register configurable services
-// TODO verify all
-for (let i in routeConfig) {
-  if (Object.prototype.hasOwnProperty.call(routeConfig, i)) {
-    let rule = routeConfig[i];
-    if (!rule.method) {
-      console.error('rule number ' + i + ' has no "method"');
-      process.exit(1);
-    }
-    if (rule.method == 'static') {
-      if (!rule.use) {
-        console.error('rule number ' + i + ' is static and has no "use"');
-        process.exit(1);
-      }
-      app.use(express.static(rule.use));
-    } else {
-      for (let j in rule.handlers) {
-        if (Object.prototype.hasOwnProperty.call(rule.handlers, j)) {
-          let handler = rule.handlers[j];
-          if (!rule.route) {
-            console.error('rule number ' + i + ' has no "route"');
-            process.exit(1);
-          }
-          if (!handler.function) {
-            console.error(
-              'rule number ' + i + ' handler ' + j + ' has no "function"',
-            );
-            process.exit(1);
-          }
-          if (!HANDLERS.hasOwnProperty(handler.function)) {
-            console.error(
-              'handler named "' +
-                handler.function +
-                '" not found (rule ' +
-                i +
-                ' handler ' +
-                j +
-                ')',
-            );
-            process.exit(1);
-          }
-          let args = handler.args || [];
-          // handler.function needs to be in handlers
-          app[rule.method](rule.route, HANDLERS[handler.function](...args));
-        }
-      }
-    }
-  }
-}
+/**
+ * Bind routes.json configuration to application at rumtime.
+ *
+ * there is no need to check for validity of routes.json during runtine because
+ * a dedicated service is written to validate and test the route configurations.
+ *
+ * It is run at built time (of container) and therefore addiitonal checks to ensure
+ * that all required fields are specified are no longer needed.
+ */
+Object.keys(routeConfig).forEach((index) => {
+  const rule = routeConfig[index];
 
-// render mongo returns/data
-app.use('/data', function (req, res, next) {
+  /** to add directory as a static location to be directly served */
+  if (rule.method === 'static') {
+    app.use(express.static(rule.use));
+    return;
+  }
+
+  /** to link a function / middleware to the application */
+  Object.keys(rule.handlers).forEach((handlerIndex) => {
+    const handler = rule.handlers[handlerIndex];
+    const args = handler.args || [];
+
+    /** register a route with handler and arguments dynamically */
+    app[rule.method](rule.route, HANDLERS[handler.function](...args));
+  });
+});
+
+/** route to test data exchange */
+app.use('/data', (req, res) => {
   if (!req.data) {
-    res.status(404).json({});
+    return res.status(404).json({});
   }
-  res.json(req.data);
+  return res.json(req.data);
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  let statusCode = err.statusCode || 500;
-  // wrap strings in a json
-  if (typeof err === 'string' || err instanceof String) {
-    err = { error: err };
+/** sending error response if application fails */
+app.use((err, req, res) => {
+  const statusCode = err.statusCode || 500;
+  let errorResponse = err;
+
+  if (typeof err === 'string') {
+    errorResponse = { error: err };
+    return res.status(statusCode).json(errorResponse);
+  }
+
+  console.error(err.error || err.message || err.toString());
+  return res.status(statusCode).json(err);
+});
+
+/**
+ * export application to be consumed in two modules.
+ * - tests
+ * - server.js to launch a cluster
+ */
+module.exports = app;
+
+/**
+ * Bootstraps an application that is launched via throng / process manager
+ * @param {Application} app instance of express application
+ * @returns void
+ */
+const startApp = (application) => () => {
+  const httpsOptions = {};
+  try {
+    const sslPkPath = sslPath.privateKey;
+    const sslCertPath = sslPkPath.publicKey;
+
+    if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
+      console.info('Starting in HTTPS Mode mode');
+      httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
+      httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
+    }
+  } catch (err) {
+    console.error('Error adding ssl certificates');
     console.error(err);
-  } else {
-    console.error(err.error || err.message || err.toString());
   }
-  res.status(statusCode).json(err);
-});
 
-var startApp = function (app) {
-  return function () {
-    // Prepare for SSL/HTTPS
-    var httpsOptions = {};
-    try {
-      var sslPkPath = './ssl/privatekey.pem';
-      var sslCertPath = './ssl/certificate.pem';
-      if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
-        console.info('Starting in HTTPS Mode mode');
-        httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
-        httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    if (httpsOptions.key && httpsOptions.cert) {
-      https
-        .createServer(httpsOptions, app)
-        .listen(PORT, () => console.log('listening HTTPS on ' + PORT));
-    } else {
-      app.listen(PORT, () => console.log('listening on ' + PORT));
-    }
-  };
+  /** if https ready, launch with ssl, else without */
+  if (httpsOptions.key && httpsOptions.cert) {
+    https
+      .createServer(httpsOptions, application)
+      .listen(PORT, () => console.log(`listening HTTPS on ${PORT}`));
+  } else {
+    application.listen(PORT, () => console.log(`listening HTTPS on ${PORT}`));
+  }
 };
 
+/** launch the application as multiple workers */
 throng(WORKERS, startApp(app));
 
 /** initialize DataTransformationHandler only after database is ready */
@@ -238,5 +279,3 @@ connector
     console.error(e);
     process.exit(1);
   });
-
-module.exports = app; // for tests
