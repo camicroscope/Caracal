@@ -1,31 +1,43 @@
-const ALLOW_PUBLIC = (process.env.ALLOW_PUBLIC === 'true');
+const ALLOW_PUBLIC = process.env.ALLOW_PUBLIC === 'true';
 
 const dataHandlers = require('./dataHandlers.js');
-// userFunction -- used for login given id provider token
+
+/**
+ * Loading services
+ *
+ * roles => to operate on roles and summon default roles
+ */
+const { DEFAULT_ROLE } = require('../service/roles/roles');
+
+/**
+ * Used for login
+ * @param {string} token JWT token in decoded format to read data about current user
+ * @returns Promise<Middleware> Express Middleware
+ */
 function userFunction(token) {
-  return new Promise((res, rej) => {
+  return new Promise((resolve, reject) => {
     dataHandlers.User.forLogin(token.email).then((x) => {
       if (x.length <= 0) {
         if (ALLOW_PUBLIC) {
           const publicToken = {};
           publicToken.userFilter = ['Public'];
-          publicToken.userType = 'Null';
+          publicToken.userType = DEFAULT_ROLE;
           publicToken.email = token.email;
           publicToken.name = token.name;
           publicToken.picture = token.picture;
-          res(publicToken);
+          resolve(publicToken);
         } else {
-          rej(new Error('Public users not allowed on this instance'));
+          reject(new Error('Public users not allowed on this instance'));
         }
       } else {
         const newToken = {};
-        newToken.userType = x[0].userType || 'Null';
+        newToken.userType = x[0].userType || DEFAULT_ROLE;
         newToken.userFilter = x[0].userFilter || ['Public'];
         newToken.sub = token.email;
         newToken.email = token.email;
         newToken.name = token.name;
         newToken.picture = token.picture;
-        res(newToken);
+        resolve(newToken);
       }
     });
   });
