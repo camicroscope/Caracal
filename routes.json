@@ -18,10 +18,6 @@
       {
         "function": "loginHandler",
         "args": []
-      },
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
       }
     ]
   },
@@ -130,10 +126,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "slide"]
       }
@@ -147,10 +139,6 @@
       "operation": "delete"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoFind",
         "args": ["camic", "slide"]
@@ -173,10 +161,6 @@
       "operation": "update"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoFind",
         "args": ["camic", "slide"]
@@ -272,10 +256,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "mark"]
       }
@@ -298,10 +278,6 @@
         "args": ["data"]
       },
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoDelete",
         "args": ["camic", "mark"]
       }
@@ -322,10 +298,6 @@
       {
         "function": "editHandler",
         "args": ["data"]
-      },
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
       },
       {
         "function": "mongoUpdate",
@@ -454,10 +426,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "template"]
       }
@@ -471,10 +439,6 @@
       "operation": "delete"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoDelete",
         "args": ["camic", "template"]
@@ -536,10 +500,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "heatmap"]
       }
@@ -562,10 +522,6 @@
         "args": ["data"]
       },
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoDelete",
         "args": ["camic", "heatmap"]
       }
@@ -586,10 +542,6 @@
       {
         "function": "editHandler",
         "args": ["data"]
-      },
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
       },
       {
         "function": "mongoUpdate",
@@ -620,10 +572,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "heatmapEdit"]
       }
@@ -646,10 +594,6 @@
         "args": ["data"]
       },
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoDelete",
         "args": ["camic", "heatmapEdit"]
       }
@@ -670,10 +614,6 @@
       {
         "function": "editHandler",
         "args": ["data"]
-      },
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
       },
       {
         "function": "mongoUpdate",
@@ -718,10 +658,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoDelete",
         "args": ["camic", "log"]
       }
@@ -735,10 +671,6 @@
       "operation": "update"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoUpdate",
         "args": ["camic", "log"]
@@ -782,10 +714,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoDelete",
         "args": ["camic", "freeform"]
       }
@@ -799,10 +727,6 @@
       "operation": "update"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoUpdate",
         "args": ["camic", "freeform"]
@@ -832,10 +756,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "configuration"]
       }
@@ -850,10 +770,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoDelete",
         "args": ["camic", "configuration"]
       }
@@ -867,10 +783,6 @@
       "operation": "update"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoUpdate",
         "args": ["camic", "configuration"]
@@ -900,10 +812,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoAdd",
         "args": ["camic", "collection"]
       }
@@ -918,10 +826,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "mongoUpdate",
         "args": ["camic", "collection"]
       }
@@ -935,10 +839,6 @@
       "operation": "delete"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "mongoDelete",
         "args": ["camic", "collection"]
@@ -1036,10 +936,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "getDataset",
         "args": []
       }
@@ -1053,10 +949,6 @@
       "operation": "trainModel"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "trainModel",
         "args": []
@@ -1072,10 +964,6 @@
     },
     "handlers": [
       {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
-      {
         "function": "deleteDataset",
         "args": []
       }
@@ -1089,10 +977,6 @@
       "operation": "modelDownload"
     },
     "handlers": [
-      {
-        "function": "permissionHandler",
-        "args": [["Admin", "Editor"]]
-      },
       {
         "function": "sendTrainedModel",
         "args": []
