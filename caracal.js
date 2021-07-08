@@ -53,7 +53,7 @@ const auth = require('./handlers/authHandlers');
 const monitor = require('./handlers/monitorHandlers');
 const userFunction = require('./handlers/userFunction');
 const iipHandler = require('./handlers/iipHandler');
-// const proxyHandler = require('./handlers/proxyHandler');
+const proxyHandler = require('./handlers/proxyHandler');
 // const permissionHandler = require('./handlers/permssionHandler');
 const dataHandlers = require('./handlers/dataHandlers');
 const sanitizeBody = require('./handlers/sanitizeHandler');
@@ -66,6 +66,7 @@ const DataTransformationHandler = require('./handlers/dataTransformationHandler'
  */
 const { connector } = require('./service/database/connector');
 const { roleStatusCheck } = require('./service/roles/definitions');
+const { RouteProcessor } = require('./service/roles/middleware');
 
 /**
  * Application Constants based on environment
@@ -76,7 +77,7 @@ const { roleStatusCheck } = require('./service/roles/definitions');
  * DISABLE_CSP => true to disable content security policy
  */
 const PORT = process.env.PORT || 4010;
-const WORKERS = process.env.NUM_THREADS || 4;
+const WORKERS = process.env.NUM_THREADS || 1;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 const DISABLE_CSP = process.env.DISABLE_CSP || false;
 
@@ -135,6 +136,7 @@ const HANDLERS = {
   trainModel: Model.trainModel,
   deleteDataset: DataSet.deleteData,
   sendTrainedModel: Model.sendTrainedModel,
+  proxyHandler,
   loginHandler: function () {
     return auth.loginHandler(auth.PUBKEY);
   },
@@ -190,11 +192,19 @@ Object.keys(routeConfig).forEach((index) => {
 
   /** to link a function / middleware to the application */
   Object.keys(rule.handlers).forEach((handlerIndex) => {
-    const handler = rule.handlers[handlerIndex];
-    const args = handler.args || [];
+    if (Object.prototype.hasOwnProperty.call(rule.handlers, handlerIndex)) {
+      const handler = rule.handlers[handlerIndex];
+      const args = handler.args || [];
 
-    /** register a route with handler and arguments dynamically */
-    app[rule.method](rule.route, HANDLERS[handler.function](...args));
+      if (typeof HANDLERS[handler.function] !== 'function') {
+        console.error(handler);
+      }
+
+      /** register a route with handler and arguments dynamically */
+      app[rule.method](rule.route, HANDLERS[handler.function](...args));
+    } else {
+      console.error(handlerIndex);
+    }
   });
 });
 
@@ -206,18 +216,22 @@ app.use('/data', (req, res) => {
   return res.json(req.data);
 });
 
+app.use(RouteProcessor);
+
 /** sending error response if application fails */
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
+  console.error(`Last layer reached, code ${statusCode}`);
   let errorResponse = err;
 
   if (typeof err === 'string') {
     errorResponse = { error: err };
+    console.log(`error : ${errorResponse}`);
     return res.status(statusCode).json(errorResponse);
   }
 
   console.error(err.error || err.message || err.toString());
-  return res.status(statusCode).json(err);
+  return res.status(statusCode).json({ err, code: statusCode });
 });
 
 /**
@@ -254,7 +268,7 @@ const startApp = (application) => () => {
       .createServer(httpsOptions, application)
       .listen(PORT, () => console.log(`listening HTTPS on ${PORT}`));
   } else {
-    application.listen(PORT, () => console.log(`listening HTTPS on ${PORT}`));
+    application.listen(PORT, () => console.log(`listening HTTP on ${PORT}`));
   }
 };
 
