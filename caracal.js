@@ -66,7 +66,7 @@ const DataTransformationHandler = require('./handlers/dataTransformationHandler'
  */
 const { connector } = require('./service/database/connector');
 const { roleStatusCheck } = require('./service/roles/definitions');
-const { RouteProcessor } = require('./service/roles/middleware');
+const { RoleProcessor } = require('./service/roles/middleware');
 
 /**
  * Application Constants based on environment
@@ -190,7 +190,12 @@ Object.keys(routeConfig).forEach((index) => {
     return;
   }
 
+  /** destruct access specifier data from route entry */
+  const { entity, operation } = rule.access;
+
   /** to link a function / middleware to the application */
+  app[rule.method](rule.route, RoleProcessor(entity, operation));
+
   Object.keys(rule.handlers).forEach((handlerIndex) => {
     if (Object.prototype.hasOwnProperty.call(rule.handlers, handlerIndex)) {
       const handler = rule.handlers[handlerIndex];
@@ -215,8 +220,6 @@ app.use('/data', (req, res) => {
   }
   return res.json(req.data);
 });
-
-app.use(RouteProcessor);
 
 /** sending error response if application fails */
 app.use((err, req, res, next) => {

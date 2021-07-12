@@ -26,7 +26,7 @@ const { check } = require('./definitions');
  * @param {string} route route to attach the role checking service to
  * @param {{entity:string, operation:string}} access access identifier to identify resource
  */
-const RouteProcessor = (route, access) => {
+const RoleProcessor = (route, access) => {
   const middleware = (req, res, next) => {
     /** express middleware definition */
     console.log('----------------------------------------');
@@ -97,4 +97,4 @@ const RouteProcessor = (route, access) => {
   return middleware;
 };
 
-module.exports = { RouteProcessor };
+module.exports = { RoleProcessor };
