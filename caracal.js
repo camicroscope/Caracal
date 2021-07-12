@@ -27,7 +27,6 @@ const DataTransformationHandler = require('./handlers/dataTransformationHandler.
 
 const {connector} = require("./service/database/connector");
 const {socketHttpServer} = require('./socketio/init.sockets');
-// const { httpServer } = require('./socketio/init.sockets');
 
 var WORKERS = process.env.NUM_THREADS || 4;
 
@@ -203,20 +202,26 @@ var startApp = function(app) {
     } else {
       app.listen(PORT, () => console.log('listening on ' + PORT));
     }
-    socketHttpServer.listen(SOCKET_PORT, () => {
-      console.log(`
-      ============================================================================================================
-      ============================================================================================================
-      Example socket app listening at http://localhost:${SOCKET_PORT}
-      ============================================================================================================
-      ============================================================================================================
-      `);
-    });
-    
   };
 };
 
-throng(WORKERS, startApp(app));
+const startSocketServer = (socketHttpServer) => {
+  socketHttpServer.listen(SOCKET_PORT, () => {
+    console.log(`
+    ============================================================================================================
+    ============================================================================================================
+    Example socket app listening at http://localhost:${SOCKET_PORT}
+    ============================================================================================================
+    ============================================================================================================
+    `);
+  });
+}
+
+throng({count: WORKERS, master: () => {
+  startSocketServer(socketHttpServer);
+}}, startApp(app));
+
+
 
 /** initialize DataTransformationHandler only after database is ready */
 connector.init().then(() => {
