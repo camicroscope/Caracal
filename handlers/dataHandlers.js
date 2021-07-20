@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const {ObjectID} = require("mongodb");
 var General = {};
+
 General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
@@ -14,7 +15,15 @@ General.find = function(db, collection) {
     }).catch((e) => next(e));
   };
 };
-
+General.count = function(db, collection) {
+  return function(req, res, next) {
+    var query = req.query;
+    mongoDB.count(db, collection, query).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  };
+};
 General.get = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;

@@ -22,9 +22,21 @@ class Mongo {
   static async find(database, collectionName, query, transform = true) {
     try {
       query = transformIdToObjectId(query);
-
+      const opt = {};
+      if (query.sort) {
+        opt = query.sort;
+        delete query.sort;
+      }
+      if (query.skip) {
+        opt = query.skip;
+        delete query.skip;
+      }
+      if (query.limit) {
+        opt = query.limit;
+        delete query.limit;
+      }
       const collection = getConnection(database).collection(collectionName);
-      const data = await collection.find(query).toArray();
+      const data = await collection.find(query, opt).toArray();
 
       /** allow caller method to toggle response transformation */
       if (transform) {
@@ -41,7 +53,29 @@ class Mongo {
       throw e;
     }
   }
-
+  /**
+   * Runs the MongoDB count() method to fetch documents.
+   *
+   * @async
+   * @param {string} database Name of the database
+   * @param {string} collectionName Name of the collection to run operation on
+   * @param {document} query Specifies selection filter using query operators.
+   * To return all documents in a collection, omit this parameter or pass an empty document ({}).
+   * @param {boolean} [transform=false] check to transform the IDs to ObjectID in response
+   *
+   * {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/ Read MongoDB Reference}
+   */
+  static async count(database, collectionName, query) {
+    try {
+      query = transformIdToObjectId(query);
+      const collection = getConnection(database).collection(collectionName);
+      const data = await collection.count(query);
+      return data;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
   /**
    * Runs a distinct find operation based on given query
    *
@@ -206,6 +240,7 @@ class Mongo {
 
 /** export to be import using the destructuring syntax */
 module.exports = {
+  count: Mongo.count,
   add: Mongo.add,
   find: Mongo.find,
   update: Mongo.update,

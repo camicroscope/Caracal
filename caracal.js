@@ -70,6 +70,7 @@ var HANDLERS = {
     return sanitizeBody;
   },
   "monitorCheck": monitor.check,
+  "mongoCount": dataHandlers.General.count,
   "mongoFind": dataHandlers.General.find,
   "mongoAdd": dataHandlers.General.add,
   "mongoUpdate": dataHandlers.General.update,
