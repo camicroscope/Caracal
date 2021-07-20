@@ -24,17 +24,20 @@ class Mongo {
       query = transformIdToObjectId(query);
       const opt = {};
       if (query.sort) {
-        opt = query.sort;
+        opt.sort = JSON.parse(query.sort);
         delete query.sort;
       }
       if (query.skip) {
-        opt = query.skip;
+        opt.skip = query.skip;
         delete query.skip;
       }
       if (query.limit) {
-        opt = query.limit;
+        opt.limit = query.limit;
         delete query.limit;
       }
+      console.log('------------------ test start ---------------');
+      console.log(query, opt);
+      console.log('------------------ test end ---------------');
       const collection = getConnection(database).collection(collectionName);
       const data = await collection.find(query, opt).toArray();
 
