@@ -28,11 +28,11 @@ class Mongo {
         delete query.sort;
       }
       if (query.skip) {
-        opt.skip = query.skip;
+        opt.skip = +query.skip;
         delete query.skip;
       }
       if (query.limit) {
-        opt.limit = query.limit;
+        opt.limit = +query.limit;
         delete query.limit;
       }
       console.log('------------------ test start ---------------');
