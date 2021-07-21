@@ -35,9 +35,6 @@ class Mongo {
         opt.limit = +query.limit;
         delete query.limit;
       }
-      console.log('------------------ test start ---------------');
-      console.log(query, opt);
-      console.log('------------------ test end ---------------');
       const collection = getConnection(database).collection(collectionName);
       const data = await collection.find(query, opt).toArray();
 
