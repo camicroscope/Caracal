@@ -1,9 +1,10 @@
-const Ajv = require("ajv");
+const Ajv = require('ajv');
+const path = require('path');
 const ajv = new Ajv();
-require("ajv-keywords")(ajv);
+require('ajv-keywords')(ajv);
 
 /** loading dataset */
-const routeDefinitions = require("./routes.json");
+const routeDefinitions = require('../../routes.json');
 
 /**
  * Quick information about schema declaration
@@ -18,21 +19,21 @@ const routeDefinitions = require("./routes.json");
 
 /** declare schema */
 const schema = {
-  type: "array",
+  type: 'array',
   items: {
-    type: "object",
+    type: 'object',
     oneOf: [
       /** static blocks */
       {
         properties: {
           method: {
-            const: "static",
+            const: 'static',
           },
           use: {
-            type: "string",
+            type: 'string',
           },
         },
-        required: ["method", "use"],
+        required: ['method', 'use'],
       },
 
       /** use middleware */
@@ -40,36 +41,49 @@ const schema = {
         properties: {
           /** the type of requests which are accepted by the entry */
           method: {
-            enum: ["use", "get", "post", "delete"],
+            enum: ['use', 'get', 'post', 'delete'],
           },
 
           /** the URL fragment on which the route is attached */
           route: {
-            type: "string",
+            type: 'string',
+          },
+
+          /** information related to access rights of the item */
+          access: {
+            type: 'object',
+            properties: {
+              /** the category to which the operation belongs */
+              entity: { type: 'string' },
+
+              /** slug to identify the operation */
+              operation: { type: 'string' },
+            },
+            required: ['entity', 'operation'],
           },
 
           /** list of handlers / middleware layers attached to given route */
           handlers: {
             /** each route has multiple handles attached to it, therefore array */
-            type: "array",
+            type: 'array',
 
             items: {
-              type: "object",
+              type: 'object',
               properties: {
                 /** the name of the function that is attached from the codebase to the route */
-                function: {type: "string"},
+                function: { type: 'string' },
 
                 /** array of arguments that are passed into the above specified function */
                 args: {
-                  type: "array",
+                  type: 'array',
                 },
               },
 
-              required: ["function", "args"],
+              required: ['function', 'args'],
             },
           },
         },
-        required: ["method", "route", "handlers"],
+        required: ['method', 'route', 'handlers', 'access'],
       },
     ],
   },
@@ -79,4 +93,4 @@ const schema = {
 const validate = ajv.compile(schema);
 
 const valid = validate(routeDefinitions);
-valid === true ? console.log("ok") : console.log(validate.errors);
+valid === true ? console.log('ok') : console.log(validate.errors);
