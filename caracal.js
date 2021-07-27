@@ -167,7 +167,8 @@ for (let i in routeConfig) {
 
 // render mongo returns/data
 app.use('/data', function(req, res, next) {
-  if (!req.data) {
+  // if (!req.data ) {
+  if (typeof req.data == 'undefined') {
     res.status(404).json({});
   }
   res.json(req.data);
