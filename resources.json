@@ -1,14 +1,23 @@
 {
+  "slide": ["read", "create", "delete", "update"],
+  "request": ["read", "create", "delete"],
+  "presetLabel": ["create", "update", "delete"],
+  "template": ["read", "create", "delete", "update"],
+  "heatmap": ["read", "types", "create", "delete", "update"],
+  "heatmapEdit": ["read", "create", "delete", "update"],
+  "log": ["read", "create", "delete", "update"],
+  "freeform": ["read", "create", "delete", "update"],
+  "configuration": ["read", "create", "delete", "update"],
+  "collection": ["read", "create", "update", "delete"],
+  "user": ["read", "create", "delete", "update", "wcido"],
   "middleware": [
     "loader.login",
     "loader.slide.delete",
-    "loader.proxyHandler",
+    "loader.proxyHandlehr",
     "googleAuth",
     "img.iip.raw",
     "data"
   ],
-  "slide": ["read", "create", "delete", "update"],
-  "request": ["read", "create", "delete"],
   "mark": [
     "read",
     "create",
@@ -19,15 +28,6 @@
     "spatial",
     "findMarkTypes"
   ],
-  "presetLabel": ["create", "update", "delete"],
-  "template": ["read", "create", "delete", "update"],
-  "heatmap": ["read", "types", "create", "delete", "update"],
-  "heatmapEdit": ["read", "create", "delete", "update"],
-  "log": ["read", "create", "delete", "update"],
-  "freeform": ["read", "create", "delete", "update"],
-  "configuration": ["read", "create", "delete", "update"],
-  "collection": ["read", "create", "update", "delete"],
-  "user": ["read", "create", "delete", "update", "wcido"],
   "workbench": [
     "uploadDataset",
     "trainModel",
