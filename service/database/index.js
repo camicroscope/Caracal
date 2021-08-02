@@ -37,10 +37,9 @@ class Mongo {
       }
       if (query._search_) {
         const _search_ = JSON.parse(query._search_);
-        
         for (let key in _search_) {
           if (Object.prototype.hasOwnProperty.call(_search_, key)) {
-            opt[_keyobj] = new RegExp(_search_[key], "i");
+            opt[key] = new RegExp(_search_[key], "i");
           }
         }
         console.log("--------test start--------");
