@@ -36,13 +36,16 @@ class Mongo {
         delete query.limit;
       }
       if (query._search_) {
+        console.log("--------test start--------");
+        console.log(query._search_);
+        console.log(JSON.parse(query._search_));
         const _search_ = JSON.parse(query._search_);
         for (let key in _search_) {
           if (Object.prototype.hasOwnProperty.call(_search_, key)) {
             opt[key] = new RegExp(_search_[key], "i");
           }
         }
-        console.log("--------test start--------");
+        
         console.log(opt);
         console.log("--------test end--------");
         delete query._search_;
