@@ -35,6 +35,14 @@ class Mongo {
         opt.limit = +query.limit;
         delete query.limit;
       }
+      if (query._search_) {
+        const _search_ = JSON.parse(query._search_);
+        for (let key in _search_) {
+          if (Object.prototype.hasOwnProperty.call(_search_, key)) {
+            opt[_keyobj] = new RegExp(_search_[key], "i");
+          }
+        }
+      }
       const collection = getConnection(database).collection(collectionName);
       const data = await collection.find(query, opt).toArray();
 
