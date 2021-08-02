@@ -77,6 +77,15 @@ class Mongo {
   static async count(database, collectionName, query) {
     try {
       query = transformIdToObjectId(query);
+      if (query._search_) {
+        const _search_ = JSON.parse(query._search_);
+        for (let key in _search_) {
+          if (Object.prototype.hasOwnProperty.call(_search_, key)) {
+            query[key] = new RegExp(_search_[key], "i");
+          }
+        }
+        delete query._search_;
+      }
       const collection = getConnection(database).collection(collectionName);
       const data = await collection.count(query);
       return data;
