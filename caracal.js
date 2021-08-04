@@ -95,6 +95,9 @@ var HANDLERS = {
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;
   },
+  "updateMarksLabel": function() {
+    return Mark.updateMarksLabel;
+  },
   "heatmapTypes": function() {
     return dataHandlers.Heatmap.types;
   },

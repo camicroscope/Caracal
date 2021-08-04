@@ -252,7 +252,7 @@ Mark.findMarkTypes = function(req, res, next) {
     }).catch((e) => next(e));
   }
 };
-Mark.updatePresetlabels = function(req, res, next) {
+Mark.updateMarksLabel = function(req, res, next) {
   var query = req.query;
   delete query.token;
   // initial data
