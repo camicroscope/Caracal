@@ -92,17 +92,24 @@ if (!DISABLE_SOCKETS) {
     console.log('Socket connected with id as : ', socket.id);
   
     socket.on('room', function(room) {
-      console.log('room:', room);
+      // console.log('room:', room);
       socket.join(room);
       socket.to(room).emit('user joined', socket.id);
     });
   
     socket.on("message", (arg) => {
-      console.log("Message received: ", arg);
+      // console.log("Message received: ", arg);
       const {roomId} = arg;
-      console.log(roomId);
+      // console.log(roomId);
       // io.emit("message", arg);
       // socket.broadcast.emit("message", arg);
+      socket.to(roomId).emit("message", arg);
+    });
+
+    socket.on("chat", (arg) => {
+      // console.log("Chat received: ", arg);
+      const {roomId} = arg;
+      // console.log(roomId);
       socket.to(roomId).emit("message", arg);
     });
   });
