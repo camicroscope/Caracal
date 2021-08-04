@@ -256,6 +256,7 @@ Mark.updateMarksLabel = function(req, res, next) {
   var query = req.query;
   delete query.token;
   // initial data
+
   var newVals = {
     $set: {
       'provenance.analysis.name': query.name,
@@ -263,7 +264,7 @@ Mark.updateMarksLabel = function(req, res, next) {
       'properties.annotations.notes': query.name,
     },
   };
-  mongoDB.update('camic', 'marks',
+  mongoDB.update('camic', 'mark',
       {
         'provenance.analysis.labelId': query.id,
       }, newVals).then((x) => {
