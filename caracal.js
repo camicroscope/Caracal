@@ -86,12 +86,8 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
-  "markMulti": function() {
-    return dataHandlers.Mark.multi;
-  },
-  "markSpatial": function() {
-    return dataHandlers.Mark.spatial;
-  },
+  "markMulti": dataHandlers.Mark.multi,
+  "markSpatial": dataHandlers.Mark.spatial,
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;
   },
@@ -208,4 +204,3 @@ connector.init().then(() => {
 });
 
 module.exports = app; // for tests
-

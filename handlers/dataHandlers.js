@@ -138,81 +138,87 @@ Presetlabels.remove = function(req, res, next) {
 
 var Mark = {};
 // special routes
-Mark.spatial = function(req, res, next) {
-  var query = req.query;
-  delete query.token;
-  // handle  x0, y0, x1, y1, footprint
-  if (req.query.x0 && req.query.x1) {
-    query.x = {
-      '$gt': parseFloat(req.query.x0),
-      '$lt': parseFloat(req.query.x1),
-    };
-  }
-  delete query.x0;
-  delete query.x1;
-  if (req.query.y0 && req.query.y1) {
-    query.y = {
-      '$gt': parseFloat(req.query.y0),
-      '$lt': parseFloat(req.query.y1),
-    };
-  }
-  delete query.y0;
-  delete query.y1;
-  if (query.footprint) {
-    query.footprint = {
-      '$gt': parseFloat(query.footprint),
-    };
-  }
-  mongoDB.find('camic', 'mark', query).then((x) => {
-    req.data = x;
-    next();
-  }).catch((e) => next(e));
+Mark.spatial = function(collection) {
+  collection = collection || "mark";
+  return function(req, res, next) {
+    var query = req.query;
+    delete query.token;
+    // handle  x0, y0, x1, y1, footprint
+    if (req.query.x0 && req.query.x1) {
+      query.x = {
+        '$gt': parseFloat(req.query.x0),
+        '$lt': parseFloat(req.query.x1),
+      };
+    }
+    delete query.x0;
+    delete query.x1;
+    if (req.query.y0 && req.query.y1) {
+      query.y = {
+        '$gt': parseFloat(req.query.y0),
+        '$lt': parseFloat(req.query.y1),
+      };
+    }
+    delete query.y0;
+    delete query.y1;
+    if (query.footprint) {
+      query.footprint = {
+        '$gt': parseFloat(query.footprint),
+      };
+    }
+    mongoDB.find('camic', 'mark', query).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  };
 };
 
-Mark.multi = function(req, res, next) {
-  var query = {};
+Mark.multi = function(collection) {
+  collection = collection || 'mark';
+  return function(req, res, next) {
+    var query = {};
 
-  var postQuery = JSON.parse(req.body);
+    var postQuery = JSON.parse(req.body);
 
-  // handle source
-  if (postQuery.source) {
-    query['provenance.analysis.source'] = postQuery.source;
-  }
+    // handle source
+    if (postQuery.source) {
+      query['provenance.analysis.source'] = postQuery.source;
+    }
 
-  // handle notes
-  if (postQuery.notes) {
-    query['properties.annotations.notes'] = postQuery.notes;
-  }
+    // handle notes
+    if (postQuery.notes) {
+      query['properties.annotations.notes'] = postQuery.notes;
+    }
 
-  if (postQuery.ids) {
-    query['provenance.analysis.execution_id'] = {'$in': postQuery.ids};
-  }
+    if (postQuery.ids) {
+      query['provenance.analysis.execution_id'] = {'$in': postQuery.ids};
+    }
 
-  // handle  x0, y0, x1, y1, footprint
-  if (postQuery.x0 && postQuery.x1) {
-    query.x = {
-      '$gt': parseFloat(postQuery.x0),
-      '$lt': parseFloat(postQuery.x1),
-    };
-  }
+    // handle  x0, y0, x1, y1, footprint
+    if (postQuery.x0 && postQuery.x1) {
+      query.x = {
+        '$gt': parseFloat(postQuery.x0),
+        '$lt': parseFloat(postQuery.x1),
+      };
+    }
 
-  if (postQuery.y0 && postQuery.y1) {
-    query.y = {
-      '$gt': parseFloat(postQuery.y0),
-      '$lt': parseFloat(postQuery.y1),
-    };
-  }
+    if (postQuery.y0 && postQuery.y1) {
+      query.y = {
+        '$gt': parseFloat(postQuery.y0),
+        '$lt': parseFloat(postQuery.y1),
+      };
+    }
 
-  if (postQuery.footprint) {
-    query.footprint = {
-      '$gt': parseFloat(postQuery.footprint),
-    };
-  }
+    if (postQuery.footprint) {
+      query.footprint = {
+        '$gt': parseFloat(postQuery.footprint),
+      };
+    }
 
-  mongoDB.find('camic', 'mark', query).then((x) => {
-    req.data = x;
-    next();
-  }).catch((e) => next(e));
+    mongoDB.find('camic', collection, query).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  };
 };
 
 Mark.findMarkTypes = function(req, res, next) {
