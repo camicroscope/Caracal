@@ -8,7 +8,10 @@ function permissionHandlerForCollabRooms(permissionList, test=false) {
       req.permission_ok = true;
       next();
     } else {
-      if (req.tokenInfo.email && req.data && permissionList.indexOf(req.data[0].members.find(member => member.email === req.tokenInfo.email).role) >= 0) {
+      if (!req.data[0].privateStatus) {
+        req.permission_ok = true;
+        next();
+      } else if (req.tokenInfo.email && req.data && permissionList.indexOf(req.data[0].members.find(member => member.email === req.tokenInfo.email).role) >= 0) {
         req.permission_ok = true;
         next();
       } else {
@@ -33,6 +36,7 @@ function addDefaultCollabRoomOnSlideCreate(db, collection) {
         role: 'admin',
       }],
       collabStatus: false,
+      privateStatus: true,
     };
     mongoDB.add(db, collection, collabRoomData).then((x) => {
       req.data = x;
