@@ -158,7 +158,7 @@ class Mongo {
       filter = transformIdToObjectId(filter);
 
       const collection = getConnection(database).collection(collectionName);
-      const result = await collection.deleteOne(filter);
+      const result = await collection.deleteMany(filter);
       delete result.connection;
 
       return result;
