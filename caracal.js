@@ -20,11 +20,6 @@ const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 
-if (!DISABLE_TF) {
-  const DataSet = require('./handlers/datasetHandler.js');
-  const Model = require('./handlers/modelTrainer.js');
-}
-
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 // TODO validation of data
 
@@ -39,6 +34,12 @@ var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
 
 var DISABLE_TF = process.env.DISABLE_TF || false;
+
+
+if (!DISABLE_TF) {
+  const DataSet = require('./handlers/datasetHandler.js');
+  const Model = require('./handlers/modelTrainer.js');
+}
 
 const app = express();
 app.use(cookieParser());
