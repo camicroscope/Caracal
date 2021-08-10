@@ -5,7 +5,7 @@ COPY . /src
 WORKDIR /src
 RUN npm install
 ARG DISABLE_TF
-RUN if [[ -z $DISABLE_TF ]] ; then npm install tfjs; else echo "Disabled TF"; fi
+RUN if [[ -z $DISABLE_TF ]] ; then npm install tfjs @tensorflow/tfjs-node; else echo "Disabled TF"; fi
 ARG viewer
 ARG fork
 RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
