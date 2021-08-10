@@ -30,6 +30,7 @@ All possible configuration variables are listed in `.env.example`. Renaming the 
 |EXPIRY | expire in time for jwks| 1d |
 |DISABLE_SEC | set truthy to disable permission and login handlers | false |
 |DISABLE_CSP | set truthy to disable content security policy headers | false |
+|DISABLE_TF | set truthy to disable installing and using tensorflow | false |
 |ALLOW_PUBLIC | set truthy to allow public users | false |
 |IIP_PATH | IIP server location | http://ca-iip |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
