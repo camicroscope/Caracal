@@ -125,7 +125,9 @@ if (!DISABLE_TF) {
   HANDLERS["sendTrainedModel"] = Model.sendTrainedModel;
 } else {
   function disabledRoute() {
-    return "Disabled route.";
+    return function(req, res) {
+      res.status(500).send('{"err":"This TF route is disabled"}');
+    };
   }
   HANDLERS["getDataset"] = disabledRoute;
   HANDLERS["trainModel"] = disabledRoute;
