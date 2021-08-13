@@ -4,7 +4,7 @@ var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SE
 
 function addMessage(db, collection) {
   return function(req, res, next) {
-    const defaultUserEmail = req.tokenInfo ? req.tokenInfo.email : "sample@mail.com"; //sample user when DISABLE_SEC=true
+    const defaultUserEmail = req.tokenInfo ? req.tokenInfo.email : "sample@mail.com"; // sample user when DISABLE_SEC=true
     const messageData = JSON.parse(req.body);
     messageData.from = defaultUserEmail;
     mongoDB.add(db, collection, messageData).then((x) => {

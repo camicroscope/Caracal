@@ -26,7 +26,7 @@ function permissionHandlerForCollabRooms(permissionList, test=false) {
 
 function addDefaultCollabRoomOnSlideCreate(db, collection) {
   return function(req, res, next) {
-    const defaultUserEmail = req.tokenInfo ? req.tokenInfo.email : "sample@mail.com"; //sample user when DISABLE_SEC=true
+    const defaultUserEmail = req.tokenInfo ? req.tokenInfo.email : "sample@mail.com"; // sample user when DISABLE_SEC=true
     const collabRoomData = {
       createdBy: defaultUserEmail,
       roomId: String(req.data.ops[0]._id),
