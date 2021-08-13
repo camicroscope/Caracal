@@ -86,6 +86,9 @@ class Mongo {
         }
         delete query._search_;
       }
+      console.log(' || ---- count start---- || ');
+      console.log(collectionName, query);
+      console.log(' || ---- count end ---- || ');
       const collection = getConnection(database).collection(collectionName);
       const data = await collection.count(query);
       return data;
