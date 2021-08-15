@@ -4,7 +4,16 @@ const { RESOURCE } = require('./resources');
 
 const controller = new AccessControl();
 
-/** any un-authenticated user */
+/** load peer services */
+const { find, add } = require('../database');
+const DefaultRoles = require('./defaultRoles');
+
+/**
+ * Define the roles to be used in the application by default. These would
+ * continue to function irrespective of the database state.
+ */
+
+/** Visitor = person without a role, unauthenticated */
 controller
   .grant(ROLE.VISITOR)
   .read(RESOURCE.MIDDLEWARE('loader.proxyHandler'))
@@ -33,7 +42,14 @@ controller
   .read(RESOURCE.USER())
   .read(RESOURCE.USER('wcido'));
 
-/** roles of user in system */
+/**
+ * The role definitions can be extended. For example here, the role EDITOR
+ * extends the role VISITOR. This means that whatever rights are granted to
+ * the role VISITOR, they will also be granted to the role EDITOR.
+ *
+ * When editing the roles in the GUI editor, the same rule is applied to the
+ * role definitions.
+ */
 controller
   .grant(ROLE.EDITOR)
   .extend(ROLE.VISITOR)
@@ -76,11 +92,73 @@ controller
 controller.grant(ROLE.ADMIN).extend(ROLE.EDITOR);
 
 /**
- * Displays the current configuration of roles and list all the resources on the console on startup
+ * @global
+ * livehandler contains the current access control instance. This can change
+ * midway in the application when the roles are updated from the GUI editor.
+ *
+ * Whenever the rules are changed, the liveHandle is updated and the
+ * getAccessControlHandle starts to point to the new liveHandle.
  */
-const roleStatusCheck = () => {
-  console.log(`All roles: ${controller.getRoles()}`);
-  console.log(`All resources: ${controller.getResources()}`);
+let liveHandle = controller;
+
+/**
+ * function to return the latest instance of the access control
+ * @return {AccessControl}
+ */
+const getAccessControlHandle = () => liveHandle;
+
+/**
+ * This method initializes the access control and assigns the live handle to
+ * the global variable. This ensures that whenever the instance is to used,
+ * it will be the latest instance and all operations would be consistent.
+ */
+const initialize = async () => {
+  /** load the roles from the database */
+  const roles = await find('camic', 'roles', {});
+
+  /**
+   * if roles are not found, then save the default connfiguration into the
+   * database. This allows the application to start with a default role
+   * hard-coded from the code-base, and then depend
+   */
+  if (roles.length === 0) {
+    /**
+     * @todo :- dynamically generate the default roles from controller
+     * currently its loaded from the statis file.
+     */
+    const insertOperation = await add('camic', 'roles', DefaultRoles);
+    console.log(
+      `[service:roles] Created default roles: ${insertOperation.insertedIds}`,
+    );
+  }
+
+  console.log(
+    `[service:roles] Loaded ${roles.length} rule entries from database`,
+  );
+
+  /**
+   * initialize an instance of the access control with the loaded roles
+   * from the database.
+   */
+  liveHandle = new AccessControl(roles);
 };
 
-module.exports = { check: controller, roleStatusCheck };
+/**
+ * Method to display the details about the access control instance during
+ * application bootstrapping.
+ *
+ * This runs after the database is initialized, and tries to display the
+ * access control instance state after the database rules import.
+ */
+const roleStatusCheck = () => {
+  console.log(`[service:roles] roles: ${liveHandle.getRoles()}`);
+  console.log(`[service:roles] resources: ${liveHandle.getResources()}`);
+  console.log(`[service:roles] rules: ${liveHandle.getGrants()}`);
+};
+
+module.exports = {
+  check: controller,
+  roleStatusCheck,
+  initializeRolesService: initialize,
+  getAccessControlHandle,
+};
