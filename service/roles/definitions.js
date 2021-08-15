@@ -151,9 +151,11 @@ const initialize = async () => {
  * access control instance state after the database rules import.
  */
 const roleStatusCheck = () => {
-  console.log(`[service:roles] roles: ${liveHandle.getRoles()}`);
-  console.log(`[service:roles] resources: ${liveHandle.getResources()}`);
-  console.log(`[service:roles] rules: ${liveHandle.getGrants()}`);
+  console.log('[service:roles] roles:', liveHandle.getRoles());
+  console.log(
+    '[service:roles] resources:',
+    JSON.stringify(liveHandle.getResources()),
+  );
 };
 
 module.exports = {
