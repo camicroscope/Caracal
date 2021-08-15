@@ -65,7 +65,10 @@ const DataTransformationHandler = require('./handlers/dataTransformationHandler'
  * Application Services
  */
 const { connector } = require('./service/database/connector');
-const { roleStatusCheck } = require('./service/roles/definitions');
+const {
+  roleStatusCheck,
+  initializeRolesService,
+} = require('./service/roles/definitions');
 const { RoleProcessor } = require('./service/roles/middleware');
 
 /**
@@ -281,14 +284,16 @@ throng(WORKERS, startApp(app));
 /** initialize DataTransformationHandler only after database is ready */
 connector
   .init()
-  .then(() => {
+  .then(async () => {
     const handler = new DataTransformationHandler(
       MONGO_URI,
       './json/configuration.json',
     );
 
-    /** display the status of roles and print out all role configurations */
+    /** initialize the roles service and start updation listener */
+    await initializeRolesService();
     roleStatusCheck();
+
     handler.startHandler();
   })
   .catch((e) => {
