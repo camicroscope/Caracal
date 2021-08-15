@@ -70,6 +70,7 @@ const {
   initializeRolesService,
 } = require('./service/roles/definitions');
 const { RoleProcessor } = require('./service/roles/middleware');
+const { roleRoutes } = require('./service/roles/routes');
 
 /**
  * Application Constants based on environment
@@ -120,6 +121,15 @@ app.get(
   auth.tokenTrade(auth.PUBKEY, auth.PRIKEY, userFunction),
 );
 app.get('/auth/Token/proto', auth.firstSetupUserSignupExists());
+
+/**
+ * Routes to operate on the roles service.
+ *
+ * Used to display the current configuration of the roles service
+ * and also update the configuration of the roles service.
+ */
+
+app.use('/api/roles', roleRoutes);
 
 /**
  * Linking all handlers to bind to the application at runtime

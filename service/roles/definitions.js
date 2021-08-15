@@ -5,7 +5,7 @@ const { RESOURCE } = require('./resources');
 const controller = new AccessControl();
 
 /** load peer services */
-const { find, add } = require('../database');
+const MongoDB = require('../database');
 const DefaultRoles = require('./defaultRoles');
 
 /**
@@ -114,7 +114,7 @@ const getAccessControlHandle = () => liveHandle;
  */
 const initialize = async () => {
   /** load the roles from the database */
-  const roles = await find('camic', 'roles', {});
+  const roles = await MongoDB.find('camic', 'roles', {});
 
   /**
    * if roles are not found, then save the default connfiguration into the
@@ -126,7 +126,7 @@ const initialize = async () => {
      * @todo :- dynamically generate the default roles from controller
      * currently its loaded from the statis file.
      */
-    const insertOperation = await add('camic', 'roles', DefaultRoles);
+    const insertOperation = await MongoDB.add('camic', 'roles', DefaultRoles);
     console.log(
       `[service:roles] Created default roles: ${insertOperation.insertedIds}`,
     );
@@ -141,6 +141,23 @@ const initialize = async () => {
    * from the database.
    */
   liveHandle = new AccessControl(roles);
+};
+
+const updateRules = async (rules) => {
+  /** update the access control with the new rules */
+  liveHandle = new AccessControl(rules);
+
+  try {
+    await MongoDB.delete('camic', 'roles', {});
+    console.log('[service:roles] roles cleared:');
+    const insertOperation = await MongoDB.add('camic', 'roles', rules);
+    console.log('[service:roles] roles inserted:', insertOperation.length);
+
+    return true;
+  } catch (e) {
+    console.error('[service:roles] roles insert failed:', e);
+    return false;
+  }
 };
 
 /**
@@ -163,4 +180,5 @@ module.exports = {
   roleStatusCheck,
   initializeRolesService: initialize,
   getAccessControlHandle,
+  updateRules,
 };
