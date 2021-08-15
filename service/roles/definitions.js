@@ -130,11 +130,11 @@ const initialize = async () => {
     console.log(
       `[service:roles] Created default roles: ${insertOperation.insertedIds}`,
     );
+  } else {
+    console.log(
+      `[service:roles] Found ${roles.length} entries in the database`,
+    );
   }
-
-  console.log(
-    `[service:roles] Loaded ${roles.length} rule entries from database`,
-  );
 
   /**
    * initialize an instance of the access control with the loaded roles
