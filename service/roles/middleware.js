@@ -10,7 +10,7 @@
  *
  */
 const { DEFAULT_ROLE } = require('./roles');
-const { check } = require('./definitions');
+const { getAccessControlHandle } = require('./definitions');
 
 /**
  * This middleware parses the incoming request for user role details and decides whether
@@ -28,6 +28,9 @@ const { check } = require('./definitions');
  */
 const RoleProcessor = (route, access) => {
   const middleware = (req, res, next) => {
+    /** get latest instance of the access control handle  on every request */
+    const check = getAccessControlHandle();
+
     /** express middleware definition */
     console.log('----------------------------------------');
     console.log(`user type :  ${req.userType}`);
