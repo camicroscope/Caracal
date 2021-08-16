@@ -28,6 +28,10 @@ const {
   roleStatusCheck,
   updateRules,
 } = require('../../service/roles/definitions');
+const { RoleProcessor } = require('../../service/roles/middleware');
+const { DEFAULT_ROLE, ROLE } = require('../../service/roles/roles');
+const { RESOURCE } = require('../../service/roles/resources');
+const { roleRoutes } = require('../../service/roles/routes');
 
 /**
  * all tests for service/database
@@ -225,6 +229,73 @@ describe('service/roles', () => {
           accessControlHandle.getGrants(),
         );
       });
+    });
+  });
+
+  /** middleware test suite */
+  describe('/middleware', () => {
+    // should be defined
+    it('should be defined', () => {
+      expect(RoleProcessor).not.to.be.undefined;
+    });
+
+    // should be callable
+    it('should be callable', () => {
+      expect(RoleProcessor).to.be.a('function');
+    });
+
+    // shuld return a function
+    it('should return a function', () => {
+      expect(RoleProcessor()).to.be.a('function');
+    });
+  });
+
+  describe('/ROLE', () => {
+    // should be defined
+    it('should be defined', () => {
+      expect(ROLE).not.to.be.undefined;
+    });
+
+    // should be an object
+    it('should be an object', () => {
+      expect(ROLE).to.be.an('object');
+    });
+
+    // should have a default role
+    it('should have a default role', () => {
+      expect(DEFAULT_ROLE).not.to.be.undefined;
+    });
+
+    // should be a string
+    it('should be a string', () => {
+      expect(DEFAULT_ROLE).to.be.a('string');
+    });
+  });
+
+  describe('/resource', () => {
+    // should be defined
+    it('should be defined', () => {
+      expect(RESOURCE).not.to.be.undefined;
+    });
+
+    // should be an object
+    it('should be an object', () => {
+      expect(RESOURCE).to.be.an('object');
+    });
+
+    // properties should be functions
+    it('all properties should be functions', () => {
+      const keys = Object.keys(RESOURCE);
+      keys.forEach((key) => {
+        expect(RESOURCE[key]).to.be.a('function');
+      });
+    });
+  });
+
+  describe('/roleRoutes', () => {
+    // should be defined
+    it('should be defined', () => {
+      expect(roleRoutes).not.to.be.undefined;
     });
   });
 });
