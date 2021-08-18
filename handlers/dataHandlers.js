@@ -100,7 +100,7 @@ Slide.getEvaluationNum = function(req, res, next) {
   );
   const match = {"$match": {"eval.is_draft": false}};
   if (query.uid) {
-    match["$match"]["creator"] = query.uid;
+    match["$match"]["eval.creator"] = query.uid;
   }
   pipeline.push(match);
   pipeline.push({"$project": {"collections": 1, "eval": {"$size": "$eval"}}});
