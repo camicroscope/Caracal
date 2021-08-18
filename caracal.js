@@ -99,6 +99,9 @@ var HANDLERS = {
   "removeSlidesFromCollection": function() {
     return dataHandlers.Collection.removeSlidesFromCollection;
   },
+  "getSlidesEvaluationNum": function() {
+    return dataHandlers.Slide.getEvaluationNum;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },

@@ -80,7 +80,41 @@ General.delete = function(db, collection) {
     }).catch((e) => next(e));
   };
 };
+var Slide = {};
+Slide.getEvaluationNum = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  const pipeline = [];
 
+  if (query.cid) {
+    pipeline.push({"$match": {"collections": query.cid}});
+  }
+  pipeline.push(
+      {"$project": {"sid": {"$toString": "$_id"}, "collections": 1}},
+      {"$lookup": {
+        "localField": "sid",
+        "from": "evaluation",
+        "foreignField": "slide_id",
+        "as": "eval",
+      }},
+  );
+  const match = {"$match": {"eval.is_draft": false}};
+  if (query.uid) {
+    match["creator"] = query.uid;
+  }
+  pipeline.push(match);
+  pipeline.push({"$project": {"collections": 1, "eval": {"$size": "$eval"}}});
+
+  //
+  console.log('|| ----------------------- getEvaluationNum start ----------------------- ||');
+  console.log(pipeline);
+  mongoDB.aggregate('camic', 'slide', pipeline).then((x) => {
+    req.data = x;
+    console.log(x);
+    console.log('|| ----------------------- getEvaluationNum end ----------------------- ||');
+    next();
+  }).catch((e) => next(e));
+};
 var Presetlabels = {};
 // add a label
 Presetlabels.add = function(req, res, next) {
@@ -453,6 +487,7 @@ SlideMetadata.get = function(req, res, next) {
 dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
 dataHandlers.Collection = Collection;
+dataHandlers.Slide = Slide;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
