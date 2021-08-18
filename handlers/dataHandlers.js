@@ -100,13 +100,14 @@ Slide.getEvaluationNum = function(req, res, next) {
   );
   const match = {"$match": {"eval.is_draft": false}};
   if (query.uid) {
-    match["creator"] = query.uid;
+    match["$match"]["creator"] = query.uid;
   }
   pipeline.push(match);
   pipeline.push({"$project": {"collections": 1, "eval": {"$size": "$eval"}}});
 
   //
   console.log('|| ----------------------- getEvaluationNum start ----------------------- ||');
+  console.log(query);
   console.log(pipeline);
   mongoDB.aggregate('camic', 'slide', pipeline).then((x) => {
     req.data = x;
