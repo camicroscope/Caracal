@@ -276,7 +276,7 @@ Mark.getSlidesHumanMarkNum = function(req, res, next) {
     }},
   ];
   console.log('|| ----------------------- getSlidesHumanMarkNum start ----------------------- ||');
-  console.log(query);
+  console.log(postQuery);
   console.log(pipeline);
   mongoDB.aggregate('camic', 'mark', pipeline).then((x) => {
     req.data = x;
