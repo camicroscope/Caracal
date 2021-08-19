@@ -102,6 +102,9 @@ var HANDLERS = {
   "getSlidesEvaluations": function() {
     return dataHandlers.Slide.getEvaluations;
   },
+  "getSlidesHumanMarkNum": function() {
+    return dataHandlers.Mark.getSlidesHumanMarkNum;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },

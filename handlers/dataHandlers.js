@@ -261,7 +261,30 @@ Mark.multi = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
-
+Mark.getSlidesHumanMarkNum = function(req, res, next) {
+  var postQuery = JSON.parse(req.body);
+  const pipeline = [
+    {
+      "$match": {
+        "provenance.analysis.source": "human",
+        "provenance.image.slide": {"$in": postQuery.sids},
+      },
+    },
+    {"$group": {
+      _id: "$provenance.image.slide",
+      count: {$sum: 1},
+    }},
+  ];
+  console.log('|| ----------------------- getSlidesHumanMarkNum start ----------------------- ||');
+  console.log(query);
+  console.log(pipeline);
+  mongoDB.aggregate('camic', 'mark', pipeline).then((x) => {
+    req.data = x;
+    console.log(x);
+    console.log('|| ----------------------- getSlidesHumanMarkNum start ----------------------- ||');
+    next();
+  }).catch((e) => next(e));
+},
 Mark.findMarkTypes = function(req, res, next) {
   var query = req.query;
   if (query.slide) {
