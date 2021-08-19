@@ -255,9 +255,12 @@ Mark.multi = function(req, res, next) {
       '$gt': parseFloat(postQuery.footprint),
     };
   }
-
+  console.log('|| --------------------- multi start ---------------------- ||');
+  console.log(postQuery);
+  console.log(query);
   mongoDB.find('camic', 'mark', query).then((x) => {
     req.data = x;
+    console.log('|| --------------------- multi end ---------------------- ||');
     next();
   }).catch((e) => next(e));
 };
