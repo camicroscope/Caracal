@@ -221,6 +221,10 @@ Mark.multi = function(req, res, next) {
 
   var postQuery = JSON.parse(req.body);
 
+  // handle slideId
+  if (postQuery['provenance.image.slide']) {
+    query['provenance.image.slide'] = postQuery['provenance.image.slide'];
+  }
   // handle source
   if (postQuery.source) {
     query['provenance.analysis.source'] = postQuery.source;
