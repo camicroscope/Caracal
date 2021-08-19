@@ -81,7 +81,7 @@ General.delete = function(db, collection) {
   };
 };
 var Slide = {};
-Slide.getEvaluationNum = function(req, res, next) {
+Slide.getEvaluations = function(req, res, next) {
   var query = req.query;
   delete query.token;
   const pipeline = [];
@@ -103,16 +103,16 @@ Slide.getEvaluationNum = function(req, res, next) {
     match["$match"]["eval.creator"] = query.uid;
   }
   pipeline.push(match);
-  pipeline.push({"$project": {"collections": 1, "eval": {"$size": "$eval"}}});
+  // pipeline.push({"$project": {"collections": 1, "eval": {"$size": "$eval"}}});
 
   //
-  console.log('|| ----------------------- getEvaluationNum start ----------------------- ||');
+  console.log('|| ----------------------- getEvaluations start ----------------------- ||');
   console.log(query);
   console.log(pipeline);
   mongoDB.aggregate('camic', 'slide', pipeline).then((x) => {
     req.data = x;
     console.log(x);
-    console.log('|| ----------------------- getEvaluationNum end ----------------------- ||');
+    console.log('|| ----------------------- getEvaluations end ----------------------- ||');
     next();
   }).catch((e) => next(e));
 };

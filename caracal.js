@@ -99,8 +99,8 @@ var HANDLERS = {
   "removeSlidesFromCollection": function() {
     return dataHandlers.Collection.removeSlidesFromCollection;
   },
-  "getSlidesEvaluationNum": function() {
-    return dataHandlers.Slide.getEvaluationNum;
+  "getSlidesEvaluations": function() {
+    return dataHandlers.Slide.getEvaluations;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
