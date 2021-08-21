@@ -11,7 +11,7 @@ function permissionHandlerForCollabRooms(permissionList, adminRole="admin", test
       if (!req.data[0].privateStatus) {
         req.permission_ok = true;
         next();
-      } else if (req.tokenInfo.email && req.data && 
+      } else if (req.tokenInfo.email && req.data &&
         permissionList.indexOf(req.data[0].members.find((member) => member.email === req.tokenInfo.email).role) >= 0) {
         if (req.data[0].members.find((member) => member.email === req.tokenInfo.email).role !== adminRole) {
           delete req.body.collabStatus;

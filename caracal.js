@@ -219,12 +219,11 @@ const startSocketServer = (socketHttpServer) => {
     ===============================================
     `);
   });
-}
+};
 
 throng({count: WORKERS, master: () => {
   startSocketServer(socketHttpServer);
 }}, startApp(app));
-
 
 
 /** initialize DataTransformationHandler only after database is ready */
