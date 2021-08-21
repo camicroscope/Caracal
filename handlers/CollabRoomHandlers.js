@@ -2,7 +2,7 @@ const mongoDB = require("../service/database");
 var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 var ENABLE_SECURITY_AT = (process.env.ENABLE_SECURITY_AT ? process.env.ENABLE_SECURITY_AT : "") || false;
 
-function permissionHandlerForCollabRooms(permissionList, test=false) {
+function permissionHandlerForCollabRooms(permissionList, adminRole="admin", test=false) {
   return function(req, res, next) {
     if (!test && DISABLE_SEC || ENABLE_SECURITY_AT && Date.parse(ENABLE_SECURITY_AT) > Date.now()) {
       req.permission_ok = true;
@@ -11,7 +11,12 @@ function permissionHandlerForCollabRooms(permissionList, test=false) {
       if (!req.data[0].privateStatus) {
         req.permission_ok = true;
         next();
-      } else if (req.tokenInfo.email && req.data && permissionList.indexOf(req.data[0].members.find(member => member.email === req.tokenInfo.email).role) >= 0) {
+      } else if (req.tokenInfo.email && req.data && 
+        permissionList.indexOf(req.data[0].members.find((member) => member.email === req.tokenInfo.email).role) >= 0) {
+        if (req.data[0].members.find((member) => member.email === req.tokenInfo.email).role !== adminRole) {
+          delete req.body.collabStatus;
+          console.log(req.body);
+        }
         req.permission_ok = true;
         next();
       } else {
@@ -49,7 +54,7 @@ function removeCollabRoomOnSlideDelete(db, collection) {
   return function(req, res, next) {
     const query = {
       roomId: String(req.query._id),
-    }
+    };
     mongoDB.delete(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -61,6 +66,6 @@ const CollabRoomHandlers = {
   permissionHandlerForCollabRooms,
   addDefaultCollabRoomOnSlideCreate,
   removeCollabRoomOnSlideDelete,
-}
+};
 
 module.exports = CollabRoomHandlers;

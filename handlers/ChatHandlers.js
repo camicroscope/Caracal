@@ -18,7 +18,7 @@ function searchMessages(db, collection) {
   return function(req, res, next) {
     const keyword = req.query.searchKey;
     const roomId = req.query.roomId;
-    const searchQuery = { "body": { "$regex": keyword, "$options": "i" }, "roomId": roomId };
+    const searchQuery = {"body": {"$regex": keyword, "$options": "i"}, "roomId": roomId};
     mongoDB.find(db, collection, searchQuery).then((x) => {
       req.data = x;
       next();
@@ -29,6 +29,6 @@ function searchMessages(db, collection) {
 const ChatHandlers = {
   addMessage,
   searchMessages,
-}
+};
 
 module.exports = ChatHandlers;

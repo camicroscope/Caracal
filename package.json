@@ -8,7 +8,7 @@
     "lint": "eslint *.js handlers/*.js test/**/*.js",
     "lint-fix": "eslint *.js handlers/*.js test/**/*.js --fix",
     "start": "node caracal.js",
-    "start:watch": "nodemon caracal.js" 
+    "start:watch": "nodemon caracal.js"
   },
   "repository": {
     "type": "git",
