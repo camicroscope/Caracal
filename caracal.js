@@ -105,6 +105,13 @@ var HANDLERS = {
   "getSlidesHumanMarkNum": function() {
     return dataHandlers.Mark.getSlidesHumanMarkNum;
   },
+  "slideInformativenessFind": function() {
+    return dataHandlers.SlideInformativeness.find;
+  },
+  "slideInformativenessRank": function() {
+    return dataHandlers.SlideInformativeness.rank;
+  },
+
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },

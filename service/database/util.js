@@ -13,7 +13,7 @@ const {ObjectID} = require("mongodb");
 const transformIdToObjectId = (query) => {
   const payload = {...query};
   try {
-    if (payload["_id"]) {
+    if (payload["_id"]&&Object.prototype.toString.call(payload["_id"]) !== '[object Object]') {
       payload["_id"] = new ObjectID(payload["_id"]);
     }
     return payload;

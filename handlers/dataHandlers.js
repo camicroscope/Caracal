@@ -116,6 +116,100 @@ Slide.getEvaluations = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
+var SlideInformativeness = {};
+SlideInformativeness.find = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  const {uid, cid} = query;
+  delete query.uid;
+  delete query.cid;
+  query._id = {uid, cid};
+  console.log('|| ----------------------- SlideInformativeness find start ----------------------- ||');
+  console.log(query);
+  mongoDB.find('camic', 'slideInformativeness', query).then((x) => {
+    req.data = x;
+    console.log('|| ----------------------- SlideInformativeness find end ----------------------- ||');
+    next();
+  }).catch((e) => next(e));
+};
+
+// rank slide informative in a collection
+SlideInformativeness.rank = async function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  const {cid, uid, sid, level} = JSON.parse(req.body);
+  const condition = {_id: {cid, uid}};
+  try {
+  // check the data is exist
+    const rs = await mongoDB.find('camic', 'slideInformativeness', condition);
+    if (rs.length > 0) { // update
+      updateDoc = rs[0];
+      if (level==="1") {
+        updateDoc.first = sid;
+        if (updateDoc.second&&updateDoc.second===sid) updateDoc.second = null;
+        if (updateDoc.third&&updateDoc.third===sid) updateDoc.third = null;
+        const index = updateDoc.less.indexOf(sid);
+        if (index > -1) {
+          updateDoc.less.splice(index, 1);
+        }
+      } else if (level==="2") {
+        updateDoc.second = sid;
+        if (updateDoc.first&&updateDoc.first===sid) updateDoc.first = null;
+        if (updateDoc.third&&updateDoc.third===sid) updateDoc.third = null;
+        const index = updateDoc.less.indexOf(sid);
+        if (index > -1) {
+          updateDoc.less.splice(index, 1);
+        }
+      } else if (level==="3") {
+        updateDoc.third = sid;
+        if (updateDoc.first&&updateDoc.first===sid) updateDoc.first = null;
+        if (updateDoc.second&&updateDoc.second===sid) updateDoc.second = null;
+        const index = updateDoc.less.indexOf(sid);
+        if (index > -1) {
+          updateDoc.less.splice(index, 1);
+        }
+      } else if (level==="less") {
+        if (updateDoc.first&&updateDoc.first===sid) updateDoc.first = null;
+        if (updateDoc.second&&updateDoc.second===sid) updateDoc.second = null;
+        if (updateDoc.third&&updateDoc.third===sid) updateDoc.third = null;
+        const index = updateDoc.less.indexOf(sid);
+        if (index === -1) {
+          updateDoc.less.push(sid);
+        }
+      }
+      console.log('|| ----------------------- rank update ----------------------- ||', condition, updateDoc);
+      const rs = await mongoDB.update('camic', 'slideInformativeness', condition, updateDoc);
+      req.data = rs;
+      next();
+    } else { // add
+      const newDoc = {
+        _id: {cid, uid},
+        first: null,
+        second: null,
+        third: null,
+        less: [],
+      };
+      if (level==="1") {
+        newDoc.first = sid;
+      } else if (level==="2") {
+        newDoc.second = sid;
+      } else if (level==="3") {
+        newDoc.third = sid;
+      } else if (level==="less") {
+        newDoc.less.push(sid);
+      }
+      console.log('|| ----------------------- rank add ----------------------- ||', newDoc);
+      const rs = await mongoDB.add('camic', 'slideInformativeness', newDoc);
+      req.data = rs;
+      next();
+    }
+  } catch (error) {
+    console.log('|| ----------------------- rank error ----------------------- ||', error);
+    req.data = error;
+    next();
+  }
+};
 var Presetlabels = {};
 // add a label
 Presetlabels.add = function(req, res, next) {
@@ -523,6 +617,6 @@ dataHandlers.Mark = Mark;
 dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
 dataHandlers.SlideMetadata = SlideMetadata;
-
+dataHandlers.SlideInformativeness = SlideInformativeness;
 dataHandlers.General = General;
 module.exports = dataHandlers;

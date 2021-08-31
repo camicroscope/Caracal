@@ -44,6 +44,9 @@ class Mongo {
         }
         delete query._search_;
       }
+      console.log('|| ---------------------- mongo find start ---------------------- ||');
+      console.log(query);
+      console.log('|| ---------------------- mongo find end ---------------------- ||');
       const collection = getConnection(database).collection(collectionName);
       const data = await collection.find(query, opt).toArray();
 
