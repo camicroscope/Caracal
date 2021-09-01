@@ -104,15 +104,8 @@ Slide.getEvaluations = function(req, res, next) {
   }
   pipeline.push(match);
   // pipeline.push({"$project": {"collections": 1, "eval": {"$size": "$eval"}}});
-
-  //
-  console.log('|| ----------------------- getEvaluations start ----------------------- ||');
-  console.log(query);
-  console.log(pipeline);
   mongoDB.aggregate('camic', 'slide', pipeline).then((x) => {
     req.data = x;
-    console.log(x);
-    console.log('|| ----------------------- getEvaluations end ----------------------- ||');
     next();
   }).catch((e) => next(e));
 };
@@ -126,11 +119,8 @@ SlideInformativeness.find = function(req, res, next) {
   delete query.cid;
   query["_id.uid"] = uid;
   query["_id.cid"] = cid;
-  console.log('|| ----------------------- SlideInformativeness find start ----------------------- ||');
-  console.log(query);
   mongoDB.find('camic', 'slideInformativeness', query).then((x) => {
     req.data = x;
-    console.log('|| ----------------------- SlideInformativeness find end ----------------------- ||');
     next();
   }).catch((e) => next(e));
 };
@@ -179,7 +169,6 @@ SlideInformativeness.rank = async function(req, res, next) {
           updateDoc.less.push(sid);
         }
       }
-      console.log('|| ----------------------- rank update ----------------------- ||', condition, updateDoc);
       const rs = await mongoDB.update('camic', 'slideInformativeness', condition, updateDoc);
       req.data = rs;
       next();
@@ -200,13 +189,11 @@ SlideInformativeness.rank = async function(req, res, next) {
       } else if (level==="less") {
         newDoc.less.push(sid);
       }
-      console.log('|| ----------------------- rank add ----------------------- ||', newDoc);
       const rs = await mongoDB.add('camic', 'slideInformativeness', newDoc);
       req.data = rs;
       next();
     }
   } catch (error) {
-    console.log('|| ----------------------- rank error ----------------------- ||', error);
     req.data = error;
     next();
   }
@@ -354,12 +341,9 @@ Mark.multi = function(req, res, next) {
       '$gt': parseFloat(postQuery.footprint),
     };
   }
-  console.log('|| --------------------- multi start ---------------------- ||');
-  console.log(postQuery);
-  console.log(query);
+
   mongoDB.find('camic', 'mark', query).then((x) => {
     req.data = x;
-    console.log('|| --------------------- multi end ---------------------- ||');
     next();
   }).catch((e) => next(e));
 };
@@ -377,13 +361,9 @@ Mark.getSlidesHumanMarkNum = function(req, res, next) {
       count: {$sum: 1},
     }},
   ];
-  console.log('|| ----------------------- getSlidesHumanMarkNum start ----------------------- ||');
-  console.log(postQuery);
-  console.log(pipeline);
+
   mongoDB.aggregate('camic', 'mark', pipeline).then((x) => {
     req.data = x;
-    console.log(x);
-    console.log('|| ----------------------- getSlidesHumanMarkNum start ----------------------- ||');
     next();
   }).catch((e) => next(e));
 },
