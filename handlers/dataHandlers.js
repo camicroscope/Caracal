@@ -124,7 +124,8 @@ SlideInformativeness.find = function(req, res, next) {
   const {uid, cid} = query;
   delete query.uid;
   delete query.cid;
-  query._id = {uid, cid};
+  query["_id.uid"] = uid;
+  query["_id.cid"] = cid;
   console.log('|| ----------------------- SlideInformativeness find start ----------------------- ||');
   console.log(query);
   mongoDB.find('camic', 'slideInformativeness', query).then((x) => {
