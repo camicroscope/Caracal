@@ -142,9 +142,9 @@ SlideInformativeness.rank = async function(req, res, next) {
   const condition = {_id: {cid, uid}};
   try {
   // check the data is exist
-    const rs = await mongoDB.find('camic', 'slideInformativeness', condition);
-    if (rs.length > 0) { // update
-      updateDoc = rs[0];
+    const data = await mongoDB.find('camic', 'slideInformativeness', condition);
+    if (data.length > 0) { // update
+      updateDoc = data[0];
       if (level==="1") {
         updateDoc.first = sid;
         if (updateDoc.second&&updateDoc.second===sid) updateDoc.second = null;
