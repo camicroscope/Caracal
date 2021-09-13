@@ -106,7 +106,7 @@ class Mongo {
       filter = transformIdToObjectId(filter);
 
       const collection = getConnection(database).collection(collectionName);
-      const result = await collection.deleteOne(filter);
+      const result = await collection.deleteMany(filter);
       delete result.connection;
 
       return result;
@@ -156,7 +156,7 @@ class Mongo {
       const collection = await getConnection(database).collection(
         collectionName
       );
-      const result = await collection.updateOne(filter, updates);
+      const result = await collection.updateMany(filter, updates);
       delete result.connection;
       return result;
     } catch (e) {

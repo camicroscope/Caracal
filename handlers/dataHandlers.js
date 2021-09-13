@@ -252,7 +252,26 @@ Mark.findMarkTypes = function(req, res, next) {
     }).catch((e) => next(e));
   }
 };
+Mark.updateMarksLabel = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  // initial data
 
+  var newVals = {
+    $set: {
+      'provenance.analysis.name': query.name,
+      'properties.annotations.name': query.name,
+      'properties.annotations.notes': query.name,
+    },
+  };
+  mongoDB.update('camic', 'mark',
+      {
+        'provenance.analysis.labelId': query.id,
+      }, newVals).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
 var Heatmap = {};
 Heatmap.types = function(req, res, next) {
   var query = req.query;

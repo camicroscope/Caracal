@@ -17,6 +17,8 @@ const userFunction = require('./handlers/userFunction.js');
 const iipHandler = require('./handlers/iipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
+const CollabRoomHandlers = require('./handlers/CollabRoomHandlers.js');
+const ChatHandlers = require('./handlers/ChatHandlers.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataSet = require('./handlers/datasetHandler.js');
@@ -25,14 +27,19 @@ const DataTransformationHandler = require('./handlers/dataTransformationHandler.
 // TODO validation of data
 
 const {connector} = require("./service/database/connector");
+const {socketHttpServer} = require('./socketio/init.sockets');
 
 var WORKERS = process.env.NUM_THREADS || 4;
 
 var PORT = process.env.PORT || 4010;
 
+// Socket port
+const SOCKET_PORT = process.env.SOCKET_PORT || 5000;
+
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
-var DISABLE_CSP = process.env.DISABLE_CSP || false;
+// var DISABLE_CSP = process.env.DISABLE_CSP || false; // change this to false
+var DISABLE_CSP = true; // change this to false
 
 const app = express();
 app.use(cookieParser());
@@ -77,6 +84,11 @@ var HANDLERS = {
   "mongoDistinct": dataHandlers.General.distinct,
   "filterHandler": auth.filterHandler,
   "permissionHandler": permissionHandler,
+  "permissionHandlerForCollabRooms": CollabRoomHandlers.permissionHandlerForCollabRooms,
+  "addDefaultCollabRoomOnSlideCreate": CollabRoomHandlers.addDefaultCollabRoomOnSlideCreate,
+  "removeCollabRoomOnSlideDelete": CollabRoomHandlers.removeCollabRoomOnSlideDelete,
+  "addMessageChatHandler": ChatHandlers.addMessage,
+  "searchMessagesChatHandler": ChatHandlers.searchMessages,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
   "getDataset": DataSet.getDataset,
@@ -94,6 +106,9 @@ var HANDLERS = {
   },
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;
+  },
+  "updateMarksLabel": function() {
+    return dataHandlers.Mark.updateMarksLabel;
   },
   "heatmapTypes": function() {
     return dataHandlers.Heatmap.types;
@@ -196,7 +211,20 @@ var startApp = function(app) {
   };
 };
 
-throng(WORKERS, startApp(app));
+const startSocketServer = (socketHttpServer) => {
+  socketHttpServer.listen(SOCKET_PORT, () => {
+    console.log(`
+    ===============================================
+    Socket server listening at port: ${SOCKET_PORT}
+    ===============================================
+    `);
+  });
+};
+
+throng({count: WORKERS, master: () => {
+  startSocketServer(socketHttpServer);
+}}, startApp(app));
+
 
 /** initialize DataTransformationHandler only after database is ready */
 connector.init().then(() => {
