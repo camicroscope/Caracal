@@ -110,15 +110,11 @@ Slide.getEvaluations = function(req, res, next) {
   }).catch((e) => next(e));
 };
 
+
 var SlideInformativeness = {};
 SlideInformativeness.find = function(req, res, next) {
   var query = req.query;
   delete query.token;
-  const {uid, cid} = query;
-  delete query.uid;
-  delete query.cid;
-  query["_id.uid"] = uid;
-  query["_id.cid"] = cid;
   mongoDB.find('camic', 'slideInformativeness', query).then((x) => {
     req.data = x;
     next();
@@ -130,10 +126,11 @@ SlideInformativeness.rank = async function(req, res, next) {
   var query = req.query;
   delete query.token;
   const {cid, uid, sid, level} = JSON.parse(req.body);
-  const condition = {_id: {cid, uid}};
+  const condition = {cid};
+  if (uid) condition.uid = uid;
   try {
   // check the data is exist
-    const data = await mongoDB.find('camic', 'slideInformativeness', condition, false);
+    const data = await mongoDB.find('camic', 'slideInformativeness', condition);
     if (data.length > 0) { // update
       updateDoc = data[0];
       if (level==="1") {
@@ -174,12 +171,13 @@ SlideInformativeness.rank = async function(req, res, next) {
       next();
     } else { // add
       const newDoc = {
-        _id: {cid, uid},
+        cid,
         first: null,
         second: null,
         third: null,
         less: [],
       };
+      if (uid) newDoc.uid = uid;
       if (level==="1") {
         newDoc.first = sid;
       } else if (level==="2") {
@@ -361,6 +359,7 @@ Mark.getSlidesHumanMarkNum = function(req, res, next) {
       count: {$sum: 1},
     }},
   ];
+  if (postQuery.uid) pipeline["$match"]["creator"] = postQuery.uid;
 
   mongoDB.aggregate('camic', 'mark', pipeline).then((x) => {
     req.data = x;
@@ -553,6 +552,7 @@ User.wcido = function(req, res, next) {
     res.send(error);
   }
 };
+
 var SlideMetadata = {};
 SlideMetadata.get = function(req, res, next) {
   const strPath = req.query.path;
