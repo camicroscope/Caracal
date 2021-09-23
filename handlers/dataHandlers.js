@@ -515,7 +515,7 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
 
 var SeerService = {};
 SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, res, next) {
-  const cid = res.query.cid;
+  const cid = req.query.cid;
   try {
     console.log('|| ================= getSlidesEvalAndHumanAnnotCountByCollectionId start ================ ||');
     console.log(cid);
