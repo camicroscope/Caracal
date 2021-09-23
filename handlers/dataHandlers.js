@@ -131,7 +131,7 @@ SlideInformativeness.rank = async function(req, res, next) {
   try {
     console.log("|| ================= rank start ================ ||");
     // check the data is exist
-    const data = await mongoDB.find('camic', 'slideInformativeness', condition);
+    const data = await mongoDB.find('camic', 'slideInformativeness', condition, false);
     console.log(data);
     if (data.length > 0) { // update
       console.log('update');
