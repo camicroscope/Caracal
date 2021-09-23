@@ -129,9 +129,12 @@ SlideInformativeness.rank = async function(req, res, next) {
   const condition = {cid};
   if (uid) condition.uid = uid;
   try {
-  // check the data is exist
+    console.log("|| ================= rank start ================ ||");
+    // check the data is exist
     const data = await mongoDB.find('camic', 'slideInformativeness', condition);
+    console.log(data);
     if (data.length > 0) { // update
+      console.log('update');
       updateDoc = data[0];
       if (level==="1") {
         updateDoc.first = sid;
@@ -166,8 +169,10 @@ SlideInformativeness.rank = async function(req, res, next) {
           updateDoc.less.push(sid);
         }
       }
+      console.log(updateDoc);
       const rs = await mongoDB.update('camic', 'slideInformativeness', condition, updateDoc);
       req.data = rs;
+      console.log("|| ================= rank end ================ ||");
       next();
     } else { // add
       const newDoc = {
@@ -187,8 +192,11 @@ SlideInformativeness.rank = async function(req, res, next) {
       } else if (level==="less") {
         newDoc.less.push(sid);
       }
+      console.log('insert');
+      console.log(newDoc);
       const rs = await mongoDB.add('camic', 'slideInformativeness', newDoc);
       req.data = rs;
+      console.log("|| ================= rank start ================ ||");
       next();
     }
   } catch (error) {
