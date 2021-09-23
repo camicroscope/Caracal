@@ -525,7 +525,7 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
     if (collection&&Array.isArray(collection)&&collection[0]) {
       const sids = collection[0].slides;
       // get evaluation infos
-      const evaluations = await mongoDB.find('camic', 'evaluation', {'slide_id': {'$in': sids}});
+      const evaluations = await mongoDB.find('camic', 'evaluation', {'is_draft': false, 'slide_id': {'$in': sids}});
       console.log(evaluations);
       // get human annotation counts
       const pipeline = [
