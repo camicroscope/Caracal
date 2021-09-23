@@ -111,7 +111,9 @@ var HANDLERS = {
   "slideInformativenessRank": function() {
     return dataHandlers.SlideInformativeness.rank;
   },
-
+  "getSlidesExtraInfoByCollectionId": function() {
+    return dataHandlers.SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },

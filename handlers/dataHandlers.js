@@ -513,6 +513,105 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
   }
 };
 
+var SeerService = {};
+SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, res, next) {
+  const cid = res.query.cid;
+  try {
+    console.log('|| ================= getSlidesEvalAndHumanAnnotCountByCollectionId start ================ ||');
+    console.log(cid);
+    // get slide info
+    const collection = await mongoDB.find('camic', 'collection', {_id: new ObjectID(cid)});
+    console.log(collection);
+    if (collection&&Array.isArray(collection)&&collection[0]) {
+      const sids = collection[0].slides;
+      // get evaluation infos
+      const evals = await mongoDB.find('camic', 'slide_id', {'slide_id': {'$in': sids}});
+      console.log(evals);
+      // get human annotation counts
+      const pipeline = [
+        {
+          "$match": {
+            "provenance.analysis.source": "human",
+            "provenance.image.slide": {"$in": sids},
+          },
+        },
+        {"$group": {
+          _id: "$provenance.image.slide",
+          count: {$sum: 1},
+        }},
+      ];
+      const humanAnnotationCounts = await mongoDB.aggregate('camic', 'mark', pipeline);
+      console.log(humanAnnotationCounts);
+      req.data = {evaluations, humanAnnotationCounts};
+      console.log('|| ================= getSlidesEvalAndHumanAnnotCountByCollectionId end ================ ||');
+      next();
+    } else {
+      req.data = null;
+      next();
+    }
+  } catch (error) {
+
+  }
+};
+SeerService.getCollectionTaskStatus = function(req, res, next) {
+  // uid
+  // cid
+  // const uid = ;
+  // const cid = ;
+};
+SeerService.getAllCollectionTaskStatus = async function(req, res, next) {
+  try {
+    // get parameter from request
+    // TODO
+
+    const collQuery = {};
+    if (uid) collQuery.creator = uid;
+    // if(cid) collQuery._id = cid;
+
+    const collData = await mongoDB.find('camic', 'collection', {});
+
+    // get collection and has slides
+    const collLeaf = collData.filter((d)=>d.slides&&d.slides.length>0);
+
+    // get all slide id
+    const slideIds = Array.from(new Set(collLeaf.map((d)=> d.slides?d.slides:[]).flat()));
+    // slide map key is slideId
+    const slideMap = slideIds.reduce((map, sid)=>map.set(sid, {}), new Map());
+    // get all evaluation info
+    const evalQuery = {slide_id: {'$in': slideIds}};
+    if (uid) evalQuery.creator = uid;
+    const evalData = await mongoDB.find('camic', 'evaluation', evalQuery);
+
+    // get all human annotaion nums
+    const pipeline = [
+      {
+        "$match": {
+          "provenance.analysis.source": "human",
+          "provenance.image.slide": {"$in": slideIds},
+        },
+      },
+      {"$group": {
+        _id: "$provenance.image.slide",
+        count: {$sum: 1},
+      }},
+    ];
+    if (uid) pipeline["$match"]["creator"] = uid;
+
+    const annotNums = await mongoDB.aggregate('camic', 'mark', pipeline);
+
+    // get status
+    const slideInfoQuery = {};
+    if (uid) slideInfoQuery.creator = uid;
+    const slideInformativenessData = await mongoDB.find('camic', 'slideInformativeness', slideInfoQuery);
+  } catch (error) {
+    console.error(err);
+    res.json({hasError: true, error: err});
+  }
+  // uid
+
+
+  // get all collection info
+};
 
 var User = {};
 User.forLogin = function(email) {
@@ -599,5 +698,6 @@ dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
 dataHandlers.SlideMetadata = SlideMetadata;
 dataHandlers.SlideInformativeness = SlideInformativeness;
+dataHandlers.SeerService = SeerService;
 dataHandlers.General = General;
 module.exports = dataHandlers;
