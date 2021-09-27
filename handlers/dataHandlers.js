@@ -540,7 +540,7 @@ Collection.getCollectionTaskStatus = function(req, res, next) {
   }
 };
 
-SeerService.setCollectionTaskStatus= function(req, res, next) {
+Collection.setCollectionTaskStatus = function(req, res, next) {
   const status = req.query.status;
   var query;
   if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
