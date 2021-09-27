@@ -99,6 +99,12 @@ var HANDLERS = {
   "removeSlidesFromCollection": function() {
     return dataHandlers.Collection.removeSlidesFromCollection;
   },
+  "getCollectionTaskStatus": function() {
+    return dataHandlers.Collection.getCollectionTaskStatus;
+  },
+  "setCollectionTaskStatus": function() {
+    return dataHandlers.Collection.setCollectionTaskStatus;
+  },
   "getSlidesEvaluations": function() {
     return dataHandlers.Slide.getEvaluations;
   },

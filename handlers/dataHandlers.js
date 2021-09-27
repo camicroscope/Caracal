@@ -521,6 +521,45 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
   }
 };
 
+Collection.getCollectionTaskStatus = function(req, res, next) {
+  var query;
+  if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
+  if (req.query.sid) query = {slides: req.query.sid};
+  try {
+    console.log('|| ================= getCollectionTaskStatus start ================ ||');
+    mongoDB.find('camic', 'collection', query).then((x) => {
+      req.data = x;
+      console.log('query', req.query);
+      console.log(query);
+      console.log(x);
+      console.log('|| ================= getCollectionTaskStatus end ================ ||');
+      next();
+    }).catch((e) => next(e));
+  } catch (error) {
+    next(e);
+  }
+};
+
+SeerService.setCollectionTaskStatus= function(req, res, next) {
+  const status = req.query.status;
+  var query;
+  if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
+  if (req.query.sid) query = {slides: req.query.sid};
+  try {
+    console.log('|| ================= setCollectionTaskStatus start ================ ||');
+    mongoDB.updateMany('camic', 'collection', query, {'$set': {'task_status': status}}).then((x) => {
+      req.data = x;
+      console.log('query', req.query);
+      console.log(query);
+      console.log(x);
+      console.log('|| ================= setCollectionTaskStatus end ================ ||');
+      next();
+    }).catch((e) => next(e));
+  } catch (error) {
+    next(e);
+  }
+};
+
 var SeerService = {};
 SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, res, next) {
   const cid = req.query.cid;
@@ -561,12 +600,7 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
     next(e);
   }
 };
-SeerService.getCollectionTaskStatus = function(req, res, next) {
-  // uid
-  // cid
-  // const uid = ;
-  // const cid = ;
-};
+
 SeerService.getAllCollectionTaskStatus = async function(req, res, next) {
   try {
     // get parameter from request
