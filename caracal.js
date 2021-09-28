@@ -120,6 +120,9 @@ var HANDLERS = {
   "getSlidesExtraInfoByCollectionId": function() {
     return dataHandlers.SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId;
   },
+  "collectionDataExports": function() {
+    return dataHandlers.SeerService.collectionDataExports;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },
