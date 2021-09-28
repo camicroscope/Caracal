@@ -565,64 +565,71 @@ Collection.setCollectionTaskStatus = function(req, res, next) {
 
 var SeerService = {};
 SeerService.collectionDataExports = async function(req, res, next) {
-  var collectionIds = JSON.parse(req.body);
-  var zip = new AdmZip();
-  const fileName = 'test_1';
-  // create csv
-  const csvWriter = createCsvWriter({
-    path: `./template/${fileName}.csv`,
-    header: [
-      {id: 'name', title: 'Name'},
-      {id: 'surname', title: 'Surname'},
-      {id: 'age', title: 'Age'},
-      {id: 'gender', title: 'Gender'},
-    ],
-  });
-
-  const data = [
-    {
-      name: 'John',
-      surname: 'Snow',
-      age: 26,
-      gender: 'M',
-    }, {
-      name: 'Clair',
-      surname: 'White',
-      age: 33,
-      gender: 'F',
-    }, {
-      name: 'Fancy',
-      surname: 'Brown',
-      age: 78,
-      gender: 'F',
-    },
-  ];
-
-  await csvWriter.writeRecords(data);
-  // create json
-  // Write to file
   try {
-    fs.writeFileSync(`./template/${fileName}.json`, JSON.stringify({test: 'collection', name: 'gogog'}));
-    console.log('Done writing to file.');
-  } catch (err) {
-    console.log('Error writing to file', err);
+    var collectionIds = JSON.parse(req.body);
+    console.log('|| ================================== collectionDataExports ================================ ||');
+    console.log(collectionIds);
+    var zip = new AdmZip();
+    const fileName = 'test_1';
+    // create csv
+    const csvWriter = createCsvWriter({
+      path: `./template/${fileName}.csv`,
+      header: [
+        {id: 'name', title: 'Name'},
+        {id: 'surname', title: 'Surname'},
+        {id: 'age', title: 'Age'},
+        {id: 'gender', title: 'Gender'},
+      ],
+    });
+
+    const data = [
+      {
+        name: 'John',
+        surname: 'Snow',
+        age: 26,
+        gender: 'M',
+      }, {
+        name: 'Clair',
+        surname: 'White',
+        age: 33,
+        gender: 'F',
+      }, {
+        name: 'Fancy',
+        surname: 'Brown',
+        age: 78,
+        gender: 'F',
+      },
+    ];
+
+    await csvWriter.writeRecords(data);
+    // create json
+    // Write to file
+    try {
+      fs.writeFileSync(`./template/${fileName}.json`, JSON.stringify({test: 'collection', name: 'gogog'}));
+      console.log('Done writing to file.');
+    } catch (err) {
+      console.log('Error writing to file', err);
+    }
+
+    zip.addLocalFile(`./template/${fileName}.json`);
+    zip.addLocalFile(`./template/${fileName}.csv`);
+    const buffer = zip.toBuffer();
+
+
+    // this is the code for downloading!
+    // here we have to specify 3 things:
+    // 1. type of content that we are downloading
+    // 2. name of file to be downloaded
+    // 3. length or size of the downloaded file!
+    const zipName = 'test_downloaded_file.zip';
+    res.set('Content-Type', 'application/octet-stream');
+    res.set('Content-Disposition', `attachment; filename=${zipName}`);
+    res.set('Content-Length', buffer.length);
+    console.log('========================== export end ==============================');
+    res.send(buffer);
+  } catch (error) {
+    next(error);
   }
-
-  zip.addLocalFile(`./template/${fileName}.json`);
-  zip.addLocalFile(`./template/${fileName}.csv`);
-  const buffer = zip.toBuffer();
-
-
-  // this is the code for downloading!
-  // here we have to specify 3 things:
-  // 1. type of content that we are downloading
-  // 2. name of file to be downloaded
-  // 3. length or size of the downloaded file!
-  const zipName = 'test_downloaded_file.zip';
-  res.set('Content-Type', 'application/octet-stream');
-  res.set('Content-Disposition', `attachment; filename=${zipName}`);
-  res.set('Content-Length', buffer.length);
-  res.send(buffer);
 };
 
 SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, res, next) {
@@ -661,7 +668,7 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
       next();
     }
   } catch (error) {
-    next(e);
+    next(error);
   }
 };
 
