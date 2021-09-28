@@ -4,6 +4,7 @@ const mongoDB = require("../service/database");
 const fs = require("fs");
 const path = require("path");
 const {ObjectID} = require("mongodb");
+const os = require('os');
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const AdmZip = require('adm-zip');
@@ -570,10 +571,14 @@ SeerService.collectionDataExports = async function(req, res, next) {
     console.log('|| ================================== collectionDataExports ================================ ||');
     console.log(collectionIds);
     var zip = new AdmZip();
+
+    // create a temp
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `exports`));
+    console.log(tmpDir);
     const fileName = 'test_1';
     // create csv
     const csvWriter = createCsvWriter({
-      path: `./template/${fileName}.csv`,
+      path: `${tmpDir}/${fileName}.csv`,
       header: [
         {id: 'name', title: 'Name'},
         {id: 'surname', title: 'Surname'},
@@ -605,14 +610,14 @@ SeerService.collectionDataExports = async function(req, res, next) {
     // create json
     // Write to file
     try {
-      fs.writeFileSync(`./template/${fileName}.json`, JSON.stringify({test: 'collection', name: 'gogog'}));
+      fs.writeFileSync(`${tmpDir}/${fileName}.json`, JSON.stringify({test: 'collection', name: 'gogog'}));
       console.log('Done writing to file.');
     } catch (err) {
       console.log('Error writing to file', err);
     }
 
-    zip.addLocalFile(`./template/${fileName}.json`);
-    zip.addLocalFile(`./template/${fileName}.csv`);
+    zip.addLocalFile(`${tmpDir}/${fileName}.json`);
+    zip.addLocalFile(`${tmpDir}/${fileName}.csv`);
     const buffer = zip.toBuffer();
 
 
