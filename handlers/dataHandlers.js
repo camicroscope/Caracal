@@ -693,7 +693,7 @@ SeerService.getCollectionsData = async function(cids) {
     const collectionMap = new Map();
     collData.forEach((coll)=>{
       console.log(typeof coll._id);
-      collectionMap.set(coll._id, coll);
+      collectionMap.set(coll._id.toString(), coll);
     });
     console.log('collection Data', collData);
 
@@ -709,8 +709,7 @@ SeerService.getCollectionsData = async function(cids) {
     const slideData = await mongoDB.find('camic', 'slide', slideQuery, false);
     console.log('Slide Data', slideData);
     slideData.forEach((slide)=>{
-      console.log(typeof slide._id);
-      const sData = slideMap.get(slide._id);
+      const sData = slideMap.get(slide._id.toString());
       console.log(sData);
       if (sData&&sData.slide) sData.slide = slide;
     });
@@ -722,6 +721,7 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('Evaluation Data', evalData);
     evalData.forEach((eval)=>{
       const eData = slideMap.get(eval.slide_id);
+      console.log(eData);
       if (eData&&eData.evaluation) eData.evaluation = eval.evaluation;
     });
 
@@ -746,7 +746,8 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('Relative Informative', relativeInformativenessData);
     relativeInformativenessData.forEach((relative)=>{
       const rData = collectionMap.get(relative.cid);
-      if (rData&&rData.relativeInformative) rData.relativeInformative = relative;
+      console.log(rData);
+      if (rData) rData.relativeInformative = relative;
     });
 
     console.log('collection map', collectionMap);
