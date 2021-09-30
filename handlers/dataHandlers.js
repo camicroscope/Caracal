@@ -565,7 +565,7 @@ Collection.setCollectionTaskStatus = function(req, res, next) {
 };
 
 var SeerService = {};
-SeerService.collectionDataExport = async function(req, res, next) {
+SeerService.collectionDataExports = async function(req, res, next) {
   try {
     var collectionIds = JSON.parse(req.body);
     console.log('|| ================================== collectionDataExports ================================ ||');
