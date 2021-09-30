@@ -614,7 +614,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
 
 
     // create collection csv file
-    collectionMap.forEach(async (data, collectionId)=>{
+    await collectionMap.forEach(async (data, collectionId)=>{
     // create csv
       const csvWriter = createCsvWriter({
         path: `${tmpDir}/${data.text}.csv`,
@@ -640,7 +640,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
         const slideData = slideMap.get(sid);
         csvData.push(slideData.csvData);
       });
-      await csvWriter.writeRecords(data);
+      await csvWriter.writeRecords(csvData);
       zip.addLocalFile(`${tmpDir}/${data.text}.csv`);
     });
     const buffer = zip.toBuffer();
