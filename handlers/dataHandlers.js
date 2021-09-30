@@ -692,7 +692,6 @@ SeerService.getCollectionsData = async function(cids) {
     const collData = await mongoDB.find('camic', 'collection', collQuery, false);
     const collectionMap = new Map();
     collData.forEach((coll)=>{
-      console.log(typeof coll._id);
       collectionMap.set(coll._id.toString(), coll);
     });
     console.log('collection Data', collData);
@@ -711,7 +710,7 @@ SeerService.getCollectionsData = async function(cids) {
     slideData.forEach((slide)=>{
       const sData = slideMap.get(slide._id.toString());
       console.log(sData);
-      if (sData&&sData.slide) sData.slide = slide;
+      if (sData) sData.slide = slide;
     });
 
     // get all evaluation info
@@ -722,7 +721,7 @@ SeerService.getCollectionsData = async function(cids) {
     evalData.forEach((eval)=>{
       const eData = slideMap.get(eval.slide_id);
       console.log(eData);
-      if (eData&&eData.evaluation) eData.evaluation = eval.evaluation;
+      if (eData) eData.evaluation = eval.evaluation;
     });
 
     // get all human annotaions
@@ -735,7 +734,6 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('Mark Data', annotData);
     annotData.forEach((mark)=>{
       const mData = slideMap.get(mark.provenance.image.slide);
-
       if (mData&&mData.marks&&Array.isArray(mData.marks)) mData.marks.push(mark);
     });
 
