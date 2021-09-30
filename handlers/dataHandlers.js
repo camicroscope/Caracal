@@ -570,56 +570,79 @@ SeerService.collectionDataExports = async function(req, res, next) {
     var collectionIds = JSON.parse(req.body);
     console.log('|| ================================== collectionDataExports ================================ ||');
     console.log('collection Ids', collectionIds);
-    await SeerService.getCollectionsData(collectionIds);
-
-    var zip = new AdmZip();
+    const {collectionMap, slideMap} = await SeerService.getCollectionsData(collectionIds);
 
     // create a temp
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `exports`));
-    console.log(tmpDir);
-    const fileName = 'test_1';
-    // create csv
-    const csvWriter = createCsvWriter({
-      path: `${tmpDir}/${fileName}.csv`,
-      header: [
-        {id: 'name', title: 'Name'},
-        {id: 'surname', title: 'Surname'},
-        {id: 'age', title: 'Age'},
-        {id: 'gender', title: 'Gender'},
-      ],
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `exports_`));
+
+    // zip file
+    var zip = new AdmZip();
+    // create slide json
+    // const csvData = [];
+    slideMap.forEach((data, slideId)=>{
+      const {slide, evaluation, marks} = data;
+      const locPath = slide.location.split('/'); // TODO
+      const wsiFileName = locPath[locPath.length-1];
+      // create marks json for slide
+      try {
+        fs.writeFileSync(`${tmpDir}/${slide.name}.json`, JSON.stringify(marks));
+        console.log(`${tmpDir}/${slide.name}.json Done writing to file.`);
+      } catch (err) {
+        console.log(`${tmpDir}/${slide.name}.json Error writing to file`, err);
+      }
+      zip.addLocalFile(`${tmpDir}/${slide.name}.json`);
+      // create slide info
+      data.csvData = {
+        wsiFileName,
+        tokenId: slide.name, // TODO change later
+        imageId: slide.name,
+        tumorSiteCodeAndLabel: '',
+        slideQualitySatisfactory: +evaluation.slide_quality,
+        tumorPresent: +evaluation.tumor_present,
+        tumorHistologyAccurate: +evaluation.tumor_histology,
+        informativenessYN: +evaluation.informativeness,
+        // TODO Relative Informativeness need to add
+        absoluteInformativeness: evaluation.absolute_informativeness?+evaluation.absolute_informativeness: 0,
+        tumorHistologyCorrected: evaluation.comments?evaluation.comments.trim(): '',
+        // Tumor ROI Filename TODO
+        tumorROIFilename: `${slide.name}.json`,
+        annotatingPathologist: evaluation.creator,
+        exportDate: new Date(),
+        lastAnnotationDate: new Date(), // TODO
+      };
     });
 
-    const data = [
-      {
-        name: 'John',
-        surname: 'Snow',
-        age: 26,
-        gender: 'M',
-      }, {
-        name: 'Clair',
-        surname: 'White',
-        age: 33,
-        gender: 'F',
-      }, {
-        name: 'Fancy',
-        surname: 'Brown',
-        age: 78,
-        gender: 'F',
-      },
-    ];
 
-    await csvWriter.writeRecords(data);
-    // create json
-    // Write to file
-    try {
-      fs.writeFileSync(`${tmpDir}/${fileName}.json`, JSON.stringify({test: 'collection', name: 'gogog'}));
-      console.log('Done writing to file.');
-    } catch (err) {
-      console.log('Error writing to file', err);
-    }
-
-    zip.addLocalFile(`${tmpDir}/${fileName}.json`);
-    zip.addLocalFile(`${tmpDir}/${fileName}.csv`);
+    // create collection csv file
+    collectionMap.forEach(async (data, collectionId)=>{
+    // create csv
+      const csvWriter = createCsvWriter({
+        path: `${tmpDir}/${data.text}.csv`,
+        header: [
+          {id: 'wsiFileName', title: 'WSI file name'},
+          {id: 'tokenId', title: 'Token ID'},
+          {id: 'imageId', title: 'Image ID'},
+          {id: 'tumorSiteCodeAndLabel', title: 'Tumor Site Code and Label'},
+          {id: 'slideQualitySatisfactory', title: 'Slide Quality Satisfactory'},
+          {id: 'tumorPresent', title: 'Tumor Present'},
+          {id: 'tumorHistologyAccurate', title: 'Tumor Histology Accurate'},
+          {id: 'informativenessYN', title: 'Informativeness__YN'},
+          {id: 'absoluteInformativeness', title: 'Absolute Informativeness'},
+          {id: 'tumorHistologyCorrected', title: 'Tumor Histology Corrected'},
+          {id: 'tumorROIFilename', title: 'Tumor ROI Filename'},
+          {id: 'annotatingPathologist', title: 'Annotating Pathologist'},
+          {id: 'exportDate', title: 'Export Date'},
+          {id: 'lastAnnotationDate', title: 'Last Annotation Date'},
+        ],
+      });
+      const csvData = [];
+      data.slides.forEach((sid)=>{
+        const slideData = slideMap.get(sid);
+        csvData.push(slideData.csvData);
+      });
+      await csvWriter.writeRecords(data);
+      zip.addLocalFile(`${tmpDir}/${data.text}.csv`);
+    });
     const buffer = zip.toBuffer();
 
 
@@ -628,7 +651,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
     // 1. type of content that we are downloading
     // 2. name of file to be downloaded
     // 3. length or size of the downloaded file!
-    const zipName = 'test_downloaded_file.zip';
+    const zipName = `seer_data_export_${Date.now()}.zip`;
     res.set('Content-Type', 'application/octet-stream');
     res.set('Content-Disposition', `attachment; filename=${zipName}`);
     res.set('Content-Length', buffer.length);
@@ -721,6 +744,7 @@ SeerService.getCollectionsData = async function(cids) {
     evalData.forEach((eval)=>{
       const eData = slideMap.get(eval.slide_id);
       console.log(eData);
+      eval.evaluation.creator = eval.creator;
       if (eData) eData.evaluation = eval.evaluation;
     });
 
@@ -751,6 +775,7 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('collection map', collectionMap);
     console.log('slide map', slideMap);
     console.log('|| ==================================== get CollectionsData End ==================================== ||');
+    return {collectionMap, slideMap};
   } catch (error) {
     console.error(error);
   }
