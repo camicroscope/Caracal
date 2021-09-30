@@ -689,9 +689,10 @@ SeerService.getCollectionsData = async function(cids) {
     // if (uid) collQuery.creator = uid;
 
     // get collection data and create collection map
-    const collData = await mongoDB.find('camic', 'collection', collQuery);
+    const collData = await mongoDB.find('camic', 'collection', collQuery, false);
     const collectionMap = new Map();
     collData.forEach((coll)=>{
+      console.log(typeof coll._id);
       collectionMap.set(coll._id, coll);
     });
     console.log('collection Data', collData);
@@ -708,8 +709,10 @@ SeerService.getCollectionsData = async function(cids) {
     const slideData = await mongoDB.find('camic', 'slide', slideQuery, false);
     console.log('Slide Data', slideData);
     slideData.forEach((slide)=>{
+      console.log(typeof slide._id);
       const sData = slideMap.get(slide._id);
-      sData.slide = slide;
+      console.log(sData);
+      if (sData&&sData.slide) sData.slide = slide;
     });
 
     // get all evaluation info
@@ -719,7 +722,7 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('Evaluation Data', evalData);
     evalData.forEach((eval)=>{
       const eData = slideMap.get(eval.slide_id);
-      eData.evaluation = eval.evaluation;
+      if (eData&&eData.evaluation) eData.evaluation = eval.evaluation;
     });
 
     // get all human annotaions
@@ -732,17 +735,18 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('Mark Data', annotData);
     annotData.forEach((mark)=>{
       const mData = slideMap.get(mark.provenance.image.slide);
-      mData.marks.push(mark);
+
+      if (mData&&mData.marks&&Array.isArray(mData.marks)) mData.marks.push(mark);
     });
 
     // get status
     const cidQuery = {'cid': {'$in': cids}};
     // if (uid) slideInfoQuery.creator = uid;
-    const relativeInformativenessData = await mongoDB.find('camic', 'slideInformativeness', cidQuery);
+    const relativeInformativenessData = await mongoDB.find('camic', 'slideInformativeness', cidQuery, false);
     console.log('Relative Informative', relativeInformativenessData);
     relativeInformativenessData.forEach((relative)=>{
       const rData = collectionMap.get(relative.cid);
-      rData.relativeInformative = relative;
+      if (rData&&rData.relativeInformative) rData.relativeInformative = relative;
     });
 
     console.log('collection map', collectionMap);
