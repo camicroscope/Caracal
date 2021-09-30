@@ -749,7 +749,7 @@ SeerService.getCollectionsData = async function(cids) {
     console.log('slide map', slideMap);
     console.log('|| ==================================== get CollectionsData End ==================================== ||');
   } catch (error) {
-    console.error(err);
+    console.error(error);
   }
 };
 
