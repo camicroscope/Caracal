@@ -565,11 +565,13 @@ Collection.setCollectionTaskStatus = function(req, res, next) {
 };
 
 var SeerService = {};
-SeerService.collectionDataExports = async function(req, res, next) {
+SeerService.collectionDataExport = async function(req, res, next) {
   try {
     var collectionIds = JSON.parse(req.body);
     console.log('|| ================================== collectionDataExports ================================ ||');
-    console.log(collectionIds);
+    console.log('collection Ids', collectionIds);
+    await SeerService.getCollectionsData(collectionIds);
+
     var zip = new AdmZip();
 
     // create a temp
@@ -677,58 +679,78 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
   }
 };
 
-SeerService.getAllCollectionTaskStatus = async function(req, res, next) {
+SeerService.getCollectionsData = async function(cids) {
   try {
     // get parameter from request
     // TODO
+    console.log('|| ==================================== get CollectionsData Start ==================================== ||');
+    const collObjectIds = cids.map((cid)=>new ObjectID(cid));
+    const collQuery = {'_id': {'$in': collObjectIds}};
+    // if (uid) collQuery.creator = uid;
 
-    const collQuery = {};
-    if (uid) collQuery.creator = uid;
-    // if(cid) collQuery._id = cid;
+    // get collection data and create collection map
+    const collData = await mongoDB.find('camic', 'collection', collQuery);
+    const collectionMap = new Map();
+    collData.forEach((coll)=>{
+      collectionMap.set(coll._id, coll);
+    });
+    console.log('collection Data', collData);
 
-    const collData = await mongoDB.find('camic', 'collection', {});
-
-    // get collection and has slides
-    const collLeaf = collData.filter((d)=>d.slides&&d.slides.length>0);
 
     // get all slide id
-    const slideIds = Array.from(new Set(collLeaf.map((d)=> d.slides?d.slides:[]).flat()));
+    const slideIds = Array.from(new Set(collData.map((d)=> d.slides?d.slides:[]).flat()));
     // slide map key is slideId
-    const slideMap = slideIds.reduce((map, sid)=>map.set(sid, {}), new Map());
+    const slideMap = new Map();
+    slideIds.forEach((sid) => slideMap.set(sid, {slide: null, evaluation: null, marks: []}));
+
+    // get all slide info
+    const slideQuery = {'_id': {'$in': slideIds.map((sid)=>new ObjectID(sid))}};
+    const slideData = await mongoDB.find('camic', 'slide', slideQuery, false);
+    console.log('Slide Data', slideData);
+    slideData.forEach((slide)=>{
+      const sData = slideMap.get(slide._id);
+      sData.slide = slide;
+    });
+
     // get all evaluation info
-    const evalQuery = {slide_id: {'$in': slideIds}};
-    if (uid) evalQuery.creator = uid;
-    const evalData = await mongoDB.find('camic', 'evaluation', evalQuery);
+    const evalQuery = {'slide_id': {'$in': slideIds}};
+    // if (uid) evalQuery.creator = uid;
+    const evalData = await mongoDB.find('camic', 'evaluation', evalQuery, false);
+    console.log('Evaluation Data', evalData);
+    evalData.forEach((eval)=>{
+      const eData = slideMap.get(eval.slide_id);
+      eData.evaluation = eval.evaluation;
+    });
 
-    // get all human annotaion nums
-    const pipeline = [
-      {
-        "$match": {
-          "provenance.analysis.source": "human",
-          "provenance.image.slide": {"$in": slideIds},
-        },
-      },
-      {"$group": {
-        _id: "$provenance.image.slide",
-        count: {$sum: 1},
-      }},
-    ];
-    if (uid) pipeline["$match"]["creator"] = uid;
+    // get all human annotaions
+    const annotQuery = {
+      "provenance.analysis.source": "human",
+      "provenance.image.slide": {"$in": slideIds},
+    };
 
-    const annotNums = await mongoDB.aggregate('camic', 'mark', pipeline);
+    const annotData = await mongoDB.find('camic', 'mark', annotQuery, false);
+    console.log('Mark Data', annotData);
+    annotData.forEach((mark)=>{
+      const mData = slideMap.get(mark.provenance.image.slide);
+      mData.marks.push(mark);
+    });
 
     // get status
-    const slideInfoQuery = {};
-    if (uid) slideInfoQuery.creator = uid;
-    const slideInformativenessData = await mongoDB.find('camic', 'slideInformativeness', slideInfoQuery);
+    const cidQuery = {'cid': {'$in': cids}};
+    // if (uid) slideInfoQuery.creator = uid;
+    const relativeInformativenessData = await mongoDB.find('camic', 'slideInformativeness', cidQuery);
+    console.log('Relative Informative', relativeInformativenessData);
+    relativeInformativenessData.forEach((relative)=>{
+      const rData = collectionMap.get(relative.cid);
+      rData.relativeInformative = relative;
+    });
+
+    console.log('collection map', collectionMap);
+    console.log('slide map', slideMap);
+    console.log('|| ==================================== get CollectionsData End ==================================== ||');
   } catch (error) {
     console.error(err);
-    res.json({hasError: true, error: err});
   }
-  // uid
-
-
-  // get all collection info
 };
 
 var User = {};
