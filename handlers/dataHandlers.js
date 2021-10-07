@@ -645,13 +645,13 @@ SeerService.collectionDataExports = async function(req, res, next) {
         console.log('sid:', sid);
 
         if (sid == first) {
-          slideData.csvData.absoluteInformativeness = '1';
+          slideData.csvData.relativeInformativeness = '1';
         } else if (sid == second) {
-          slideData.csvData.absoluteInformativeness = '2';
+          slideData.csvData.relativeInformativeness = '2';
         } else if (sid == third) {
-          slideData.csvData.absoluteInformativeness = '3';
+          slideData.csvData.relativeInformativeness = '3';
         } else {
-          slideData.csvData.absoluteInformativeness = 'L';
+          slideData.csvData.relativeInformativeness = 'L';
         }
         csvData.push(slideData.csvData);
       });
