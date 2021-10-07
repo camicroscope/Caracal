@@ -627,6 +627,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
           {id: 'tumorPresent', title: 'Tumor Present'},
           {id: 'tumorHistologyAccurate', title: 'Tumor Histology Accurate'},
           {id: 'informativenessYN', title: 'Informativeness__YN'},
+          {id: 'relativeInformativeness', title: 'Relative Informativeness'},
           {id: 'absoluteInformativeness', title: 'Absolute Informativeness'},
           {id: 'tumorHistologyCorrected', title: 'Tumor Histology Corrected'},
           {id: 'tumorROIFilename', title: 'Tumor ROI Filename'},
@@ -636,8 +637,22 @@ SeerService.collectionDataExports = async function(req, res, next) {
         ],
       });
       const csvData = [];
+      const {first, second, third} = data.relativeInformative;
+      console.log('relativeInformative', data.relativeInformative);
       data.slides.forEach((sid)=>{
         const slideData = slideMap.get(sid);
+        // set relative informative
+        console.log('sid:', sid);
+
+        if (sid == first) {
+          slideData.csvData.absoluteInformativeness = '1';
+        } else if (sid == second) {
+          slideData.csvData.absoluteInformativeness = '2';
+        } else if (sid == third) {
+          slideData.csvData.absoluteInformativeness = '3';
+        } else {
+          slideData.csvData.absoluteInformativeness = 'L';
+        }
         csvData.push(slideData.csvData);
       });
       await csvWriter.writeRecords(csvData);
