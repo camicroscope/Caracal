@@ -133,12 +133,9 @@ SlideInformativeness.rank = async function(req, res, next) {
   const condition = {cid};
   if (uid) condition.uid = uid;
   try {
-    console.log("|| ================= rank start ================ ||");
     // check the data is exist
     const data = await mongoDB.find('camic', 'slideInformativeness', condition, false);
-    console.log(data);
     if (data.length > 0) { // update
-      console.log('update');
       updateDoc = data[0];
       if (level==="1") {
         updateDoc.first = sid;
@@ -173,10 +170,10 @@ SlideInformativeness.rank = async function(req, res, next) {
           updateDoc.less.push(sid);
         }
       }
-      console.log(updateDoc);
+
       const rs = await mongoDB.update('camic', 'slideInformativeness', condition, updateDoc);
       req.data = rs;
-      console.log("|| ================= rank end ================ ||");
+
       next();
     } else { // add
       const newDoc = {
@@ -196,11 +193,10 @@ SlideInformativeness.rank = async function(req, res, next) {
       } else if (level==="less") {
         newDoc.less.push(sid);
       }
-      console.log('insert');
-      console.log(newDoc);
+
       const rs = await mongoDB.add('camic', 'slideInformativeness', newDoc);
       req.data = rs;
-      console.log("|| ================= rank start ================ ||");
+
       next();
     }
   } catch (error) {
@@ -530,13 +526,8 @@ Collection.getCollectionTaskStatus = function(req, res, next) {
   if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
   if (req.query.sid) query = {slides: req.query.sid};
   try {
-    console.log('|| ================= getCollectionTaskStatus start ================ ||');
     mongoDB.find('camic', 'collection', query).then((x) => {
       req.data = x;
-      console.log('query', req.query);
-      console.log(query);
-      console.log(x);
-      console.log('|| ================= getCollectionTaskStatus end ================ ||');
       next();
     }).catch((e) => next(e));
   } catch (error) {
@@ -550,13 +541,8 @@ Collection.setCollectionTaskStatus = function(req, res, next) {
   if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
   if (req.query.sid) query = {slides: req.query.sid};
   try {
-    console.log('|| ================= setCollectionTaskStatus start ================ ||');
     mongoDB.updateMany('camic', 'collection', query, {'$set': {'task_status': status}}).then((x) => {
       req.data = x;
-      console.log('query', req.query);
-      console.log(query);
-      console.log(x);
-      console.log('|| ================= setCollectionTaskStatus end ================ ||');
       next();
     }).catch((e) => next(e));
   } catch (error) {
@@ -568,8 +554,6 @@ var SeerService = {};
 SeerService.collectionDataExports = async function(req, res, next) {
   try {
     var collectionIds = JSON.parse(req.body);
-    console.log('|| ================================== collectionDataExports ================================ ||');
-    console.log('collection Ids', collectionIds);
     const {collectionMap, slideMap} = await SeerService.getCollectionsData(collectionIds);
 
     // create a temp
@@ -638,11 +622,11 @@ SeerService.collectionDataExports = async function(req, res, next) {
       });
       const csvData = [];
       const {first, second, third} = data.relativeInformative;
-      console.log('relativeInformative', data.relativeInformative);
+
       data.slides.forEach((sid)=>{
         const slideData = slideMap.get(sid);
         // set relative informative
-        console.log('sid:', sid);
+
 
         if (sid == first) {
           slideData.csvData.relativeInformativeness = '1';
@@ -670,7 +654,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
     res.set('Content-Type', 'application/octet-stream');
     res.set('Content-Disposition', `attachment; filename=${zipName}`);
     res.set('Content-Length', buffer.length);
-    console.log('========================== export end ==============================');
+
     res.send(buffer);
   } catch (error) {
     next(error);
@@ -680,16 +664,14 @@ SeerService.collectionDataExports = async function(req, res, next) {
 SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, res, next) {
   const cid = req.query.cid;
   try {
-    console.log('|| ================= getSlidesEvalAndHumanAnnotCountByCollectionId start ================ ||');
-    console.log(cid);
     // get slide info
     const collection = await mongoDB.find('camic', 'collection', {_id: new ObjectID(cid)});
-    console.log(collection);
+
     if (collection&&Array.isArray(collection)&&collection[0]) {
       const sids = collection[0].slides;
       // get evaluation infos
       const evaluations = await mongoDB.find('camic', 'evaluation', {'is_draft': false, 'slide_id': {'$in': sids}});
-      console.log(evaluations);
+
       // get human annotation counts
       const pipeline = [
         {
@@ -704,9 +686,9 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
         }},
       ];
       const humanAnnotationCounts = await mongoDB.aggregate('camic', 'mark', pipeline);
-      console.log(humanAnnotationCounts);
+
       req.data = {evaluations, humanAnnotationCounts};
-      console.log('|| ================= getSlidesEvalAndHumanAnnotCountByCollectionId end ================ ||');
+
       next();
     } else {
       req.data = null;
@@ -720,8 +702,8 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
 SeerService.getCollectionsData = async function(cids) {
   try {
     // get parameter from request
-    // TODO
-    console.log('|| ==================================== get CollectionsData Start ==================================== ||');
+
+
     const collObjectIds = cids.map((cid)=>new ObjectID(cid));
     const collQuery = {'_id': {'$in': collObjectIds}};
     // if (uid) collQuery.creator = uid;
@@ -732,7 +714,6 @@ SeerService.getCollectionsData = async function(cids) {
     collData.forEach((coll)=>{
       collectionMap.set(coll._id.toString(), coll);
     });
-    console.log('collection Data', collData);
 
 
     // get all slide id
@@ -744,10 +725,10 @@ SeerService.getCollectionsData = async function(cids) {
     // get all slide info
     const slideQuery = {'_id': {'$in': slideIds.map((sid)=>new ObjectID(sid))}};
     const slideData = await mongoDB.find('camic', 'slide', slideQuery, false);
-    console.log('Slide Data', slideData);
+
     slideData.forEach((slide)=>{
       const sData = slideMap.get(slide._id.toString());
-      console.log(sData);
+
       if (sData) sData.slide = slide;
     });
 
@@ -755,10 +736,10 @@ SeerService.getCollectionsData = async function(cids) {
     const evalQuery = {'slide_id': {'$in': slideIds}};
     // if (uid) evalQuery.creator = uid;
     const evalData = await mongoDB.find('camic', 'evaluation', evalQuery, false);
-    console.log('Evaluation Data', evalData);
+
     evalData.forEach((eval)=>{
       const eData = slideMap.get(eval.slide_id);
-      console.log(eData);
+
       eval.evaluation.creator = eval.creator;
       if (eData) eData.evaluation = eval.evaluation;
     });
@@ -770,7 +751,7 @@ SeerService.getCollectionsData = async function(cids) {
     };
 
     const annotData = await mongoDB.find('camic', 'mark', annotQuery, false);
-    console.log('Mark Data', annotData);
+
     annotData.forEach((mark)=>{
       const mData = slideMap.get(mark.provenance.image.slide);
       if (mData&&mData.marks&&Array.isArray(mData.marks)) mData.marks.push(mark);
@@ -780,16 +761,13 @@ SeerService.getCollectionsData = async function(cids) {
     const cidQuery = {'cid': {'$in': cids}};
     // if (uid) slideInfoQuery.creator = uid;
     const relativeInformativenessData = await mongoDB.find('camic', 'slideInformativeness', cidQuery, false);
-    console.log('Relative Informative', relativeInformativenessData);
+
     relativeInformativenessData.forEach((relative)=>{
       const rData = collectionMap.get(relative.cid);
-      console.log(rData);
+
       if (rData) rData.relativeInformative = relative;
     });
 
-    console.log('collection map', collectionMap);
-    console.log('slide map', slideMap);
-    console.log('|| ==================================== get CollectionsData End ==================================== ||');
     return {collectionMap, slideMap};
   } catch (error) {
     console.error(error);
