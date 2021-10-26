@@ -19,9 +19,15 @@ const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
-
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
-// TODO validation of data
+
+// TODO -- make optional
+const DISABLE_TF = true; // DUE TO PRODUCTION STABILITY ISSUES WITH TFJS
+
+if (!DISABLE_TF) {
+  const DataSet = require('./handlers/datasetHandler.js');
+  const Model = require('./handlers/modelTrainer.js');
+}
 
 const {connector} = require("./service/database/connector");
 
@@ -32,14 +38,6 @@ var PORT = process.env.PORT || 4010;
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
-
-var DISABLE_TF = process.env.DISABLE_TF || false;
-
-
-if (!DISABLE_TF) {
-  const DataSet = require('./handlers/datasetHandler.js');
-  const Model = require('./handlers/modelTrainer.js');
-}
 
 const app = express();
 app.use(cookieParser());
