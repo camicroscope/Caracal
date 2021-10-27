@@ -88,7 +88,6 @@ class FixAnnotationLabelIDPatch {
       'provenance.analysis.labelId': {$exists: false},
     }, {
       geometries: 0,
-      sort: '_id',
       skip: 0,
       limit: this.recordPerBatch,
     }).toArray();
