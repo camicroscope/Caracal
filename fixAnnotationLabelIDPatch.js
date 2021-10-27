@@ -96,7 +96,7 @@ class FixAnnotationLabelIDPatch {
     for (let idx = 0; idx < marks.length; idx++) {
       const mark = marks[idx];
 
-      console.log(`(${idx+1}/${this.recordPerBatch}) => mark Id: ${mark._id}`);
+      console.log(`(${idx+1}/${marks.length}) => mark Id: ${mark._id}`);
       const execId = mark.provenance.analysis.execution_id;
       const executionId = execId.slice(execId.lastIndexOf('_'));
       const labelType = mark.properties.annotations.notes;
