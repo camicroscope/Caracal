@@ -7,7 +7,7 @@ name: Container Publish
 
 on:
   push:
-    branches: ['master', 'gh-container-action']
+    branches: ['master']
 
 env:
   REGISTRY: ghcr.io
