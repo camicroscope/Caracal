@@ -34,6 +34,7 @@ All possible configuration variables are listed in `.env.example`. Renaming the 
 |IIP_PATH | IIP server location | http://ca-iip |
 |MONGO_URI | mongo connection uri | mongodb://localhost |
 |MONGO_DB | mongo db to use, default camic |
+|RUN_INDEXER | add indexes and defaults for mongo, default true |
 |GENERATE_KEY_IF_MISSING | automatic generate key in server in not found | false |
 |ENABLE_SECURITY_AT| time at which to enable security; [see parsable times](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse)| (not active) |
 

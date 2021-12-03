@@ -73,7 +73,7 @@ class FixAnnotationLabelIDPatch {
       if (isCompleted) console.log(`Batch ${this.currentBatch} Completed`);
       this.currentBatch++;
     }
-    
+
     console.log('FixAnnotationLabelIDPatch End');
     return true;
   }

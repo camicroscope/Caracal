@@ -29,6 +29,7 @@ if (!DISABLE_TF) {
   const Model = require('./handlers/modelTrainer.js');
 }
 
+
 const {connector} = require("./service/database/connector");
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -38,6 +39,8 @@ var PORT = process.env.PORT || 4010;
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
+
+var RUN_INDEXER = process.env.RUN_INDEXER || true;
 
 const app = express();
 app.use(cookieParser());
@@ -223,6 +226,14 @@ throng(WORKERS, startApp(app));
 connector.init().then(() => {
   const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
   handler.startHandler();
+}).then(()=>{
+  if (RUN_INDEXER) {
+    const indexer = require('./idx_mongo.js');
+    indexer.collections();
+    indexer.indexes();
+    indexer.defaults();
+    console.log("added indexes");
+  }
 }).catch((e) => {
   console.error("error connecting to database");
   process.exit(1);
