@@ -164,6 +164,30 @@ class Mongo {
       throw e;
     }
   }
+
+  static async createIndex(database, collectionName, index, unique){
+    try {
+      const collection = await getConnection(database).collection(
+        collectionName
+      );
+      const result = await collection.createIndex(index, unique);
+      delete result.connection;
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  static async createCollection(database, collectionName, validator){
+    try {
+      const collection = await getConnection(database).createCollection(collectionName, validator);
+      return collection;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 /** export to be import using the destructuring syntax */

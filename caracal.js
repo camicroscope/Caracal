@@ -29,6 +29,7 @@ if (!DISABLE_TF) {
   const Model = require('./handlers/modelTrainer.js');
 }
 
+
 const {connector} = require("./service/database/connector");
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -38,6 +39,16 @@ var PORT = process.env.PORT || 4010;
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
+
+var RUN_INDEXER = process.env.RUN_INDEXER || true;
+
+if (RUN_INDEXER){
+  const indexer = ('./idx_mongo.js');
+  indexer.collections();
+  console.log("COLLECTIONS")
+  indexer.indexes();
+  console.log("INDEXES")
+}
 
 const app = express();
 app.use(cookieParser());
