@@ -221,7 +221,7 @@ var startApp = function(app) {
 };
 
 // call this only once no matter what
-function masterHandler(){
+function masterHandler() {
   connector.init().then(() => {
     const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
     handler.startHandler();
@@ -239,7 +239,7 @@ function masterHandler(){
   });
 }
 // for each worker
-function workerHandler(){
+function workerHandler() {
   connector.init().then(() => {
     const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
     handler.startHandler();
@@ -251,7 +251,6 @@ function workerHandler(){
   });
 }
 
-throng({ master, worker, count: WORKERS });
+throng({masterHandler, workerHandler, count: WORKERS});
 
 module.exports = app; // for tests
-
