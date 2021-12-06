@@ -471,7 +471,7 @@ function defaults() {
     },
     "version": "1.0.0",
   };
-  mongodb.add(db, 'configuration', evaluation_form, true);
+  mongodb.add(db, 'configuration', evaluationForm, true);
 }
 
 module.exports = {
