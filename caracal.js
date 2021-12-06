@@ -234,7 +234,7 @@ function masterHandler(){
       console.log("added indexes");
     }
   }).catch((e) => {
-    console.error("error connecting to database");
+    console.error(e);
     process.exit(1);
   });
 }
