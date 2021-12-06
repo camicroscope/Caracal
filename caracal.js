@@ -235,6 +235,7 @@ connector.init().then(() => {
     console.log("added indexes");
   }
 }).catch((e) => {
+  console.error(e);
   console.error("error connecting to database");
   process.exit(1);
 });
