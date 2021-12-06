@@ -345,7 +345,7 @@ function defaults() {
         "mode": "free",
         "type": "NSCLC-AdenoCA(all)",
         "id": "026",
-      }, {evaluation_form
+      }, {
         "color": "#d9d9d9",
         "mode": "free",
         "type": "NSCLC-Acinar",
