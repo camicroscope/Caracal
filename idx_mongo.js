@@ -345,7 +345,7 @@ function defaults() {
         "mode": "free",
         "type": "NSCLC-AdenoCA(all)",
         "id": "026",
-      }, {
+      }, {evaluation_form
         "color": "#d9d9d9",
         "mode": "free",
         "type": "NSCLC-Acinar",
@@ -471,7 +471,7 @@ function defaults() {
     },
     "version": "1.0.0",
   };
-  mongodb.add(db, 'configuration', evaluation_form, true);
+  mongodb.add(db, 'configuration', evaluationForm, true);
 }
 
 module.exports = {
