@@ -220,24 +220,38 @@ var startApp = function(app) {
   };
 };
 
-throng(WORKERS, startApp(app));
+// call this only once no matter what
+function masterHandler(){
+  connector.init().then(() => {
+    const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+    handler.startHandler();
+  }).then(()=>{
+    if (RUN_INDEXER) {
+      const indexer = require('./idx_mongo.js');
+      indexer.collections();
+      indexer.indexes();
+      indexer.defaults();
+      console.log("added indexes");
+    }
+  }).catch((e) => {
+    console.error("error connecting to database");
+    process.exit(1);
+  });
+}
+// for each worker
+function workerHandler(){
+  connector.init().then(() => {
+    const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+    handler.startHandler();
+  }).then(()=>{
+    startApp(app);
+  }).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
 
-/** initialize DataTransformationHandler only after database is ready */
-connector.init().then(() => {
-  const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
-  handler.startHandler();
-}).then(()=>{
-  if (RUN_INDEXER) {
-    const indexer = require('./idx_mongo.js');
-    indexer.collections();
-    indexer.indexes();
-    indexer.defaults();
-    console.log("added indexes");
-  }
-}).catch((e) => {
-  console.error(e);
-  console.error("error connecting to database");
-  process.exit(1);
-});
+throng({ master, worker, count: WORKERS });
 
 module.exports = app; // for tests
+
