@@ -251,6 +251,6 @@ function workerHandler() {
   });
 }
 
-throng({masterHandler, workerHandler, count: WORKERS});
+throng({master: masterHandler, worker: workerHandler, count: WORKERS});
 
 module.exports = app; // for tests
