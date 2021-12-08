@@ -1,5 +1,6 @@
 const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 const mongoDB = require("../service/database");
+const {transformIdToObjectId} = require("../service/database/util");
 
 var General = {};
 General.find = function(db, collection) {
@@ -68,7 +69,25 @@ General.delete = function(db, collection) {
     }).catch((e) => next(e));
   };
 };
-
+var Labeling = {};
+Labeling.pullAnnotation = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  const {labelId, annotationId} = query;
+  mongoDB.update('camic', 'labeling', {'id': labelId}, {$pull: {annotations: annotationId}}).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
+Labeling.pushAnnotation = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  const {labelId, annotationId} = query;
+  mongoDB.update('camic', 'labeling', {'id': labelId}, {$push: {annotations: annotationId}}).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
 var Presetlabels = {};
 // add a label
 Presetlabels.add = function(req, res, next) {
@@ -328,11 +347,74 @@ User.wcido = function(req, res, next) {
   }
 };
 
+var Slide = {};
+Slide.countLabeling = async function(req, res, next) {
+  try {
+    // {"$match": {"provenance.image.slide": {"$in": sids}}},
+    const data = await mongoDB.aggregate('camic', 'labeling',
+        [
+          {"$group": {_id: "$provenance.image", count: {$sum: 1}}},
+        ]);
+    req.data = data;
+    next();
+  } catch (error) {
+    req.data = {error};
+    next();
+  }
+};
+Slide.findLabelingStat = async function(req, res, next) {
+  try {
+    var query = req.query;
+    const {cid, uid} = query;
+    // find slide data
+    const slides = await mongoDB.find('camic', 'slide', {'collections': cid}, false);
+
+    const sids = slides.map((slide)=>slide._id.toString());
+
+    // count labeling
+    const labelings = await mongoDB.aggregate('camic', 'labeling',
+        [
+          {"$match": {"provenance.image.slide": {"$in": sids}}},
+          {"$group": {_id: "$provenance.image.slide", count: {$sum: 1}}},
+        ]);
+    const labelingMap = new Map();
+    labelings.forEach(({_id, count})=>{
+      labelingMap.set(_id, count);
+    });
+
+    // count labelingAnnotation
+    const labelingAnnotations = await mongoDB.aggregate('camic', 'labelingAnnotation', [
+      {"$match": {"provenance.image.slide": {"$in": sids}, "creator": uid}},
+      {"$group": {_id: "$provenance.image.slide", count: {$sum: 1}}},
+    ]);
+    const labelingAnnotationMap = new Map();
+    labelingAnnotations.forEach(({_id, count})=>{
+      labelingAnnotationMap.set(_id, count);
+    });
+
+    slides.forEach((slide)=>{
+      const id = slide._id.toString();
+      slide.stat = {
+        labelingAnnotationCount: labelingAnnotationMap.has(id)?labelingAnnotationMap.get(id):0,
+        labelingCount: labelingMap.has(id)?labelingMap.get(id):0,
+      };
+    });
+    req.data = slides;
+    next();
+  } catch (error) {
+    req.data = {error};
+    next();
+  }
+};
+
 dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
+dataHandlers.Labeling = Labeling;
+dataHandlers.Slide = Slide;
+
 
 dataHandlers.General = General;
 module.exports = dataHandlers;

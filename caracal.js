@@ -21,6 +21,9 @@ const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
+const nodemailer = require('nodemailer');
+const Agenda = require("agenda");
+
 // TODO -- make optional
 const DISABLE_TF = true; // DUE TO PRODUCTION STABILITY ISSUES WITH TFJS
 
@@ -87,17 +90,29 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
+  "findLabelingStat": function() {
+    return dataHandlers.Slide.findLabelingStat;
+  },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
   },
   "markSpatial": function() {
     return dataHandlers.Mark.spatial;
   },
+  "countLabelingBySlide": function() {
+    return dataHandlers.Slide.countLabeling;
+  },
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;
   },
   "updateMarksLabel": function() {
     return dataHandlers.Mark.updateMarksLabel;
+  },
+  "labelingPushAnnotation": function() {
+    return dataHandlers.Labeling.pushAnnotation;
+  },
+  "labelingPullAnnotation": function() {
+    return dataHandlers.Labeling.pullAnnotation;
   },
   "heatmapTypes": function() {
     return dataHandlers.Heatmap.types;
@@ -227,5 +242,33 @@ connector.init().then(() => {
   console.error("error connecting to database");
   process.exit(1);
 });
+
+// test
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'nan.li@dbmi.emory.edu',
+    pass: 'Ln8214696@',
+  },
+});
+
+var mailOptions = {
+  from: 'nan.li@dbmi.emory.edu',
+  to: 'linanldj@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!',
+  html: "<b>Hello world?</b>",
+};
+
+ const test = await transporter.sendMail(mailOptions, function(error, info) {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
+
+
+//
 
 module.exports = app; // for tests

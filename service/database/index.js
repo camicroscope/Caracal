@@ -1,5 +1,5 @@
-const { getConnection } = require("./connector");
-const { transformIdToObjectId } = require("./util");
+const {getConnection} = require("./connector");
+const {transformIdToObjectId} = require("./util");
 
 /**
  * @class Mongo
@@ -24,6 +24,7 @@ class Mongo {
       query = transformIdToObjectId(query);
 
       const collection = getConnection(database).collection(collectionName);
+      console.log('find', database, collectionName, query);
       const data = await collection.find(query).toArray();
 
       /** allow caller method to toggle response transformation */
@@ -153,9 +154,7 @@ class Mongo {
     try {
       filter = transformIdToObjectId(filter);
 
-      const collection = await getConnection(database).collection(
-        collectionName
-      );
+      const collection = await getConnection(database).collection(collectionName);
       const result = await collection.updateMany(filter, updates);
       delete result.connection;
       return result;

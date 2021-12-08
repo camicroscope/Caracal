@@ -21,6 +21,7 @@
   "homepage": "https://github.com/camicroscope/caboodle#readme",
   "dependencies": {
     "adm-zip": "^0.4.16",
+    "agenda": "^4.2.1",
     "ajv": "^8.6.0",
     "ajv-keywords": "^5.0.0",
     "atob": "^2.1.2",
@@ -32,6 +33,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.12.3",
     "mongodb": "^3.6.6",
+    "nodemailer": "^6.7.1",
     "throng": "^4.0.0"
   },
   "devDependencies": {
