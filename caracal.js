@@ -197,7 +197,7 @@ app.use(function(err, req, res, next) {
   res.status(statusCode).json(err);
 });
 
-var startApp = function(app) {
+function startApp(app) {
   return function() {
     // Prepare for SSL/HTTPS
     var httpsOptions = {};
@@ -243,7 +243,6 @@ function workerHandler() {
   connector.init().then(() => {
     const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
     handler.startHandler();
-  }).then(()=>{
     startApp(app);
   }).catch((e) => {
     console.error(e);
