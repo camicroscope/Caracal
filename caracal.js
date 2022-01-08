@@ -198,24 +198,24 @@ app.use(function(err, req, res, next) {
 });
 
 function startApp(app) {
-    // Prepare for SSL/HTTPS
-    var httpsOptions = {};
-    try {
-      var sslPkPath = "./ssl/privatekey.pem";
-      var sslCertPath = "./ssl/certificate.pem";
-      if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
-        console.info("Starting in HTTPS Mode mode");
-        httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
-        httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
-      }
-    } catch (err) {
-      console.error(err);
+  // Prepare for SSL/HTTPS
+  var httpsOptions = {};
+  try {
+    var sslPkPath = "./ssl/privatekey.pem";
+    var sslCertPath = "./ssl/certificate.pem";
+    if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
+      console.info("Starting in HTTPS Mode mode");
+      httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
+      httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
     }
-    if (httpsOptions.key && httpsOptions.cert) {
-      https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
-    } else {
-      app.listen(PORT, () => console.log('listening on ' + PORT));
-    }
+  } catch (err) {
+    console.error(err);
+  }
+  if (httpsOptions.key && httpsOptions.cert) {
+    https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
+  } else {
+    app.listen(PORT, () => console.log('listening on ' + PORT));
+  }
 };
 
 // call this only once no matter what
