@@ -239,18 +239,21 @@ function masterHandler() {
   });
 }
 // for each worker
-function workerHandler() {
-  console.log("start handler")
-  connector.init().then(() => {
-    const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
-    handler.startHandler();
-    startApp(app);
-  }).catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+function workerHandler(app) {
+  return function(){
+    connector.init().then(() => {
+      const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+      handler.startHandler();
+    }).then(()=>{
+      console.log("start handler")
+      startApp(app);
+    }).catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+  }
 }
 
-throng({master: masterHandler, start: workerHandler, count: WORKERS});
+throng({master: masterHandler, start: workerHandler(app), count: WORKERS});
 
 module.exports = app; // for tests
