@@ -198,8 +198,7 @@ app.use(function(err, req, res, next) {
 });
 
 function startApp(app) {
-  return function() {
-    console.log("called startapp")
+    console.log("called startapp");
     // Prepare for SSL/HTTPS
     var httpsOptions = {};
     try {
@@ -218,7 +217,6 @@ function startApp(app) {
     } else {
       app.listen(PORT, () => console.log('listening on ' + PORT));
     }
-  };
 };
 
 // call this only once no matter what
@@ -246,7 +244,7 @@ function workerHandler() {
     handler.startHandler();
   }).then(()=>{
     console.log("start handler")
-    app.listen(PORT, () => console.log('listening on ' + PORT));
+    startApp(app);
   }).catch((e) => {
     console.error(e);
     process.exit(1);
