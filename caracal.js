@@ -240,6 +240,7 @@ function masterHandler() {
 }
 // for each worker
 function workerHandler() {
+  console.log("worker handler")
   connector.init().then(() => {
     const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
     handler.startHandler();
