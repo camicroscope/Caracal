@@ -199,6 +199,7 @@ app.use(function(err, req, res, next) {
 
 function startApp(app) {
   return function() {
+    console.log("called startapp")
     // Prepare for SSL/HTTPS
     var httpsOptions = {};
     try {
