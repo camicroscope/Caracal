@@ -240,7 +240,7 @@ function masterHandler() {
 }
 // for each worker
 function workerHandler() {
-  console.log("worker handler")
+  console.log("start handler")
   connector.init().then(() => {
     const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
     handler.startHandler();
@@ -251,6 +251,6 @@ function workerHandler() {
   });
 }
 
-throng({master: masterHandler, worker: workerHandler, count: WORKERS});
+throng({master: masterHandler, start: workerHandler, count: WORKERS});
 
 module.exports = app; // for tests
