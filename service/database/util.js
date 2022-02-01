@@ -26,4 +26,32 @@ const transformIdToObjectId = (query) => {
   }
 };
 
-module.exports = {transformIdToObjectId};
+const generateTableBody = (data) =>{
+  return `<tbody>${data
+      .map((d) =>{
+        const alias = d.alias;
+        const xIdx = alias.lastIndexOf('_x');
+        const yIdx = alias.lastIndexOf('_y');
+        const [x, width] = alias.slice(xIdx+2, yIdx).split('.');
+        const [y, height] = alias.slice(yIdx+2).split('.');
+        console.log(x, y, width, height);
+        return `<tr>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d._id}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.provenance.image.name}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${x}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${y}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${width}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${height}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.properties.type}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.properties.percent_stroma}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.properties.til_density}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.alias}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.viewer_size.width}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.viewer_size.height}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.viewer_mag}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.creator}</td>
+        <td style='border: 1px solid #ddd;padding: 8px;'>${d.create_date}</td>
+        </tr>`;
+      }).join("")}</tbody>`;
+};
+module.exports = {transformIdToObjectId, generateTableBody};

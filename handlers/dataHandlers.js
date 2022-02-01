@@ -37,8 +37,9 @@ General.distinct = function(db, collection, upon) {
 
 General.add = function(db, collection) {
   return function(req, res, next) {
-    var data = JSON.parse(req.body);
-    mongoDB.add(db, collection, data).then((x) => {
+    const newData = JSON.parse(req.body);
+    newData.create_date = new Date();
+    mongoDB.add(db, collection, newData).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -49,8 +50,10 @@ General.update = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
+    const updateData = JSON.parse(req.body);
+    updateData.update_date = new Date();
     var newVals = {
-      $set: JSON.parse(req.body),
+      $set: updateData,
     };
     mongoDB.update(db, collection, query, newVals).then((x) => {
       req.data = x;
@@ -346,7 +349,41 @@ User.wcido = function(req, res, next) {
     res.send(error);
   }
 };
+var LabelingAnnotation = {};
+LabelingAnnotation.advancedFind = async function(req, res, next) {
+  // get params -
+  // id - annotation id (_id)
+  // slideId - slide Id (provenance.image.slide)
+  // slideName - slide Name (provenance.image.name)
+  // type - ROI type (properties.type)
+  // creator - creator (creator)
+  // alias - alias (alias)
+  // startDate - create date (create_date)
+  // endDate - create date (create_date)
+  const {id, slideId, slideName, type, creator, alias, startDate, endDate} = req.query;
+  delete req.query.token;
+  const query = {};
+  if (id) query["_id"] = id;
 
+  if (slideId) query["provenance.image.slide"] = slideId;
+  if (slideName) query["provenance.image.name"] = slideName;
+
+  if (type) query["properties.type"] = type;
+
+  if (creator) query.creator = creator;
+
+  if (alias) query.alias = alias;
+  if (startDate || endDate) {
+    query.create_date = {};
+    if (startDate) query.create_date['$gte'] = new Date(startDate);
+    if (endDate) query.create_date['$lte'] = new Date(endDate);
+  }
+  mongoDB.find('camic', 'labelingAnnotation', query ).then((x) => {
+    console.log(x.length);
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
 var Slide = {};
 Slide.countLabeling = async function(req, res, next) {
   try {
@@ -414,7 +451,7 @@ dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
 dataHandlers.Labeling = Labeling;
 dataHandlers.Slide = Slide;
-
+dataHandlers.LabelingAnnotation = LabelingAnnotation;
 
 dataHandlers.General = General;
 module.exports = dataHandlers;

@@ -21,8 +21,11 @@ const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
+const mongoDB = require('./service/database');
 const nodemailer = require('nodemailer');
 const Agenda = require("agenda");
+
+const {generateTableBody} = require("./service/database/util");
 
 // TODO -- make optional
 const DISABLE_TF = true; // DUE TO PRODUCTION STABILITY ISSUES WITH TFJS
@@ -128,6 +131,9 @@ var HANDLERS = {
   },
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
+  },
+  "advancedFindLabelingAnnotation": function() {
+    return dataHandlers.LabelingAnnotation.advancedFind;
   },
 };
 
@@ -243,32 +249,82 @@ connector.init().then(() => {
   process.exit(1);
 });
 
-// test
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'nan.li@dbmi.emory.edu',
-    pass: 'Ln8214696@',
-  },
+async function sendEmail(transportOption, contextOption) {
+  var transporter = nodemailer.createTransport(transportOption);
+
+  await transporter.sendMail(contextOption, function(error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+}
+
+// agenda test start
+const mongoConnectionString = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
+var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collection: 'agendaJobs'}});
+
+agenda.on( "ready", async function() {
+  const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
+  await agenda.start();
+  await agenda.every("00 00 * * 6", "send email report", {
+    transportOption: emailOption[0].configuration.transport_option,
+    contextOption: emailOption[0].configuration.context_option,
+  });
 });
 
-var mailOptions = {
-  from: 'nan.li@dbmi.emory.edu',
-  to: 'linanldj@gmail.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!',
-  html: "<b>Hello world?</b>",
-};
+agenda.define(
+    "send email report",
+    async (job) => {
+      const {transportOption, contextOption} = job.attrs.data;
 
-//  const test = await transporter.sendMail(mailOptions, function(error, info) {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log('Email sent: ' + info.response);
-//   }
-// });
+      // get first and last week day
+      var curr = new Date(); // get current date
+      var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+      var last = first + 6; // last day is the first day + 6
 
+      var firstDay = new Date(curr.setDate(first));
+      firstDay.setHours(0, 0, 0, 0);
+      var lastDay = new Date(curr.setDate(last));
+      lastDay.setHours(23, 59, 59, 999);
+      console.log('days', firstDay, lastDay);
+      // get all annotations
+      const labelingAnnotations = await mongoDB.find('camic', 'labelingAnnotation', {create_date: {
+        '$gte': firstDay,
+        '$lte': lastDay,
+      }}, false);
 
-//
+      const html = generateEmail(firstDay, lastDay, labelingAnnotations);
+      contextOption.subject = `Label Annotaions Summary ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}`;
+      contextOption.html = html;
+      await sendEmail(transportOption, contextOption);
+    },
+);
+
+function generateEmail(firstDay, lastDay, labelingAnnotations) {
+  return `<h2>Label Annotaions: ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}</h2>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead><tr>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>ID</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Slide Name</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>X</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Y</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Width</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Height</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Annotation Type</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Annotation Percent Stroma</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Annotation TIL Density</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Alias</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>View Width</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>View Height</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>View Magnification Level</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Creator</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Create Date Time</th>
+      </tr></thead>
+  ${generateTableBody(labelingAnnotations)}
+  </table>
+  <p><strong>Total Annotations:</strong> ${labelingAnnotations.length}</p>`;
+}
 
 module.exports = app; // for tests
