@@ -53,6 +53,12 @@ General.distinct = function(db, collection, upon) {
 General.add = function(db, collection) {
   return function(req, res, next) {
     var data = JSON.parse(req.body);
+    // -- customized code for reading user info from header START -- //
+    if (data.creator&&req.headers['x-remote-user']) {
+      data.creator = req.headers['x-remote-user'];
+    }
+    data['create_date'] = new Date();
+    // -- customized code for reading user info from header END -- //
     mongoDB.add(db, collection, data).then((x) => {
       req.data = x;
       next();
@@ -64,9 +70,16 @@ General.update = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
+    // -- customized code for reading user info from header START -- //
+    const vals = JSON.parse(req.body);
+    if (vals.updater&&req.headers['x-remote-user']) {
+      vals.updater = req.headers['x-remote-user'];
+    }
+    vals['update_date'] = new Date();
     var newVals = {
-      $set: JSON.parse(req.body),
+      $set: vals,
     };
+    // -- customized code for reading user info from header END -- //
     mongoDB.update(db, collection, query, newVals).then((x) => {
       req.data = x;
       next();
