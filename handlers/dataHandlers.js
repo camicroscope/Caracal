@@ -1,185 +1,11 @@
-var mongo = require('mongodb');
-
-var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
-var DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
-
-
-function mongoFind(database, collection, query) {
-  return new Promise(function(res, rej) {
-    try {
-      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-        if (err) {
-          rej(err);
-        } else {
-          if (query['_id']) {
-            query['_id'] = new mongo.ObjectID(query['_id']);
-          }
-          var dbo = db.db(database);
-          dbo.collection(collection).find(query).toArray(function(err, result) {
-            if (err) {
-              rej(err);
-            }
-            // compatible wiht bindaas odd format
-            result.forEach((x) => {
-              x['_id'] = {
-                '$oid': x['_id'],
-              };
-            });
-            res(result);
-            db.close();
-          });
-        }
-      });
-    } catch (error) {
-      rej(error);
-    }
-  });
-}
-
-function mongoDistinct(database, collection, upon, query) {
-  return new Promise(function(res, rej) {
-    try {
-      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-        if (err) {
-          rej(err);
-        } else {
-          var dbo = db.db(database);
-          dbo.collection(collection).distinct(upon, query, function(err, result) {
-            if (err) {
-              rej(err);
-            }
-            res(result);
-            db.close();
-          });
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      rej(error);
-    }
-  });
-}
-
-function mongoAdd(database, collection, data) {
-  return new Promise(function(res, rej) {
-    // if data not array, make it one
-    if (!Array.isArray(data)) {
-      data = [data];
-    }
-    try {
-      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-        if (err) {
-          rej(err);
-        } else {
-          var dbo = db.db(database);
-          dbo.collection(collection).insertMany(data, function(err, result) {
-            if (err) {
-              rej(err);
-            }
-            res(result);
-            db.close();
-          });
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      rej(error);
-    }
-  });
-}
-
-function mongoDelete(database, collection, query) {
-  return new Promise(function(res, rej) {
-    mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-      try {
-        if (err) {
-          rej(err);
-        } else {
-          var dbo = db.db(database);
-          if (query['_id']) {
-            query['_id'] = new mongo.ObjectID(query['_id']);
-          }
-          dbo.collection(collection).deleteOne(query, function(err, result) {
-            if (err) {
-              rej(err);
-            }
-            delete result.connection;
-            res(result);
-            db.close();
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        rej(error);
-      }
-    });
-  });
-}
-
-function mongoAggregate(database, collection, pipeline) {
-  return new Promise(function(res, rej) {
-    mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-      try {
-        if (err) {
-          rej(err);
-        } else {
-          var dbo = db.db(database);
-          dbo.collection(collection).aggregate(pipeline).toArray(function(err, result) {
-            if (err) {
-              rej(err);
-            }
-            // compatible wiht bindaas odd format
-            // result.forEach((x) => {
-            //   x['_id'] = {
-            //     '$oid': x['_id'],
-            //   };
-            // });
-            res(result);
-            db.close();
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        rej(error);
-      }
-    });
-  });
-}
-
-function mongoUpdate(database, collection, query, newVals) {
-  return new Promise(function(res, rej) {
-    try {
-      mongo.MongoClient.connect(MONGO_URI, function(err, db) {
-        if (err) {
-          rej(err);
-        } else {
-          var dbo = db.db(database);
-          if (query['_id']) {
-            query['_id'] = new mongo.ObjectID(query['_id']);
-          }
-          dbo.collection(collection).updateOne(query, newVals, function(err, result) {
-            if (err) {
-              console.log(err);
-              rej(err);
-            }
-            delete result.connection;
-            res(result);
-            db.close();
-          });
-        }
-      });
-    } catch (error) {
-      rej(error);
-    }
-  });
-}
+const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
+const mongoDB = require("../service/database");
 
 var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
-    delete query.token;
-    mongoFind(db, collection, query).then((x) => {
+    mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -190,7 +16,7 @@ General.get = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
-    mongoFind(db, collection, {_id: req.query.id}).then((x) => {
+    mongoDB.find(db, collection, {_id: req.query.id}).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -201,7 +27,7 @@ General.distinct = function(db, collection, upon) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
-    mongoDistinct(db, collection, upon, query).then((x) => {
+    mongoDB.distinct(db, collection, upon, query).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -211,7 +37,7 @@ General.distinct = function(db, collection, upon) {
 General.add = function(db, collection) {
   return function(req, res, next) {
     var data = JSON.parse(req.body);
-    mongoAdd(db, collection, data).then((x) => {
+    mongoDB.add(db, collection, data).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -225,7 +51,7 @@ General.update = function(db, collection) {
     var newVals = {
       $set: JSON.parse(req.body),
     };
-    mongoUpdate(db, collection, query, newVals).then((x) => {
+    mongoDB.update(db, collection, query, newVals).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -236,7 +62,7 @@ General.delete = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
-    mongoDelete(db, collection, query).then((x) => {
+    mongoDB.delete(db, collection, query).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -249,7 +75,7 @@ Presetlabels.add = function(req, res, next) {
   var query = req.query;
   delete query.token;
   var labels = JSON.parse(req.body);
-  mongoUpdate('camic', 'configuration', {'config_name': 'preset_label'}, {$push: {configuration: labels}}).then((x) => {
+  mongoDB.update('camic', 'configuration', {'config_name': 'preset_label'}, {$push: {configuration: labels}}).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
@@ -287,7 +113,7 @@ Presetlabels.update = function(req, res, next) {
     newVals['$unset']['configuration.$.key'] = 1;
   }
 
-  mongoUpdate('camic', 'configuration',
+  mongoDB.update('camic', 'configuration',
       {
         'config_name': 'preset_label',
         'configuration.id': query.id,
@@ -301,7 +127,7 @@ Presetlabels.update = function(req, res, next) {
 Presetlabels.remove = function(req, res, next) {
   var query = req.query;
   delete query.token;
-  mongoUpdate('camic', 'configuration',
+  mongoDB.update('camic', 'configuration',
       {
         'config_name': 'preset_label',
       }, {$pull: {configuration: {id: query.id}}}).then((x) => {
@@ -337,7 +163,7 @@ Mark.spatial = function(req, res, next) {
       '$gt': parseFloat(query.footprint),
     };
   }
-  mongoFind('camic', 'mark', query).then((x) => {
+  mongoDB.find('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
@@ -347,7 +173,10 @@ Mark.multi = function(req, res, next) {
   var query = {};
 
   var postQuery = JSON.parse(req.body);
-
+  // handle slideId
+  if (postQuery['provenance.image.slide']) {
+    query['provenance.image.slide'] = postQuery['provenance.image.slide'];
+  }
   // handle source
   if (postQuery.source) {
     query['provenance.analysis.source'] = postQuery.source;
@@ -383,7 +212,7 @@ Mark.multi = function(req, res, next) {
     };
   }
 
-  mongoFind('camic', 'mark', query).then((x) => {
+  mongoDB.find('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
   }).catch((e) => next(e));
@@ -415,23 +244,42 @@ Mark.findMarkTypes = function(req, res, next) {
         },
       },
     ];
-    mongoAggregate('camic', 'mark', pipeline).then((x) => {
+    mongoDB.aggregate('camic', 'mark', pipeline).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
   } else {
-    mongoDistinct('camic', 'mark', 'provenance.analysis', query).then((x) => {
+    mongoDB.distinct('camic', 'mark', 'provenance.analysis', query).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
   }
 };
+Mark.updateMarksLabel = function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  // initial data
 
+  var newVals = {
+    $set: {
+      'provenance.analysis.name': query.name,
+      'properties.annotations.name': query.name,
+      'properties.annotations.notes': query.name,
+    },
+  };
+  mongoDB.update('camic', 'mark',
+      {
+        'provenance.analysis.labelId': query.id,
+      }, newVals).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
 var Heatmap = {};
 Heatmap.types = function(req, res, next) {
   var query = req.query;
   delete query.token;
-  mongoFind('camic', 'heatmap', query, {
+  mongoDB.find('camic', 'heatmap', query, {
     'data': 0,
   }).then((x) => {
     x.forEach((x)=>delete x.data);
@@ -443,7 +291,7 @@ Heatmap.types = function(req, res, next) {
 var User = {};
 
 User.forLogin = function(email) {
-  return mongoFind('camic', 'user', {'email': email});
+  return mongoDB.find('camic', 'user', {'email': email});
 };
 
 User.wcido = function(req, res, next) {
