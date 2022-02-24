@@ -1,59 +1,71 @@
+// EXTENDS authHandlers
 const proxy = require('http-proxy-middleware');
-var axios = require('axios');
+const axios = require('axios');
+var jwt = require('jsonwebtoken');
+var EXPIRY = process.env.EXPIRY || '1d';
+var BYPASS_IIP_CHECK = process.env.BYPASS_IIP_CHECK == "Y";
 
-var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
+// internal function to issue a new jwt
+function issueToken(data, signKey){
+  return jwt.sign(data, signKey, {
+    algorithm: 'RS256',
+    expiresIn: EXPIRY,
+  });
+}
 
-pdbIipHandler = function(req, res, next) {
-  if (req.query && req.query.slide && req.query.tsq) {
-    // expected query args:
-    // - slide - pathdb slide node id
-    // - tsq - tile server "query"
-    const PDB_URL = process.env.PDB_URL ||`https://quip-pathdb/`;
-    let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
-    console.log(lookupUrl)
-    // LOOK AT - headers may need transform??
-    axios.get(lookupUrl, {headers: req.headers}).then((x)=>{
-      // get path
-      if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
-        let filepath = x['field_iip_path']['value'];
-        // TODO ensure the ts arg is safe, and cannot smuggle in an existing filepath/overwrite
-        req.new_iip_path = "?DeepZoom=" + filepath + req.query.ts;
-        proxy({
-          secure: false,
-          onError(err, req, res) {
-            console.log(err);
-            err.statusCode = 500;
-            next(err);
-          },
-          changeOrigin: true,
-          target: IIP_PATH,
-          pathRewrite: function(path, req) {
-            // do I need to check here??
-            return req.new_iip_path;
-          },
-          onProxyReq: function(proxyReq, req, res) {
-            if (req.method == 'POST') {
-              proxyReq.write(req.body);
-              proxyReq.end();
-            }
-          },
-        })(req, res, next);
-      } else {
-        let err = {};
-        err.message = "Unexpected pathdb return format";
-        err.statusCode = 500;
-      }
-    }).catch((e)=>{
-      console.error(e);
-      next(e);
-    });
-  } else {
-    let err = {};
-    err.message = "malformed tile url";
-    err.statusCode = 400;
-    next(err);
+slideTokenGen = function(signKey){
+  return function(req, res, next){
+    if (req.query.slide){
+      // url for checking if user has access to this slide
+      const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb/`;
+      let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
+      axios.get(lookupUrl, {headers: req.headers}).then((x)=>{
+        // get path
+        if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
+          let filepath = x['field_iip_path']['value'];
+          // issue token including this slidepath as activeSlide
+          let token = req.tokenInfo
+          token.activeSlide = filepath;
+          res.data = issueToken(token, signKey)
+          next();
+        }else{
+          // do not issue token
+          let err = {};
+          err.message = "unauthorized token request";
+          err.statusCode = 401;
+          next(err);
+        }
+      }).catch((e)=>{
+        console.error(e);
+        next(e);
+      });
+    } else {
+      let err = {};
+      err.message = "malformed token request";
+      err.statusCode = 400;
+      next(err);
+    }
   }
 };
 
+slideTokenCheck = function(req, res, next){
+  if (!BYPASS_IIP_CHECK){
+    if (req.iipFileRequested && req.iipFileRequested == req.token.activeSlide){
+      next()
+    } else {
+      // do not return
+      let err = {};
+      err.message = "unauthorized slide request";
+      err.statusCode = 401;
+      next(err);
+    }
+  } else {
+    next()
+  }
+};
 
-module.exports = pdbIipHandler;
+let pih = {}
+pih.slideTokenGen = slideTokenGen;
+pih.slideTokenCheck = slideTokenCheck;
+
+module.exports = pih;
