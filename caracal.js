@@ -23,6 +23,7 @@ const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataSet = require('./handlers/datasetHandler.js');
 const Model = require('./handlers/modelTrainer.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
+
 // TODO validation of data
 
 const {connector} = require("./service/database/connector");
@@ -87,8 +88,11 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
-  "pathdbIip": function() {
-    return pdbIipHandler;
+  "slideTokenGen": function() {
+    return pdbIipHandler.slideTokenGen;
+  },
+  "slideTokenCheck": function() {
+    return pdbIipHandler.slideTokenCheck;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
@@ -215,4 +219,3 @@ connector.init().then(() => {
 });
 
 module.exports = app; // for tests
-
