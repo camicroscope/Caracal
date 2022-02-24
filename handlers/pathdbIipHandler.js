@@ -6,16 +6,16 @@ var EXPIRY = process.env.EXPIRY || '1d';
 var BYPASS_IIP_CHECK = process.env.BYPASS_IIP_CHECK == "Y";
 
 // internal function to issue a new jwt
-function issueToken(data, signKey){
+function issueToken(data, signKey) {
   return jwt.sign(data, signKey, {
     algorithm: 'RS256',
     expiresIn: EXPIRY,
   });
 }
 
-slideTokenGen = function(signKey){
-  return function(req, res, next){
-    if (req.query.slide){
+slideTokenGen = function(signKey) {
+  return function(req, res, next) {
+    if (req.query.slide) {
       // url for checking if user has access to this slide
       const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb/`;
       let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
@@ -24,11 +24,11 @@ slideTokenGen = function(signKey){
         if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
           let filepath = x['field_iip_path']['value'];
           // issue token including this slidepath as activeSlide
-          let token = req.tokenInfo
+          let token = req.tokenInfo;
           token.activeSlide = filepath;
-          res.data = issueToken(token, signKey)
+          res.data = issueToken(token, signKey);
           next();
-        }else{
+        } else {
           // do not issue token
           let err = {};
           err.message = "unauthorized token request";
@@ -45,13 +45,13 @@ slideTokenGen = function(signKey){
       err.statusCode = 400;
       next(err);
     }
-  }
+  };
 };
 
-slideTokenCheck = function(req, res, next){
-  if (!BYPASS_IIP_CHECK){
-    if (req.iipFileRequested && req.iipFileRequested == req.token.activeSlide){
-      next()
+slideTokenCheck = function(req, res, next) {
+  if (!BYPASS_IIP_CHECK) {
+    if (req.iipFileRequested && req.iipFileRequested == req.token.activeSlide) {
+      next();
     } else {
       // do not return
       let err = {};
@@ -60,11 +60,11 @@ slideTokenCheck = function(req, res, next){
       next(err);
     }
   } else {
-    next()
+    next();
   }
 };
 
-let pih = {}
+let pih = {};
 pih.slideTokenGen = slideTokenGen;
 pih.slideTokenCheck = slideTokenCheck;
 
