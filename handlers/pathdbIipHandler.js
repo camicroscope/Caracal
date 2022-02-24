@@ -18,7 +18,7 @@ function issueToken(data, signKey){
 slideTokenGen = function(req, res, next){
   if (req.query.slide){
     // url for checking if user has access to this slide
-    const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb/`;
+    const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb`;
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
     axios.get(lookupUrl, {headers: req.headers}).then((x)=>{
       // get path
