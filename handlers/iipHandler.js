@@ -2,7 +2,7 @@ var proxy = require('http-proxy-middleware');
 
 var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
 
-iipHandler = function(req, res, next) {
+preIip = function(req, res, next) {
   if (req.query) {
     if (req.query.DeepZoom) {
       if (req.query.DeepZoom.endsWith('.dzi')) {
@@ -18,7 +18,9 @@ iipHandler = function(req, res, next) {
       req.iipFileRequested = false;
     }
   }
+};
 
+iipHandler = function(req, res, next) {
   proxy({
     secure: false,
     onError(err, req, res) {
@@ -42,5 +44,9 @@ iipHandler = function(req, res, next) {
   })(req, res, next);
 };
 
+iipHandlers = {};
+iipHandlers.preIip = preIip;
+iipHandlers.iipHandler = iipHandler;
 
-module.exports = iipHandler;
+
+module.exports = iipHandlers;

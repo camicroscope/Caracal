@@ -14,8 +14,8 @@ const fs = require('fs');
 const auth = require('./handlers/authHandlers.js');
 const monitor = require('./handlers/monitorHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
-const iipHandler = require('./handlers/iipHandler.js');
-const pdbIipHandler = require('./handlers/pathdbIipHandler.js');
+const iipHandlers = require('./handlers/iipHandler.js');
+const pdbIipHandlers = require('./handlers/pathdbIipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
@@ -86,13 +86,16 @@ var HANDLERS = {
   "deleteDataset": DataSet.deleteData,
   "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
-    return iipHandler;
+    return iipHandlers.iipHandlers;
+  },
+  "preIip": function() {
+    return iipHandlers.preIip;
   },
   "slideTokenGen": function() {
-    return pdbIipHandler.slideTokenGen;
+    return pdbIipHandlers.slideTokenGen;
   },
   "slideTokenCheck": function() {
-    return pdbIipHandler.slideTokenCheck;
+    return pdbIipHandlers.slideTokenCheck;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
