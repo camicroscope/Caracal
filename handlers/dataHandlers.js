@@ -862,6 +862,28 @@ SlideMetadata.get = function(req, res, next) {
     res.json({hasError: true, error: err});
   }
 };
+// -- customized code for reading user info from header START -- //
+function setCreatorAsUserHandler() {
+  return function(req, res, next) {
+    if (req.headers['x-remote-user']) {
+      req.query.creator = req.headers['x-remote-user'];
+    } else {
+      console.warn('|| ---------- setCreatorAsUserHandler: No "x-remote-user" in request header ----- ||');
+    }
+    next();
+  };
+}
+function setUpdaterAsUserHandler() {
+  return function(req, res, next) {
+    if (req.headers['x-remote-user']) {
+      req.query.updater = req.headers['x-remote-user'];
+    } else {
+      console.warn('|| ---------- setUpdaterAsUserHandler: No "x-remote-user" in request header ----- ||');
+    }
+    next();
+  };
+}
+// -- customized code for reading user info from header END -- //
 
 dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
@@ -874,4 +896,8 @@ dataHandlers.SlideMetadata = SlideMetadata;
 dataHandlers.SlideInformativeness = SlideInformativeness;
 dataHandlers.SeerService = SeerService;
 dataHandlers.General = General;
+// -- customized code for reading user info from header START -- //
+dataHandlers.setCreatorAsUserHandler = setCreatorAsUserHandler;
+dataHandlers.setUpdaterAsUserHandler = setUpdaterAsUserHandler;
+// -- customized code for reading user info from header END -- //
 module.exports = dataHandlers;

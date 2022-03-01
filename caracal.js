@@ -47,7 +47,6 @@ if (!DISABLE_CSP) {
     directives: cspConfig,
   }));
 }
-
 // handle non-json raw body for post
 app.use(function(req, res, next) {
   var data = '';
@@ -85,6 +84,10 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  // -- customized code for reading user info from header START -- //
+  "setCreatorAsUserHandler": dataHandlers.setCreatorAsUserHandler,
+  "setUpdaterAsUserHandler": dataHandlers.setUpdaterAsUserHandler,
+  // -- customized code for reading user info from header END -- //
   "iipHandler": function() {
     return iipHandler;
   },
