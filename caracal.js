@@ -115,6 +115,9 @@ var HANDLERS = {
   "slideInformativenessFind": function() {
     return dataHandlers.SlideInformativeness.find;
   },
+  "slideInformativenessRemoveRank": function() {
+    return dataHandlers.SlideInformativeness.removeRank;
+  },
   "slideInformativenessRank": function() {
     return dataHandlers.SlideInformativeness.rank;
   },

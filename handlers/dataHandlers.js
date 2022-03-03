@@ -137,7 +137,38 @@ SlideInformativeness.find = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
-
+SlideInformativeness.removeRank = async function(req, res, next) {
+  var query = req.query;
+  delete query.token;
+  const {cid, uid, sid} = JSON.parse(req.body);
+  const condition = {cid};
+  if (uid) condition.uid = uid;
+  try {
+    // check the data is exist
+    const data = await mongoDB.find('camic', 'slideInformativeness', condition, false);
+    if (data.length > 0) {
+      updateDoc = data[0];
+      if (updateDoc.first == sid) updateDoc.first = null;
+      if (updateDoc.second == sid) updateDoc.second = null;
+      if (updateDoc.third == sid) updateDoc.third = null;
+      const index = updateDoc.less.indexOf(sid);
+      if (index !== -1) {
+        updateDoc.less.splice(index, 1);
+      }
+      // update
+      const rs = await mongoDB.update('camic', 'slideInformativeness', condition, updateDoc);
+      req.data = rs;
+      next();
+    } else {
+      // add
+      req.data = null;
+      next();
+    }
+  } catch (error) {
+    req.data = error;
+    next();
+  }
+};
 // rank slide informative in a collection
 SlideInformativeness.rank = async function(req, res, next) {
   var query = req.query;
