@@ -19,13 +19,13 @@ class Mongo {
    *
    * {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/ Read MongoDB Reference}
    */
-  static async find(database, collectionName, query, transform = true) {
+  static async find(database, collectionName, query, transform = true, projection) {
     try {
       query = transformIdToObjectId(query);
 
       const collection = getConnection(database).collection(collectionName);
-      console.log('find', database, collectionName, query);
-      const data = await collection.find(query).toArray();
+
+      const data = projection ? await collection.find(query, projection).toArray():await collection.find(query).toArray();
 
       /** allow caller method to toggle response transformation */
       if (transform) {
@@ -42,7 +42,6 @@ class Mongo {
       throw e;
     }
   }
-
   /**
    * Runs a distinct find operation based on given query
    *

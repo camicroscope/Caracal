@@ -135,6 +135,9 @@ var HANDLERS = {
   "advancedFindLabelingAnnotation": function() {
     return dataHandlers.LabelingAnnotation.advancedFind;
   },
+  "findByTypeOrCreator": function() {
+    return dataHandlers.LabelingAnnotation.findByTypeOrCreator;
+  },
 };
 
 if (!DISABLE_TF) {

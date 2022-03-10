@@ -350,6 +350,18 @@ User.wcido = function(req, res, next) {
   }
 };
 var LabelingAnnotation = {};
+LabelingAnnotation.findByTypeOrCreator = function(req, res, next) {
+  const {slideId, slideName, computation, creator} = req.query;
+  const query = {};
+  if (slideId) query["provenance.image.slide"] = slideId;
+  if (slideName) query["provenance.image.name"] = slideName;
+  if (computation) query["provenance.analysis.computation"] = computation;
+  if (creator) query["creator"] = creator;
+  mongoDB.find('camic', 'labelingAnnotation', query, true, {"geometries": 0}).then((x) => {
+    req.data = x;
+    next();
+  }).catch((e) => next(e));
+};
 LabelingAnnotation.advancedFind = async function(req, res, next) {
   // get params -
   // id - annotation id (_id)
@@ -379,7 +391,6 @@ LabelingAnnotation.advancedFind = async function(req, res, next) {
     if (endDate) query.create_date['$lte'] = new Date(endDate);
   }
   mongoDB.find('camic', 'labelingAnnotation', query ).then((x) => {
-    console.log(x.length);
     req.data = x;
     next();
   }).catch((e) => next(e));
