@@ -270,11 +270,19 @@ var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collect
 
 agenda.on( "ready", async function() {
   const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
-  await agenda.start();
-  await agenda.every("00 00 * * 6", "send email report", {
-    transportOption: emailOption[0].configuration.transport_option,
-    contextOption: emailOption[0].configuration.context_option,
-  });
+  if (emailOption&&
+    Array.isArray(emailOption)&&
+    emailOption[0]&&
+    emailOption[0].configuration.transport_option&&
+    emailOption[0].configuration.context_option) {
+    await agenda.start();
+    await agenda.every("00 00 * * 6", "send email report", {
+      transportOption: emailOption[0].configuration.transport_option,
+      contextOption: emailOption[0].configuration.context_option,
+    });
+  } else {
+    console.log('||--------------- Email Notification Fail: No email configuration -------------||');
+  }
 });
 
 agenda.define(
