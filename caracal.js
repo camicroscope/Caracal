@@ -254,12 +254,11 @@ connector.init().then(() => {
 
 async function sendEmail(transportOption, contextOption) {
   var transporter = nodemailer.createTransport(transportOption);
-
   await transporter.sendMail(contextOption, function(error, info) {
     if (error) {
       console.log(error);
     } else {
-      console.log('Email sent: ' + info.response);
+      console.log('Email Sent: ' + info.response);
     }
   });
 }
@@ -269,47 +268,46 @@ const mongoConnectionString = process.env.MONGO_URI || "mongodb://127.0.0.1:2701
 var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collection: 'agendaJobs'}});
 
 agenda.on( "ready", async function() {
-  const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
-  if (emailOption&&
-    Array.isArray(emailOption)&&
-    emailOption[0]&&
-    emailOption[0].configuration.transport_option&&
-    emailOption[0].configuration.context_option) {
-    await agenda.start();
-    await agenda.every("00 00 * * 6", "send email report", {
-      transportOption: emailOption[0].configuration.transport_option,
-      contextOption: emailOption[0].configuration.context_option,
-    });
-  } else {
-    console.log('||--------------- Email Notification Fail: No email configuration -------------||');
-  }
+  await agenda.start();
+  console.log("Agenda Start ... ");
+  await agenda.every("00 00 * * 6", "send email report");
+  console.log(`Agenda Every: ${'00 00 * * 6'} send email report... `);
+  // await agenda.every("5 minutes", "send email report");
 });
 
 agenda.define(
     "send email report",
     async (job) => {
-      const {transportOption, contextOption} = job.attrs.data;
+      console.log('Agenda Job Start ...');
+      // get email option
+      const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
+      if (emailOption&&
+        Array.isArray(emailOption)&&
+        emailOption[0]&&
+        emailOption[0].configuration.transport_option&&
+        emailOption[0].configuration.context_option) {
+        // get email option
+        const transportOption = emailOption[0].configuration.transport_option;
+        const contextOption = emailOption[0].configuration.context_option;
 
-      // get first and last week day
-      var curr = new Date(); // get current date
-      var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-      var last = first + 6; // last day is the first day + 6
+        // get current date and start date (a week before current date)
+        var currentDate = new Date();
+        var timestamp = currentDate.valueOf();
+        var startDate = new Date(timestamp - 7*24*3600*1000);
+        // get all annotations
+        const labelingAnnotations = await mongoDB.find('camic', 'labelingAnnotation', {create_date: {
+          '$gte': startDate,
+          '$lt': currentDate,
+        }}, false);
 
-      var firstDay = new Date(curr.setDate(first));
-      firstDay.setHours(0, 0, 0, 0);
-      var lastDay = new Date(curr.setDate(last));
-      lastDay.setHours(23, 59, 59, 999);
-      console.log('days', firstDay, lastDay);
-      // get all annotations
-      const labelingAnnotations = await mongoDB.find('camic', 'labelingAnnotation', {create_date: {
-        '$gte': firstDay,
-        '$lte': lastDay,
-      }}, false);
-
-      const html = generateEmail(firstDay, lastDay, labelingAnnotations);
-      contextOption.subject = `Label Annotaions Summary ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}`;
-      contextOption.html = html;
-      await sendEmail(transportOption, contextOption);
+        const html = generateEmail(startDate, currentDate, labelingAnnotations);
+        contextOption.subject = `Label Annotaions Summary ${startDate.toLocaleString()} - ${currentDate.toLocaleString()}`;
+        contextOption.html = html;
+        await sendEmail(transportOption, contextOption);
+      } else {
+        console.log('|| ----------------- no email option ---------------- ||');
+      }
+      console.log('Agenda Job End ...');
     },
 );
 

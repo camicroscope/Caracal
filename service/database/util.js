@@ -34,7 +34,6 @@ const generateTableBody = (data) =>{
         const yIdx = alias.lastIndexOf('_y');
         const [x, width] = alias.slice(xIdx+2, yIdx).split('.');
         const [y, height] = alias.slice(yIdx+2).split('.');
-        console.log(x, y, width, height);
         return `<tr>
         <td style='border: 1px solid #ddd;padding: 8px;'>${d._id}</td>
         <td style='border: 1px solid #ddd;padding: 8px;'>${d.provenance.image.name}</td>
