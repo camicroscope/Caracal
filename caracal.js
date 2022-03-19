@@ -270,9 +270,8 @@ var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collect
 agenda.on( "ready", async function() {
   await agenda.start();
   console.log("Agenda Start ... ");
-  await agenda.every("00 00 * * 6", "send email report");
-  console.log(`Agenda Every: ${'00 00 * * 6'} send email report... `);
-  // await agenda.every("5 minutes", "send email report");
+  await agenda.every("00 20 * * 7", "send email report");
+  console.log(`Agenda Every: ${'00 20 * * 7'} send email report... `);
 });
 
 agenda.define(
