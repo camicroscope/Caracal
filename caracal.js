@@ -314,20 +314,13 @@ function generateEmail(firstDay, lastDay, labelingAnnotations) {
   return `<h2>Label Annotaions: ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}</h2>
   <table style="width:100%;border-collapse:collapse;">
     <thead><tr>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>ID</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Slide Name</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>X</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Y</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Width</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Height</th>
+      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Alias</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Annotation Type</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Annotation Percent Stroma</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Annotation TIL Density</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Alias</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>View Width</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>View Height</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>View Magnification Level</th>
-      <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Creator</th>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Create Date Time</th>
       </tr></thead>
   ${generateTableBody(labelingAnnotations)}
