@@ -159,6 +159,7 @@ for (let i in routeConfig) {
           }
           let args = handler.args || [];
           // handler.function needs to be in handlers
+          console.log(j)
           app[rule.method](rule.route, HANDLERS[handler.function](...args));
         }
       }
