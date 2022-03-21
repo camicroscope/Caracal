@@ -86,7 +86,7 @@ var HANDLERS = {
   "deleteDataset": DataSet.deleteData,
   "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
-    return iipHandlers.iipHandlers;
+    return iipHandlers.iipHandler;
   },
   "preIip": function() {
     return iipHandlers.preIip;
