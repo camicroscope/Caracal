@@ -1,7 +1,9 @@
 const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 const mongoDB = require("../service/database");
 const {transformIdToObjectId} = require("../service/database/util");
-
+const fs = require('fs');
+const path = require('path');
+const mime = require('mime');
 var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
@@ -396,6 +398,30 @@ LabelingAnnotation.advancedFind = async function(req, res, next) {
   }).catch((e) => next(e));
 };
 var Slide = {};
+Slide.download = function(req, res, next) {
+  const {location} = req.query;
+  try {
+    fs.exists(location, (exist) => {
+      if (exist) {
+        const filename = path.basename(location);
+        const mimetype = mime.lookup(location);
+        var fileInfo = fs.statSync(location);
+        const fileSize = fileInfo.size;
+        const readable = fs.createReadStream(location);
+        res.setHeader('content-disposition', 'attachment; filename=' + filename);
+        res.setHeader('content-type', mimetype);
+        res.setHeader('content-length', fileSize);
+        readable.pipe(res);
+      } else {
+        res.sendStatus(404);
+      }
+    });
+  } catch (error) {
+    console.log('readble error', error);
+  }
+};
+
+
 Slide.countLabeling = async function(req, res, next) {
   try {
     // {"$match": {"provenance.image.slide": {"$in": sids}}},

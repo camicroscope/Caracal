@@ -93,6 +93,9 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
+  "downloadSlide": function() {
+    return dataHandlers.Slide.download;
+  },
   "findLabelingStat": function() {
     return dataHandlers.Slide.findLabelingStat;
   },
