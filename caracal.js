@@ -123,6 +123,9 @@ var HANDLERS = {
   "heatmapTypes": function() {
     return dataHandlers.Heatmap.types;
   },
+  "sendRegistrationEmail": function() {
+    return dataHandlers.Email.sendRegistrationEmail;
+  },
   "wcido": function() {
     return dataHandlers.User.wcido;
   },
@@ -273,14 +276,15 @@ var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collect
 agenda.on( "ready", async function() {
   await agenda.start();
   console.log("Agenda Start ... ");
-  await agenda.every("00 20 * * 7", "send email report");
-  console.log(`Agenda Every: ${'00 20 * * 7'} send email report... `);
+  // await agenda.every("10 seconds", "send email report");
+  await agenda.every("00 20 * * 6", "send email report");
+  console.log(`Agenda Every: ${'00 20 * * 6'} send email report... `);
 });
 
 agenda.define(
     "send email report",
     async (job) => {
-      console.log('Agenda Job Start ...');
+      console.log(`Agenda Job Start ...`);
       // get email option
       const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
       if (emailOption&&

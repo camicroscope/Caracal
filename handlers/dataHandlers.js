@@ -4,6 +4,7 @@ const {transformIdToObjectId} = require("../service/database/util");
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
+const nodemailer = require('nodemailer');
 var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
@@ -420,7 +421,45 @@ Slide.download = function(req, res, next) {
     console.log('readble error', error);
   }
 };
-
+Email = {};
+Email.sendRegistrationEmail = async function(req, res, next) {
+  const {email, name} = req.query;
+  console.log(`sendRegistrationEmail start - ${name}:${email}`);
+  try {
+    const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
+    if (emailOption&&
+      Array.isArray(emailOption)&&
+      emailOption[0]&&
+      emailOption[0].configuration.transport_option&&
+      emailOption[0].configuration.context_option) {
+      // get email option
+      const transportOption = emailOption[0].configuration.transport_option;
+      const contextOption = emailOption[0].configuration.context_option;
+      contextOption.to = email;
+      contextOption.subject = `FDA HTT(High Throughput Truthing) Registration Successful For ${name}`;
+      contextOption.html = `<p style='font-size:1.3rem;'>Dear ${name},<br><br>
+      Thank you for registering for the HTT data-collection project on caMicrscope!<br><br>
+      &nbsp;&nbsp;&bull;&nbsp;&nbsp;Here's a link to return to the data-collection portal: http://htt.camicroscope.org<br>
+      &nbsp;&nbsp;&bull;&nbsp;&nbsp;Here's a link to the HTT project wiki page: https://ncihub.org/groups/eedapstudies<br><br>
+      If you have questions about the project, please email the me, project lead:<br><br>   
+      Brandon.Gallas@fda.hhs.gov<p>`;
+      var transporter = nodemailer.createTransport(transportOption);
+      await transporter.sendMail(contextOption, function(error, info) {
+        if (error) {
+          console.log(error);
+          res.status(400).json({error});
+        } else {
+          console.log(`Sent Registration: ${name}:${email}`);
+          res.status(200).json({info});
+        }
+        next();
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({error});
+  }
+};
 
 Slide.countLabeling = async function(req, res, next) {
   try {
@@ -483,6 +522,7 @@ Slide.findLabelingStat = async function(req, res, next) {
 
 dataHandlers = {};
 dataHandlers.Heatmap = Heatmap;
+dataHandlers.Email = Email;
 dataHandlers.Mark = Mark;
 dataHandlers.User = User;
 dataHandlers.Presetlabels = Presetlabels;
