@@ -21,6 +21,7 @@ slideTokenGen = function(req, res, next) {
     const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb`;
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
     let new_req_headers = {}
+    console.log("\n\n\n", req.headers)
     if (req.headers.cookie) {
       new_req_headers['Cookie'] = req.headers.cookie
     }
