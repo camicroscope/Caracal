@@ -4,8 +4,7 @@ var jwt = require('jsonwebtoken');
 var EXPIRY = process.env.EXPIRY || '1d';
 var BYPASS_IIP_CHECK = process.env.BYPASS_IIP_CHECK == "Y";
 const auth = require('./authHandlers.js');
-
-import fetch from 'node-fetch';
+const fetch = require('cross-fetch');
 
 // internal function to issue a new jwt
 function issueToken(data, signKey) {
