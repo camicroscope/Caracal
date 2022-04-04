@@ -34,6 +34,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.12.3",
     "mongodb": "^3.6.6",
+    "node-fetch": "^3.2.3",
     "throng": "^4.0.0"
   },
   "devDependencies": {

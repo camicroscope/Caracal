@@ -1,6 +1,6 @@
 // EXTENDS authHandlers
 const proxy = require('http-proxy-middleware');
-const axios = require('axios');
+const fetch = require('node-fetch');
 var jwt = require('jsonwebtoken');
 var EXPIRY = process.env.EXPIRY || '1d';
 var BYPASS_IIP_CHECK = process.env.BYPASS_IIP_CHECK == "Y";
@@ -28,7 +28,7 @@ slideTokenGen = function(req, res, next) {
     if (req.headers.authorization) {
       new_req_headers['Authorization'] = req.headers.authorization
     }
-    axios.get(lookupUrl, {headers: new_req_headers}).then((x)=>{
+    fetch(lookupUrl, {headers: new_req_headers}).then((x)=>{
       // get path
       if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
         let filepath = x['field_iip_path']['value'];
