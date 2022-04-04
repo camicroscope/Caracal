@@ -27,7 +27,8 @@ slideTokenGen = function(req, res, next) {
     if (req.headers.authorization) {
       new_req_headers['Authorization'] = req.headers.authorization
     }
-    fetch(lookupUrl, {headers: new_req_headers}).then((x)=>{
+    fetch(lookupUrl, {headers: new_req_headers}).then(x=>x.json()).then((x)=>{
+      console.log(x)
       // get path
       if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
         let filepath = x['field_iip_path']['value'];
