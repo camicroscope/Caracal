@@ -21,10 +21,10 @@ slideTokenGen = function(req, res, next) {
     const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb`;
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
     let new_req_headers = {}
-    if req.headers.cookie{
+    if (req.headers.cookie) {
       new_req_headers['Cookie'] = req.headers.cookie
     }
-    if req.headers.authorization{
+    if (req.headers.authorization) {
       new_req_headers['Authorization'] = req.headers.authorization
     }
     axios.get(lookupUrl, {headers: new_req_headers}).then((x)=>{
