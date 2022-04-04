@@ -20,8 +20,14 @@ slideTokenGen = function(req, res, next) {
     // url for checking if user has access to this slide
     const PDB_URL = process.env.PDB_URL ||`http://quip-pathdb`;
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
-    let neq_req_headers = {'Cookie': req.headers.cookie, 'Authorization': req.headers.authorization}
-    axios.get(lookupUrl, {headers: neq_req_headers}).then((x)=>{
+    let new_req_headers = {}
+    if req.headers.cookie{
+      new_req_headers['Cookie'] = req.headers.cookie
+    }
+    if req.headers.authorization{
+      new_req_headers['Authorization'] = req.headers.authorization
+    }
+    axios.get(lookupUrl, {headers: new_req_headers}).then((x)=>{
       // get path
       if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
         let filepath = x['field_iip_path']['value'];
