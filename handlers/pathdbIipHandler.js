@@ -22,7 +22,7 @@ slideTokenGen = function(req, res, next) {
     let new_req_headers = {}
     console.log("\n\n\n", req.headers)
     if (req.headers.cookie) {
-      new_req_headers['Cookie'] = req.headers.cookie
+      new_req_headers['cookie'] = req.headers.cookie
     }
     if (req.headers.authorization) {
       new_req_headers['Authorization'] = req.headers.authorization
