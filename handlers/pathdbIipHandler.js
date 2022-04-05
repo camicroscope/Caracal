@@ -25,8 +25,8 @@ slideTokenGen = function(req, res, next) {
     fetch(lookupUrl, {headers: new_req_headers}).then(x=>x.json()).then((x)=>{
       console.log(x)
       // get path
-      if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path']['value']) {
-        let filepath = x['field_iip_path']['value'];
+      if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
+        let filepath = x['field_iip_path'][0]['value'];
         // issue token including this slidepath as activeSlide
         let token = req.tokenInfo;
         token.activeSlide = filepath;
