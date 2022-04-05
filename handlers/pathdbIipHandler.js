@@ -17,10 +17,10 @@ function issueToken(data, signKey) {
 slideTokenGen = function(req, res, next) {
   if (req.query.slide) {
     // url for checking if user has access to this slide
-    const PDB_URL = req.headers['x-forwarded-host']
+    const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
-    let token = auth.getToken(req);
-    let new_req_headers = {"Authorization": "Bearer " + token};
+    console.log(lookupUrl)
+    let new_req_headers = {"Authorization": "Bearer " + req.token};
     fetch(lookupUrl, {headers: new_req_headers}).then(x=>x.json()).then((x)=>{
       console.log(x)
       // get path
