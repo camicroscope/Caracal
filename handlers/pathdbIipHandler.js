@@ -20,7 +20,7 @@ slideTokenGen = function(req, res, next) {
     const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
     console.log(lookupUrl)
-    let new_req_headers = {"Authorization": "Bearer " + req.token};
+    let new_req_headers = {"Authorization": "Bearer " + auth.getToken(req)};
     console.log(new_req_headers)
     fetch(lookupUrl, {headers: new_req_headers}).then(x=>x.json()).then((x)=>{
       console.log(x)
