@@ -21,6 +21,7 @@ slideTokenGen = function(req, res, next) {
     let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
     console.log(lookupUrl)
     let new_req_headers = {"Authorization": "Bearer " + req.token};
+    console.log(new_req_headers)
     fetch(lookupUrl, {headers: new_req_headers}).then(x=>x.json()).then((x)=>{
       console.log(x)
       // get path
