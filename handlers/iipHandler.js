@@ -19,6 +19,7 @@ preIip = function(req, res, next) {
     }
   }
   console.log(req.iipFileRequested)
+  next();
 };
 
 iipHandler = function(req, res, next) {
