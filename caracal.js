@@ -20,11 +20,16 @@ const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
-const DataSet = require('./handlers/datasetHandler.js');
-const Model = require('./handlers/modelTrainer.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
-// TODO validation of data
+// TODO -- make optional
+const DISABLE_TF = true; // DUE TO PRODUCTION STABILITY ISSUES WITH TFJS
+
+if (!DISABLE_TF) {
+  const DataSet = require('./handlers/datasetHandler.js');
+  const Model = require('./handlers/modelTrainer.js');
+}
+
 
 const {connector} = require("./service/database/connector");
 
@@ -35,6 +40,8 @@ var PORT = process.env.PORT || 4010;
 var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
+
+var RUN_INDEXER = process.env.RUN_INDEXER || true;
 
 const app = express();
 app.use(cookieParser());
@@ -81,10 +88,6 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
-  "getDataset": DataSet.getDataset,
-  "trainModel": Model.trainModel,
-  "deleteDataset": DataSet.deleteData,
-  "sendTrainedModel": Model.sendTrainedModel,
   "iipHandler": function() {
     return iipHandlers.iipHandler;
   },
@@ -122,6 +125,23 @@ var HANDLERS = {
     return dataHandlers.Presetlabels.remove;
   },
 };
+
+if (!DISABLE_TF) {
+  HANDLERS["getDataset"] = DataSet.getDataset;
+  HANDLERS["trainModel"] = Model.trainModel;
+  HANDLERS["deleteDataset"] = DataSet.deleteData;
+  HANDLERS["sendTrainedModel"] = Model.sendTrainedModel;
+} else {
+  function disabledRoute() {
+    return function(req, res) {
+      res.status(500).send('{"err":"This TF route is disabled"}');
+    };
+  }
+  HANDLERS["getDataset"] = disabledRoute;
+  HANDLERS["trainModel"] = disabledRoute;
+  HANDLERS["deleteDataset"] = disabledRoute;
+  HANDLERS["sendTrainedModel"] = disabledRoute;
+}
 
 // register configurable services
 // TODO verify all
@@ -185,38 +205,58 @@ app.use(function(err, req, res, next) {
   res.status(statusCode).json(err);
 });
 
-var startApp = function(app) {
-  return function() {
-    // Prepare for SSL/HTTPS
-    var httpsOptions = {};
-    try {
-      var sslPkPath = "./ssl/privatekey.pem";
-      var sslCertPath = "./ssl/certificate.pem";
-      if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
-        console.info("Starting in HTTPS Mode mode");
-        httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
-        httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
-      }
-    } catch (err) {
-      console.error(err);
+function startApp(app) {
+  // Prepare for SSL/HTTPS
+  var httpsOptions = {};
+  try {
+    var sslPkPath = "./ssl/privatekey.pem";
+    var sslCertPath = "./ssl/certificate.pem";
+    if (fs.existsSync(sslPkPath) && fs.existsSync(sslCertPath)) {
+      console.info("Starting in HTTPS Mode mode");
+      httpsOptions.key = fs.readFileSync(sslPkPath, 'utf8');
+      httpsOptions.cert = fs.readFileSync(sslCertPath, 'utf8');
     }
-    if (httpsOptions.key && httpsOptions.cert) {
-      https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
-    } else {
-      app.listen(PORT, () => console.log('listening on ' + PORT));
-    }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+  if (httpsOptions.key && httpsOptions.cert) {
+    https.createServer(httpsOptions, app).listen(PORT, () => console.log('listening HTTPS on ' + PORT));
+  } else {
+    app.listen(PORT, () => console.log('listening on ' + PORT));
+  }
 };
 
-throng(WORKERS, startApp(app));
+// call this only once no matter what
+function masterHandler() {
+  connector.init().then(() => {
+    const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+    handler.startHandler();
+  }).then(()=>{
+    if (RUN_INDEXER) {
+      const indexer = require('./idx_mongo.js');
+      indexer.collections();
+      indexer.indexes();
+      indexer.defaults();
+      console.log("added indexes");
+    }
+  }).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
+// for each worker
+function workerHandler() {
+  connector.init().then(() => {
+    const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
+    handler.startHandler();
+  }).then(()=>{
+    startApp(app);
+  }).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
 
-/** initialize DataTransformationHandler only after database is ready */
-connector.init().then(() => {
-  const handler = new DataTransformationHandler(MONGO_URI, './json/configuration.json');
-  handler.startHandler();
-}).catch((e) => {
-  console.error("error connecting to database");
-  process.exit(1);
-});
+throng({master: masterHandler, start: workerHandler, count: WORKERS});
 
 module.exports = app; // for tests
