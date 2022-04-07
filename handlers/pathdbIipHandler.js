@@ -20,11 +20,11 @@ iipCheck = function(req, res, next) {
       // rewrite path first
       const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
       let lookupUrl = PDB_URL + "/node/" + req.iipFileRequested + "?_format=json";
-      console.log(lookupUrl);
+      console.log(lookupUrl)
       let pdbReqHeaders = {"Authorization": "Bearer " + auth.getToken(req)};
-      console.log(pdbReqHeaders);
-      fetch(lookupUrl, {headers: pdbReqHeaders}).then((x)=>x.json()).then((x)=>{
-        console.log(x);
+      console.log(pdbReqHeaders)
+      fetch(lookupUrl, {headers: pdbReqHeaders}).then(x=>x.json()).then((x)=>{
+        console.log(x)
         // get path
         if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
           req.newFilepath = x['field_iip_path'][0]['value'];
@@ -53,7 +53,6 @@ iipCheck = function(req, res, next) {
 };
 
 let pih = {};
-pih.slideTokenGen = slideTokenGen;
 pih.iipCheck = iipCheck;
 
 module.exports = pih;
