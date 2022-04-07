@@ -13,7 +13,7 @@ preIip = function(req, res, next) {
         req.iipFileRequested = req.query.DeepZoom.split('_files').slice(0, -1).join('/');
       }
     } else if (req.query.IIIF) {
-      req.iipFileRequested = req.query.IIIF.split("/")[0]
+      req.iipFileRequested = req.query.IIIF.split("/")[0];
     } else if (req.query.FIF) {
       req.iipFileRequested = req.query.FIF;
     } else {
