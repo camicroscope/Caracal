@@ -19,7 +19,8 @@ iipCheck = function(req, res, next) {
     if (req.iipFileRequested) {
       // rewrite path first
       const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
-      let lookupUrl = PDB_URL + "/node/" + req.iipFileRequested + "?_format=json";
+      let requestedNode = req.iipFileRequested.replace("pathdb*", "")
+      let lookupUrl = PDB_URL + "/node/" + requestedNode + "?_format=json";
       console.log(lookupUrl)
       let pdbReqHeaders = {"Authorization": "Bearer " + auth.getToken(req)};
       console.log(pdbReqHeaders)
