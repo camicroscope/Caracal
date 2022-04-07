@@ -18,6 +18,7 @@ preIip = function(req, res, next) {
       req.iipFileRequested = false;
     }
   }
+  console.log(req.iipFileRequested)
 };
 
 iipHandler = function(req, res, next) {
@@ -36,6 +37,7 @@ iipHandler = function(req, res, next) {
       }
       // NOTE -- this may need to change if the original url has more subdirs or so added
       var splitPath = path.split('/');
+      console.log(path)
       return '/' + splitPath.slice(2, splitPath.length).join('/');
     },
     onProxyReq: function(proxyReq, req, res) {

@@ -28,6 +28,7 @@ iipCheck = function(req, res, next) {
         // get path
         if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
           req.newFilepath = x['field_iip_path'][0]['value'];
+          console.log(req.newFilepath)
           next();
         } else {
           let err = {};
