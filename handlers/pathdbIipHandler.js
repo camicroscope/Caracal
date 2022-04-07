@@ -19,17 +19,17 @@ iipCheck = function(req, res, next) {
     if (req.iipFileRequested) {
       // rewrite path first
       const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
-      let requestedNode = req.iipFileRequested.replace("pathdb*", "")
+      let requestedNode = req.iipFileRequested.replace("pathdb*", "");
       let lookupUrl = PDB_URL + "/node/" + requestedNode + "?_format=json";
-      console.log(lookupUrl)
+      console.log(lookupUrl);
       let pdbReqHeaders = {"Authorization": "Bearer " + auth.getToken(req)};
-      console.log(pdbReqHeaders)
-      fetch(lookupUrl, {headers: pdbReqHeaders}).then(x=>x.json()).then((x)=>{
-        console.log(x)
+      console.log(pdbReqHeaders);
+      fetch(lookupUrl, {headers: pdbReqHeaders}).then((x)=>x.json()).then((x)=>{
+        console.log(x);
         // get path
         if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
           req.newFilepath = x['field_iip_path'][0]['value'];
-          console.log(req.newFilepath)
+          console.log(req.newFilepath);
           next();
         } else {
           let err = {};
