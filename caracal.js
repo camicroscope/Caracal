@@ -91,11 +91,8 @@ var HANDLERS = {
   "preIip": function() {
     return iipHandlers.preIip;
   },
-  "slideTokenGen": function() {
-    return pdbIipHandlers.slideTokenGen;
-  },
-  "slideTokenCheck": function() {
-    return pdbIipHandlers.slideTokenCheck;
+  "iipCheck": function() {
+    return pdbIipHandlers.iipCheck;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
@@ -159,7 +156,7 @@ for (let i in routeConfig) {
           }
           let args = handler.args || [];
           // handler.function needs to be in handlers
-          console.log(j)
+          console.log(j);
           app[rule.method](rule.route, HANDLERS[handler.function](...args));
         }
       }

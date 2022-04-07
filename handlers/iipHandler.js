@@ -31,6 +31,9 @@ iipHandler = function(req, res, next) {
     changeOrigin: true,
     target: IIP_PATH,
     pathRewrite: function(path, req) {
+      if (req.newFilepath) {
+        path = path.replace(req.iipFileRequested, req.newFilepath);
+      }
       // NOTE -- this may need to change if the original url has more subdirs or so added
       var splitPath = path.split('/');
       return '/' + splitPath.slice(2, splitPath.length).join('/');

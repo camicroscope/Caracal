@@ -14,47 +14,31 @@ function issueToken(data, signKey) {
   });
 }
 
-slideTokenGen = function(req, res, next) {
-  if (req.query.slide) {
-    // url for checking if user has access to this slide
-    const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
-    let lookupUrl = PDB_URL + "/node/" + req.query.slide + "?_format=json";
-    console.log(lookupUrl)
-    let new_req_headers = {"Authorization": "Bearer " + auth.getToken(req)};
-    console.log(new_req_headers)
-    fetch(lookupUrl, {headers: new_req_headers}).then(x=>x.json()).then((x)=>{
-      console.log(x)
-      // get path
-      if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
-        let filepath = x['field_iip_path'][0]['value'];
-        // issue token including this slidepath as activeSlide
-        let token = req.tokenInfo;
-        token.activeSlide = filepath;
-        res.data = issueToken(token, auth.PRIKEY);
-        next();
-      } else {
-        // do not issue token
-        let err = {};
-        err.message = "unauthorized token request";
-        err.statusCode = 401;
-        next(err);
-      }
-    }).catch((e)=>{
-      console.error(e);
-      next(e);
-    });
-  } else {
-    let err = {};
-    err.message = "malformed token request";
-    err.statusCode = 400;
-    next(err);
-  }
-};
-
-slideTokenCheck = function(req, res, next) {
+iipCheck = function(req, res, next) {
   if (!BYPASS_IIP_CHECK) {
-    if (req.iipFileRequested && req.iipFileRequested == req.token.activeSlide) {
-      next();
+    if (req.iipFileRequested) {
+      // rewrite path first
+      const PDB_URL = process.env.PDB_URL || 'http://quip-pathdb';
+      let lookupUrl = PDB_URL + "/node/" + req.iipFileRequested + "?_format=json";
+      console.log(lookupUrl);
+      let pdbReqHeaders = {"Authorization": "Bearer " + auth.getToken(req)};
+      console.log(pdbReqHeaders);
+      fetch(lookupUrl, {headers: pdbReqHeaders}).then((x)=>x.json()).then((x)=>{
+        console.log(x);
+        // get path
+        if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
+          req.newFilepath = x['field_iip_path'][0]['value'];
+          next();
+        } else {
+          let err = {};
+          err.message = "unauthorized slide request";
+          err.statusCode = 401;
+          next(err);
+        }
+      }).catch((e)=>{
+        console.error(e);
+        next(e);
+      });
     } else {
       // do not return
       let err = {};
@@ -63,12 +47,13 @@ slideTokenCheck = function(req, res, next) {
       next(err);
     }
   } else {
+    // NOTE -- this instead uses the actual value given instead
     next();
   }
 };
 
 let pih = {};
 pih.slideTokenGen = slideTokenGen;
-pih.slideTokenCheck = slideTokenCheck;
+pih.iipCheck = iipCheck;
 
 module.exports = pih;
