@@ -307,7 +307,7 @@ agenda.define(
         }}, false);
 
         const html = generateEmail(startDate, currentDate, labelingAnnotations);
-        contextOption.subject = `Label Annotaions Summary ${startDate.toLocaleString()} - ${currentDate.toLocaleString()}`;
+        contextOption.subject = `Label Annotations Summary ${startDate.toLocaleString()} - ${currentDate.toLocaleString()}`;
         contextOption.html = html;
         await sendEmail(transportOption, contextOption);
       } else {
@@ -318,7 +318,7 @@ agenda.define(
 );
 
 function generateEmail(firstDay, lastDay, labelingAnnotations) {
-  return `<h2>Label Annotaions: ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}</h2>
+  return `<h2>Label Annotations: ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}</h2>
   <table style="width:100%;border-collapse:collapse;">
     <thead><tr>
       <th style='border: 1px solid #ddd;padding: 8px; font-weight: bold;'>Alias</th>
