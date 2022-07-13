@@ -273,49 +273,49 @@ async function sendEmail(transportOption, contextOption) {
 const mongoConnectionString = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
 var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collection: 'agendaJobs'}});
 
-agenda.on( "ready", async function() {
-  await agenda.start();
-  console.log("Agenda Start ... ");
-  // await agenda.every("10 seconds", "send email report");
-  await agenda.every("00 20 * * 6", "send email report");
-  console.log(`Agenda Every: ${'00 20 * * 6'} send email report... `);
-});
+// agenda.on( "ready", async function() {
+//   await agenda.start();
+//   console.log("Agenda Start ... ");
+//   // await agenda.every("10 seconds", "send email report");
+//   await agenda.every("00 20 * * 6", "send email report");
+//   console.log(`Agenda Every: ${'00 20 * * 6'} send email report... `);
+// });
 
-agenda.define(
-    "send email report",
-    async (job) => {
-      console.log(`Agenda Job Start ...`);
-      // get email option
-      const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
-      if (emailOption&&
-        Array.isArray(emailOption)&&
-        emailOption[0]&&
-        emailOption[0].configuration.transport_option&&
-        emailOption[0].configuration.context_option) {
-        // get email option
-        const transportOption = emailOption[0].configuration.transport_option;
-        const contextOption = emailOption[0].configuration.context_option;
+// agenda.define(
+//     "send email report",
+//     async (job) => {
+//       console.log(`Agenda Job Start ...`);
+//       // get email option
+//       const emailOption = await mongoDB.find('camic', 'configuration', {config_name: 'email_option'});
+//       if (emailOption&&
+//         Array.isArray(emailOption)&&
+//         emailOption[0]&&
+//         emailOption[0].configuration.transport_option&&
+//         emailOption[0].configuration.context_option) {
+//         // get email option
+//         const transportOption = emailOption[0].configuration.transport_option;
+//         const contextOption = emailOption[0].configuration.context_option;
 
-        // get current date and start date (a week before current date)
-        var currentDate = new Date();
-        var timestamp = currentDate.valueOf();
-        var startDate = new Date(timestamp - 7*24*3600*1000);
-        // get all annotations
-        const labelingAnnotations = await mongoDB.find('camic', 'labelingAnnotation', {create_date: {
-          '$gte': startDate,
-          '$lt': currentDate,
-        }}, false);
+//         // get current date and start date (a week before current date)
+//         var currentDate = new Date();
+//         var timestamp = currentDate.valueOf();
+//         var startDate = new Date(timestamp - 7*24*3600*1000);
+//         // get all annotations
+//         const labelingAnnotations = await mongoDB.find('camic', 'labelingAnnotation', {create_date: {
+//           '$gte': startDate,
+//           '$lt': currentDate,
+//         }}, false);
 
-        const html = generateEmail(startDate, currentDate, labelingAnnotations);
-        contextOption.subject = `Label Annotations Summary ${startDate.toLocaleString()} - ${currentDate.toLocaleString()}`;
-        contextOption.html = html;
-        await sendEmail(transportOption, contextOption);
-      } else {
-        console.log('|| ----------------- no email option ---------------- ||');
-      }
-      console.log('Agenda Job End ...');
-    },
-);
+//         const html = generateEmail(startDate, currentDate, labelingAnnotations);
+//         contextOption.subject = `Label Annotations Summary ${startDate.toLocaleString()} - ${currentDate.toLocaleString()}`;
+//         contextOption.html = html;
+//         await sendEmail(transportOption, contextOption);
+//       } else {
+//         console.log('|| ----------------- no email option ---------------- ||');
+//       }
+//       console.log('Agenda Job End ...');
+//     },
+// );
 
 function generateEmail(firstDay, lastDay, labelingAnnotations) {
   return `<h2>Label Annotations: ${firstDay.toLocaleString()} - ${lastDay.toLocaleString()}</h2>
