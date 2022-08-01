@@ -5,7 +5,6 @@ const mongodb = require("./service/database");
 
 function indexes() {
   db = "camic";
-  mongodb.createIndex(db, "authorization", {"name": 1}, {unique: true});
   mongodb.createIndex(db, "user", {"email": 1}, {unique: true});
   mongodb.createIndex(db, "mark", {"provenance.image.slide": 1,
     "provenance.analysis.execution_id": 1, "footprint": 1, "x": 1, "y": 1});
