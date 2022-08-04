@@ -565,6 +565,51 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
   }
 };
 
+addUsersToCollection = async function(req, res, next) {
+  var postQuery = JSON.parse(req.body);
+  var query = {};
+  var update = {};
+
+  if (postQuery.cid) {
+    query = {'_id': new ObjectID(postQuery.cid)};
+  }
+
+  if (postQuery.ukeys) {
+    const users = postQuery.ukeys.map((ukey) => {'user':ukey, 'task_staus':false});
+    update = {$addToSet: {users: {$each: users}}};
+  }
+  try {
+    mongoDB.updateMany('camic', 'collection', query, update).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  } catch (error) {
+    next(e);
+  }
+};
+
+Collection.removeUsersFromCollection = async function(req, res, next) {
+  var postQuery = JSON.parse(req.body);
+  var query = {};
+  var update = {};
+
+  if (postQuery.cid) {
+    query = {'_id': new ObjectID(postQuery.cid)};
+  }
+
+  if (postQuery.ukeys) {
+    update = {$pull: {users: {user: {$in:postQuery.ukey}}}};
+  }
+  try {
+    mongoDB.updateMany('camic', 'collection', query, update).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  } catch (error) {
+    next(e);
+  }
+};
+
 Collection.getCollectionTaskStatus = function(req, res, next) {
   var query;
   if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
