@@ -11,4 +11,5 @@ function writeFile(path, prefix) {
 };
 
 fileHandlers = {};
-fileHandlers.writeFile = writeFile
+fileHandlers.writeFile = writeFile;
+module.exports = fileHandlers;
