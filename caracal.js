@@ -18,6 +18,7 @@ const iipHandler = require('./handlers/iipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
+const fileHandlers = require('./handlers/fileHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
@@ -90,6 +91,7 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  "writeFile": fileHandlers.writeFile,
   "iipHandler": function() {
     return iipHandler;
   },
