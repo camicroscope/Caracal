@@ -5,8 +5,7 @@ const uuid = require("uuid");
 function writeFile(path, prefix) {
   return function(req, res, next) {
     let fn = prefix + "_" + uuid.v4();
-    var data = JSON.parse(req.body);
-    fs.writeFile(path + fn, data).then(()=>next()).catch((e) => next(e));
+    fs.writeFile(path + fn, req.body).then(()=>next()).catch((e) => next(e));
   };
 };
 
