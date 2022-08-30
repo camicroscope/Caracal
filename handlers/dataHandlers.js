@@ -575,7 +575,9 @@ addUsersToCollection = async function(req, res, next) {
   }
 
   if (postQuery.ukeys) {
-    const users = postQuery.ukeys.map((ukey) => {'user':ukey, 'task_staus':false});
+    const users = postQuery.ukeys.map((ukey) => {
+      return {'user': ukey, 'task_staus': false};
+    });
     update = {$addToSet: {users: {$each: users}}};
   }
   try {
@@ -598,7 +600,7 @@ Collection.removeUsersFromCollection = async function(req, res, next) {
   }
 
   if (postQuery.ukeys) {
-    update = {$pull: {users: {user: {$in:postQuery.ukey}}}};
+    update = {$pull: {users: {user: {$in: postQuery.ukey}}}};
   }
   try {
     mongoDB.updateMany('camic', 'collection', query, update).then((x) => {
