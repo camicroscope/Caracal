@@ -263,11 +263,41 @@ function firstSetupUserSignupExists() {
   };
 }
 
+// Use a trusted header instead of a jwt for login. Use carefully if at all.
+function loginWithHeader(header, signKey, userFunction) {
+  return function(req, res) {
+    // get the correct header, set it to use userFunction
+    let token = {"email": req.headers[header]};
+    // login using that
+    userFunction(token).then((x) => {
+      if (x === false) {
+        res.status(401).send({
+          'err': 'User Unauthorized',
+        });
+      } else {
+        data = x;
+        delete data['exp'];
+        // sign using the mounted key
+        var token = jwt.sign(data, signKey, {
+          algorithm: 'RS256',
+          expiresIn: EXPIRY,
+        });
+        res.send({
+          'token': token,
+        });
+      }
+    }).catch((e) => {
+      console.log(e);
+      res.status(401).send(e);
+    });
+  };
+}
 
 auth = {};
 auth.jwkTokenTrade = jwkTokenTrade;
 auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
+auth.loginWithHeader = loginWithHeader;
 auth.loginHandler = loginHandler;
 auth.editHandler = editHandler;
 auth.firstSetupUserSignupExists = firstSetupUserSignupExists;

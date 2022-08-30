@@ -70,6 +70,7 @@ var HANDLERS = {
   "loginHandler": function() {
     return auth.loginHandler(auth.PUBKEY);
   },
+  "loginWithHeader": auth.loginWithHeader,
   "sanitizeBody": function() {
     return sanitizeBody;
   },
