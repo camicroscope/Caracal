@@ -75,7 +75,7 @@ var HANDLERS = {
   "loginHandler": function() {
     return auth.loginHandler(auth.PUBKEY);
   },
-  "loginWithHeader": auth.loginWithHeader,
+  "loginWithHeader": auth.loginWithHeader(auth.PRIKEY, userFunction),
   "sanitizeBody": function() {
     return sanitizeBody;
   },
