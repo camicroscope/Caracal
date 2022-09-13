@@ -703,95 +703,102 @@ Collection.setCollectionTaskStatus = function(req, res, next) {
 var SeerService = {};
 SeerService.collectionDataExports = async function(req, res, next) {
   try {
-    var collectionIds = JSON.parse(req.body);
-    const {collectionMap, slideMap} = await SeerService.getCollectionsData(collectionIds);
-
+    const params = JSON.parse(req.body);
+    // generate user map
+    const userCollectionsMap = new Map();
+    params.forEach(({id, users})=>{
+      users.forEach((u)=>{
+        if (!userCollectionsMap.has(u.user)) userCollectionsMap.set(u.user, new Set());
+        const collectionIds = userCollectionsMap.get(u.user);
+        collectionIds.add(id);
+      });
+    });
     // create a temp
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `exports_`));
-
-    // zip file
     var zip = new AdmZip();
-    // create slide json
-    // const csvData = [];
-    slideMap.forEach((data, slideId)=>{
-      const {slide, evaluation, marks} = data;
-      const locPath = slide.location.split('/'); // TODO
-      const wsiFileName = locPath[locPath.length-1];
-      // create marks json for slide
-      try {
-        fs.writeFileSync(`${tmpDir}/${slide.name}.json`, JSON.stringify(marks));
-        console.log(`${tmpDir}/${slide.name}.json Done writing to file.`);
-      } catch (err) {
-        console.log(`${tmpDir}/${slide.name}.json Error writing to file`, err);
-      }
-      zip.addLocalFile(`${tmpDir}/${slide.name}.json`);
-      // create slide info
-      data.csvData = {
-        wsiFileName,
-        tokenId: slide.name, // TODO change later
-        imageId: slide.name,
-        tumorSiteCodeAndLabel: '',
-        slideQualitySatisfactory: +evaluation.slide_quality,
-        tumorPresent: +evaluation.tumor_present,
-        tumorHistologyAccurate: +evaluation.tumor_histology,
-        informativenessYN: +evaluation.informativeness,
-        // TODO Relative Informativeness need to add
-        absoluteInformativeness: evaluation.absolute_informativeness?+evaluation.absolute_informativeness: 0,
-        tumorHistologyCorrected: evaluation.comments?evaluation.comments.trim(): '',
-        // Tumor ROI Filename TODO
-        tumorROIFilename: `${slide.name}.json`,
-        annotatingPathologist: evaluation.creator,
-        exportDate: new Date(),
-        lastAnnotationDate: new Date(), // TODO
-      };
-    });
-
-
-    // create collection csv file
-    for (let [collectionId, data] of collectionMap) {
-      // create csv
-      const csvWriter = createCsvWriter({
-        path: `${tmpDir}/${data.text}.csv`,
-        header: [
-          {id: 'wsiFileName', title: 'WSI file name'},
-          {id: 'tokenId', title: 'Token ID'},
-          {id: 'imageId', title: 'Image ID'},
-          {id: 'tumorSiteCodeAndLabel', title: 'Tumor Site Code and Label'},
-          {id: 'slideQualitySatisfactory', title: 'Slide Quality Satisfactory'},
-          {id: 'tumorPresent', title: 'Tumor Present'},
-          {id: 'tumorHistologyAccurate', title: 'Tumor Histology Accurate'},
-          {id: 'informativenessYN', title: 'Informativeness__YN'},
-          {id: 'relativeInformativeness', title: 'Relative Informativeness'},
-          {id: 'absoluteInformativeness', title: 'Absolute Informativeness'},
-          {id: 'tumorHistologyCorrected', title: 'Tumor Histology Corrected'},
-          {id: 'tumorROIFilename', title: 'Tumor ROI Filename'},
-          {id: 'annotatingPathologist', title: 'Annotating Pathologist'},
-          {id: 'exportDate', title: 'Export Date'},
-          {id: 'lastAnnotationDate', title: 'Last Annotation Date'},
-        ],
-      });
-      const csvData = [];
-      const {first, second, third} = data.relativeInformative;
-
-      data.slides.forEach((sid)=>{
-        const slideData = slideMap.get(sid);
-        // set relative informative
-
-
-        if (sid == first) {
-          slideData.csvData.relativeInformativeness = '1';
-        } else if (sid == second) {
-          slideData.csvData.relativeInformativeness = '2';
-        } else if (sid == third) {
-          slideData.csvData.relativeInformativeness = '3';
-        } else {
-          slideData.csvData.relativeInformativeness = 'L';
+    for (const [user, collectionIds] of userCollectionsMap.entries()) {
+      const {collectionMap, slideMap} = await SeerService.getCollectionsData(Array.from(collectionIds), user);
+      // create user dir
+      fs.mkdirSync(`${tmpDir}/${user}`);
+      //
+      slideMap.forEach((data, slideId)=>{
+        const {slide, evaluation, marks} = data;
+        const locPath = slide.location.split('/'); // TODO
+        const wsiFileName = locPath[locPath.length-1];
+        // create marks json for slide
+        try {
+          fs.writeFileSync(`${tmpDir}/${user}/${slide.name}.json`, JSON.stringify(marks));
+          console.log(`${tmpDir}/${user}/${slide.name}.json Done writing to file.`);
+        } catch (err) {
+          console.log(`${tmpDir}/${user}/${slide.name}.json Error writing to file`, err);
         }
-        csvData.push(slideData.csvData);
+        // create slide info
+        data.csvData = {
+          wsiFileName,
+          tokenId: slide.name, // TODO change later
+          imageId: slide.name,
+          tumorSiteCodeAndLabel: '',
+          slideQualitySatisfactory: +evaluation.slide_quality,
+          tumorPresent: +evaluation.tumor_present,
+          tumorHistologyAccurate: +evaluation.tumor_histology,
+          informativenessYN: +evaluation.informativeness,
+          // TODO Relative Informativeness need to add
+          absoluteInformativeness: evaluation.absolute_informativeness?+evaluation.absolute_informativeness: 0,
+          tumorHistologyCorrected: evaluation.comments?evaluation.comments.trim(): '',
+          // Tumor ROI Filename TODO
+          creator: evaluation.creator,
+          tumorROIFilename: `${slide.name}.json`,
+          annotatingPathologist: evaluation.creator,
+          exportDate: new Date(),
+          lastAnnotationDate: new Date(), // TODO
+        };
       });
-      await csvWriter.writeRecords(csvData);
-      zip.addLocalFile(`${tmpDir}/${data.text}.csv`);
+
+      // create collection csv file
+      for (let [collectionId, data] of collectionMap) {
+        // create csv
+        const csvWriter = createCsvWriter({
+          path: `${tmpDir}/${user}/${data.text}.csv`,
+          header: [
+            {id: 'wsiFileName', title: 'WSI file name'},
+            {id: 'tokenId', title: 'Token ID'},
+            {id: 'imageId', title: 'Image ID'},
+            {id: 'tumorSiteCodeAndLabel', title: 'Tumor Site Code and Label'},
+            {id: 'slideQualitySatisfactory', title: 'Slide Quality Satisfactory'},
+            {id: 'tumorPresent', title: 'Tumor Present'},
+            {id: 'tumorHistologyAccurate', title: 'Tumor Histology Accurate'},
+            {id: 'informativenessYN', title: 'Informativeness__YN'},
+            {id: 'relativeInformativeness', title: 'Relative Informativeness'},
+            {id: 'absoluteInformativeness', title: 'Absolute Informativeness'},
+            {id: 'tumorHistologyCorrected', title: 'Tumor Histology Corrected'},
+            {id: 'tumorROIFilename', title: 'Tumor ROI Filename'},
+            {id: 'annotatingPathologist', title: 'Annotating Pathologist'},
+            {id: 'exportDate', title: 'Export Date'},
+            {id: 'lastAnnotationDate', title: 'Last Annotation Date'},
+          ],
+        });
+        const csvData = [];
+        const {first, second, third} = data.relativeInformative;
+
+        data.slides.forEach((sid)=>{
+          const slideData = slideMap.get(sid);
+          // set relative informative
+
+          if (sid == first) {
+            slideData.csvData.relativeInformativeness = '1';
+          } else if (sid == second) {
+            slideData.csvData.relativeInformativeness = '2';
+          } else if (sid == third) {
+            slideData.csvData.relativeInformativeness = '3';
+          } else {
+            slideData.csvData.relativeInformativeness = 'L';
+          }
+          csvData.push(slideData.csvData);
+        });
+        await csvWriter.writeRecords(csvData);
+      }
     }
+    zip.addLocalFolder(`${tmpDir}`);
     const buffer = zip.toBuffer();
 
 
@@ -860,11 +867,9 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
   }
 };
 
-SeerService.getCollectionsData = async function(cids) {
+SeerService.getCollectionsData = async function(cids, user) {
   try {
     // get parameter from request
-
-
     const collObjectIds = cids.map((cid)=>new ObjectID(cid));
     const collQuery = {'_id': {'$in': collObjectIds}};
     // if (uid) collQuery.creator = uid;
@@ -889,12 +894,11 @@ SeerService.getCollectionsData = async function(cids) {
 
     slideData.forEach((slide)=>{
       const sData = slideMap.get(slide._id.toString());
-
       if (sData) sData.slide = slide;
     });
 
     // get all evaluation info
-    const evalQuery = {'slide_id': {'$in': slideIds}};
+    const evalQuery = {'slide_id': {'$in': slideIds}, 'creator': user};
     // if (uid) evalQuery.creator = uid;
     const evalData = await mongoDB.find('camic', 'evaluation', evalQuery, false);
 
@@ -909,6 +913,7 @@ SeerService.getCollectionsData = async function(cids) {
     const annotQuery = {
       "provenance.analysis.source": "human",
       "provenance.image.slide": {"$in": slideIds},
+      "creator": user,
     };
 
     const annotData = await mongoDB.find('camic', 'mark', annotQuery, false);
@@ -919,7 +924,7 @@ SeerService.getCollectionsData = async function(cids) {
     });
 
     // get status
-    const cidQuery = {'cid': {'$in': cids}};
+    const cidQuery = {'cid': {'$in': cids}, "creator": user};
     // if (uid) slideInfoQuery.creator = uid;
     const relativeInformativenessData = await mongoDB.find('camic', 'slideInformativeness', cidQuery, false);
 
