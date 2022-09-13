@@ -50,7 +50,6 @@ if (!DISABLE_CSP) {
 // handle non-json raw body for post
 app.use(function(req, res, next) {
   var data = '';
-  req.headers['x-remote-user'] = 'linan';
   req.setEncoding(null);
   req.on('data', function(chunk) {
     data += chunk;
