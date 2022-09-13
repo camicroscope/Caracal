@@ -50,6 +50,7 @@ if (!DISABLE_CSP) {
 // handle non-json raw body for post
 app.use(function(req, res, next) {
   var data = '';
+  req.headers['x-remote-user'] = 'linan';
   req.setEncoding(null);
   req.on('data', function(chunk) {
     data += chunk;
@@ -95,6 +96,15 @@ var HANDLERS = {
   "collectionDeleteMulti": function() {
     return dataHandlers.Collection.deleteMultiCollections;
   },
+  "getCurrentUser": function() {
+    return dataHandlers.User.getCurrentUser;
+  },
+  "addUsersToCollection": function() {
+    return dataHandlers.Collection.addUsersToCollection;
+  },
+  "removeUsersFromCollection": function() {
+    return dataHandlers.Collection.removeUsersFromCollection;
+  },
   "addSlidesToCollection": function() {
     return dataHandlers.Collection.addSlidesToCollection;
   },
@@ -133,6 +143,9 @@ var HANDLERS = {
   },
   "markSpatial": function() {
     return dataHandlers.Mark.spatial;
+  },
+  "findCurrentUserMarkTypes": function() {
+    return dataHandlers.Mark.findCurrentUserMarkTypes;
   },
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;

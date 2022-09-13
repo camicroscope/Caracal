@@ -13,6 +13,11 @@ var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    for (let key in query) {
+      if (query[key]=='false' || query[key]=='true') {
+        query[key] = query[key] == 'true';
+      }
+    }
     mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -140,9 +145,9 @@ SlideInformativeness.find = function(req, res, next) {
 SlideInformativeness.removeRank = async function(req, res, next) {
   var query = req.query;
   delete query.token;
-  const {cid, uid, sid} = JSON.parse(req.body);
+  const {cid, creator, sid} = JSON.parse(req.body);
   const condition = {cid};
-  if (uid) condition.uid = uid;
+  if (creator) condition.creator = creator;
   try {
     // check the data is exist
     const data = await mongoDB.find('camic', 'slideInformativeness', condition, false);
@@ -173,9 +178,9 @@ SlideInformativeness.removeRank = async function(req, res, next) {
 SlideInformativeness.rank = async function(req, res, next) {
   var query = req.query;
   delete query.token;
-  const {cid, uid, sid, level} = JSON.parse(req.body);
+  const {cid, creator, sid, level} = JSON.parse(req.body);
   const condition = {cid};
-  if (uid) condition.uid = uid;
+  if (creator) condition.creator = creator;
   try {
     // check the data is exist
     const data = await mongoDB.find('camic', 'slideInformativeness', condition, false);
@@ -213,6 +218,7 @@ SlideInformativeness.rank = async function(req, res, next) {
         if (index === -1) {
           updateDoc.less.push(sid);
         }
+        updateDoc.updator = creator;
       }
 
       const rs = await mongoDB.update('camic', 'slideInformativeness', condition, updateDoc);
@@ -227,7 +233,7 @@ SlideInformativeness.rank = async function(req, res, next) {
         third: null,
         less: [],
       };
-      if (uid) newDoc.uid = uid;
+      if (creator) newDoc.creator = creator;
       if (level==="1") {
         newDoc.first = sid;
       } else if (level==="2") {
@@ -237,10 +243,8 @@ SlideInformativeness.rank = async function(req, res, next) {
       } else if (level==="less") {
         newDoc.less.push(sid);
       }
-
       const rs = await mongoDB.add('camic', 'slideInformativeness', newDoc);
       req.data = rs;
-
       next();
     }
   } catch (error) {
@@ -418,8 +422,56 @@ Mark.getSlidesHumanMarkNum = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 },
+
+Mark.findCurrentUserMarkTypes = function(req, res, next) {
+  var query = req.query;
+  if (query.creator) {
+    query['creator'] = query.creator;
+    delete query.creator;
+  } else if (req.headers['x-remote-user']) {
+    query['creator'] = req.headers['x-remote-user'];
+  }
+  if (query.slide) {
+    query['provenance.image.slide'] = query.slide;
+    delete query.slide;
+  }
+  if (query.type) {
+    query['provenance.analysis.source'] = query.type;
+    delete query.type;
+  }
+  delete query.token;
+
+  if (query['provenance.analysis.source'] == 'human') {
+    const pipeline = [
+      {
+        "$match": query,
+      }, {
+        "$group": {
+          "_id": {
+            "creator": "$creator",
+            "analysis": "$provenance.analysis",
+            "shape": "$geometries.features.geometry.type",
+          },
+        },
+      },
+    ];
+    mongoDB.aggregate('camic', 'mark', pipeline).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  } else {
+    mongoDB.distinct('camic', 'mark', 'provenance.analysis', query).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  }
+};
 Mark.findMarkTypes = function(req, res, next) {
   var query = req.query;
+  if (query.creator) {
+    query['creator'] = query.creator;
+    delete query.creator;
+  }
   if (query.slide) {
     query['provenance.image.slide'] = query.slide;
     delete query.slide;
@@ -515,20 +567,22 @@ Collection.addSlidesToCollection = async function(req, res, next) {
   var collectionUpdate = {};
   var slideQuery = {};
   var slideUpdate = {};
-
+  var informativeFilter = {};
   if (postQuery.cid) {
     collectionQuery = {'_id': new ObjectID(postQuery.cid)};
     slideUpdate = {$addToSet: {collections: postQuery.cid}};
+    informativeFilter = {'cid': postQuery.cid};
   }
 
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}};
+    collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}, $set: {'users.$.task_status': false}};
   }
   try {
     const [collectionResponse, slideResponse] = await Promise.all([
       mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
       mongoDB.updateMany('camic', 'slide', slideQuery, slideUpdate),
+      mongoDB.deleteMany('camic', 'slideInformativeness', informativeFilter),
     ]);
     req.data = {collectionResponse, slideResponse};
     next();
@@ -547,16 +601,18 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
   if (postQuery.cid) {
     collectionQuery = {'_id': new ObjectID(postQuery.cid)};
     slideUpdate = {$pull: {collections: postQuery.cid}};
+    informativeFilter = {'cid': postQuery.cid};
   }
 
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$pullAll: {slides: postQuery.sids}};
+    collectionUpdate = {$pullAll: {slides: postQuery.sids}, $set: {'users.$.task_status': false}};
   }
   try {
     const [collectionResponse, slideResponse] = await Promise.all([
       mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
       mongoDB.updateMany('camic', 'slide', slideQuery, slideUpdate),
+      mongoDB.deleteMany('camic', 'slideInformativeness', informativeFilter),
     ]);
     req.data = {slideResponse, collectionResponse};
     next();
@@ -565,7 +621,7 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
   }
 };
 
-addUsersToCollection = async function(req, res, next) {
+Collection.addUsersToCollection = async function(req, res, next) {
   var postQuery = JSON.parse(req.body);
   var query = {};
   var update = {};
@@ -576,7 +632,7 @@ addUsersToCollection = async function(req, res, next) {
 
   if (postQuery.ukeys) {
     const users = postQuery.ukeys.map((ukey) => {
-      return {'user': ukey, 'task_staus': false};
+      return {'user': ukey, 'task_status': false};
     });
     update = {$addToSet: {users: {$each: users}}};
   }
@@ -600,7 +656,7 @@ Collection.removeUsersFromCollection = async function(req, res, next) {
   }
 
   if (postQuery.ukeys) {
-    update = {$pull: {users: {user: {$in: postQuery.ukey}}}};
+    update = {$pull: {users: {user: {$in: postQuery.ukeys}}}};
   }
   try {
     mongoDB.updateMany('camic', 'collection', query, update).then((x) => {
@@ -616,6 +672,7 @@ Collection.getCollectionTaskStatus = function(req, res, next) {
   var query;
   if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
   if (req.query.sid) query = {slides: req.query.sid};
+  if (req.query.ukey) query = {"users.user": req.query.ukey};
   try {
     mongoDB.find('camic', 'collection', query).then((x) => {
       req.data = x;
@@ -627,12 +684,14 @@ Collection.getCollectionTaskStatus = function(req, res, next) {
 };
 
 Collection.setCollectionTaskStatus = function(req, res, next) {
-  const status = req.query.status;
-  var query;
-  if (req.query.cid) query = {_id: new ObjectID(req.query.cid)};
-  if (req.query.sid) query = {slides: req.query.sid};
+  let status = req.query.status;
+  status = (status === 'true');
+  var query={};
+  if (req.query.cid) query["_id"] = new ObjectID(req.query.cid);
+  if (req.query.sid) query["slides"] = req.query.sid;
+  if (req.query.ukey) query["users.user"] = req.query.ukey;
   try {
-    mongoDB.updateMany('camic', 'collection', query, {'$set': {'task_status': status}}).then((x) => {
+    mongoDB.updateMany('camic', 'collection', query, {'$set': {'users.$.task_status': status}}).then((x) => {
       req.data = x;
       next();
     }).catch((e) => next(e));
@@ -754,6 +813,8 @@ SeerService.collectionDataExports = async function(req, res, next) {
 
 SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, res, next) {
   const cid = req.query.cid;
+  // user
+  const creator = req.headers['x-remote-user'];
   try {
     // get slide info
     const collection = await mongoDB.find('camic', 'collection', {_id: new ObjectID(cid)});
@@ -761,12 +822,21 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
     if (collection&&Array.isArray(collection)&&collection[0]) {
       const sids = collection[0].slides;
       // get evaluation infos
-      const evaluations = await mongoDB.find('camic', 'evaluation', {'is_draft': false, 'slide_id': {'$in': sids}});
+      const evaluations = await mongoDB.find(
+          'camic',
+          'evaluation',
+          {
+            'creator': creator,
+            'is_draft': false,
+            'slide_id': {'$in': sids},
+          },
+      );
 
       // get human annotation counts
       const pipeline = [
         {
           "$match": {
+            "creator": creator,
             "provenance.analysis.source": "human",
             "provenance.image.slide": {"$in": sids},
           },
@@ -868,6 +938,22 @@ SeerService.getCollectionsData = async function(cids) {
 var User = {};
 User.forLogin = function(email) {
   return mongoDB.find('camic', 'user', {'email': email});
+};
+
+User.getCurrentUser = function(req, res, next) {
+  if (req.headers['x-remote-user']) {
+    const key = req.headers['x-remote-user'];
+    try {
+      mongoDB.find('camic', 'user', {'key': key}).then((x) => {
+        req.data = x;
+        next();
+      }).catch((e) => next(e));
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    res.status(401).send('{"err":"no x-remote-user found in headers"}');
+  }
 };
 
 User.wcido = function(req, res, next) {
