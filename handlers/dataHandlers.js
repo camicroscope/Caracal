@@ -319,6 +319,11 @@ User.forLogin = function(email) {
   return mongoDB.find('camic', 'user', {'email': email});
 };
 
+User.getCurrentUserId = function(req, res, next) {
+  req.data = process.env.CURRENT_USER_ID;
+  next();
+};
+
 User.wcido = function(req, res, next) {
   var userType = req.query.ut;
   var permissions = {

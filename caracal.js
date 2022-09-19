@@ -97,6 +97,9 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandler;
   },
+  "getCurrentUserId": function() {
+    return dataHandlers.User.getCurrentUserId;
+  },
   "downloadSlide": function() {
     return dataHandlers.Slide.download;
   },
@@ -311,7 +314,8 @@ var agenda = new Agenda({db: {address: `${mongoConnectionString}/camic`, collect
 //         }}, false);
 
 //         const html = generateEmail(startDate, currentDate, labelingAnnotations);
-//         contextOption.subject = `Label Annotations Summary ${startDate.toLocaleString()} - ${currentDate.toLocaleString()}`;
+//         contextOption.subject = `Label Annotations Summary ${startDate.toLocaleString()}
+// - ${currentDate.toLocaleString()}`;
 //         contextOption.html = html;
 //         await sendEmail(transportOption, contextOption);
 //       } else {
