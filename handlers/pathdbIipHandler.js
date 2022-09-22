@@ -22,7 +22,7 @@ iipCheck = function(req, res, next) {
       let requestedNode = req.iipFileRequested.replace("pathdb*", "");
       let lookupUrl = PDB_URL + "/node/" + requestedNode + "?_format=json";
       console.log(lookupUrl);
-      let pdbReqHeaders = {"Cookie": "token=" + auth.getToken(req) + ";"};
+      let pdbReqHeaders = {"Cookie": req.headers.cookie};
       console.log(pdbReqHeaders);
       fetch(lookupUrl, {headers: pdbReqHeaders}).then((x)=>x.json()).then((x)=>{
         console.log(x);
