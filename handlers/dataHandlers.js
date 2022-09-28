@@ -834,7 +834,6 @@ SeerService.getSlidesEvalAndHumanAnnotCountByCollectionId = async function(req, 
           'evaluation',
           {
             'creator': creator,
-            'is_draft': false,
             'slide_id': {'$in': sids},
           },
       );
