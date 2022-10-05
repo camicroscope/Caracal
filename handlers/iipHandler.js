@@ -45,7 +45,7 @@ iipHandler = function(req, res, next) {
         path = path.replace(req.iipFileRequested, req.newFilepath);
       }
       // remove token if present
-      RemoveParameterFromUrl(path, "token");
+      path = RemoveParameterFromUrl(path, "token");
       // NOTE -- this may need to change if the original url has more subdirs or so added
       var splitPath = path.split('/');
       console.log(path);
