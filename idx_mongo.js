@@ -3,6 +3,15 @@
 
 const mongodb = require("./service/database");
 
+function quiet_mongo_add(db, collection, data, x){
+  try{
+    mongodb.add(db, collection, data, x);
+  }
+  catch(err){
+    console.error(err)
+  }
+}
+
 function indexes() {
   db = "camic";
   mongodb.createIndex(db, "user", {"email": 1}, {unique: true});
@@ -176,7 +185,7 @@ function defaults() {
     },
   };
 
-  mongodb.add(db, 'template', defaultTemplate, true);
+  quiet_mongo_add(db, 'template', defaultTemplate, true);
 
   var defaultConfigs = [{
     "configuration": [
@@ -376,7 +385,7 @@ function defaults() {
   }];
 
 
-  mongodb.add(db, 'configuration', defaultConfigs, true);
+  quiet_mongo_add(db, 'configuration', defaultConfigs, true);
 
   var defaultLinks = {
     "configuration": [
@@ -390,7 +399,7 @@ function defaults() {
     "config_name": "additional_links",
     "version": "1.0.0",
   };
-  mongodb.add(db, 'configuration', defaultLinks, true);
+  quiet_mongo_add(db, 'configuration', defaultLinks, true);
 
   var evaluationForm = {
     "config_name": "evaluation_form",
@@ -470,7 +479,7 @@ function defaults() {
     },
     "version": "1.0.0",
   };
-  mongodb.add(db, 'configuration', evaluationForm, true);
+  quiet_mongo_add(db, 'configuration', evaluationForm, true);
 }
 
 module.exports = {
