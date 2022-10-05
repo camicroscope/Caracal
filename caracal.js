@@ -229,10 +229,15 @@ function masterHandler() {
   }).then(()=>{
     if (RUN_INDEXER) {
       const indexer = require('./idx_mongo.js');
+      try{
       indexer.collections();
       indexer.indexes();
       indexer.defaults();
       console.log("added indexes");
+      }
+      catch(e){
+        console.log("error in indexer, ", e);
+      }
     }
   }).catch((e) => {
     console.error(e);
