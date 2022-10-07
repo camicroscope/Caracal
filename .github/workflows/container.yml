@@ -55,7 +55,7 @@ jobs:
         with:
           context: .
           build-args: |
-            "branch=${{ env.BRANCH_NAME }}"
+            "viewer=${{ env.BRANCH_NAME }}"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
