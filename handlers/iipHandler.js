@@ -24,10 +24,10 @@ preIip = function(req, res, next) {
   next();
 };
 
-function RemoveParameterFromUrl(url, parameter) {
+function removeParameterFromUrl(url, parameter) {
   return url
-    .replace(new RegExp('[?&]' + parameter + '=[^&#]*(#.*)?$'), '$1')
-    .replace(new RegExp('([?&])' + parameter + '=[^&]*&'), '$1');
+      .replace(new RegExp('[?&]' + parameter + '=[^&#]*(#.*)?$'), '$1')
+      .replace(new RegExp('([?&])' + parameter + '=[^&]*&'), '$1');
 }
 
 iipHandler = function(req, res, next) {
@@ -45,7 +45,7 @@ iipHandler = function(req, res, next) {
         path = path.replace(req.iipFileRequested, req.newFilepath);
       }
       // remove token if present
-      path = RemoveParameterFromUrl(path, "token");
+      path = removeParameterFromUrl(path, "token");
       // NOTE -- this may need to change if the original url has more subdirs or so added
       var splitPath = path.split('/');
       console.log(path);

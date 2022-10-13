@@ -265,7 +265,7 @@ function firstSetupUserSignupExists() {
 
 // Use a trusted header instead of a jwt for login. Use carefully if at all.
 function loginWithHeader(signKey, userFunction) {
-  return function(header){
+  return function(header) {
     return function(req, res) {
       // get the correct header, set it to use userFunction
       let token = {"email": req.headers[header]};
@@ -292,7 +292,7 @@ function loginWithHeader(signKey, userFunction) {
         res.status(401).send(e);
       });
     };
-  }
+  };
 }
 
 auth = {};

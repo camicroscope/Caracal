@@ -3,12 +3,11 @@
 
 const mongodb = require("./service/database");
 
-function quiet_mongo_add(db, collection, data, x){
-  try{
+function quietMongoAdd(db, collection, data, x) {
+  try {
     mongodb.add(db, collection, data, x);
-  }
-  catch(err){
-    console.error(err)
+  } catch (err) {
+    console.error(err);
   }
 }
 
@@ -185,7 +184,7 @@ function defaults() {
     },
   };
 
-  quiet_mongo_add(db, 'template', defaultTemplate, true);
+  quietMongoAdd(db, 'template', defaultTemplate, true);
 
   var defaultConfigs = [{
     "configuration": [
@@ -385,7 +384,7 @@ function defaults() {
   }];
 
 
-  quiet_mongo_add(db, 'configuration', defaultConfigs, true);
+  quietMongoAdd(db, 'configuration', defaultConfigs, true);
 
   var defaultLinks = {
     "configuration": [
@@ -399,7 +398,7 @@ function defaults() {
     "config_name": "additional_links",
     "version": "1.0.0",
   };
-  quiet_mongo_add(db, 'configuration', defaultLinks, true);
+  quietMongoAdd(db, 'configuration', defaultLinks, true);
 
   var evaluationForm = {
     "config_name": "evaluation_form",
@@ -479,7 +478,7 @@ function defaults() {
     },
     "version": "1.0.0",
   };
-  quiet_mongo_add(db, 'configuration', evaluationForm, true);
+  quietMongoAdd(db, 'configuration', evaluationForm, true);
 }
 
 module.exports = {
