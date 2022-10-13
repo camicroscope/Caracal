@@ -301,6 +301,7 @@ auth.tokenTrade = tokenTrade;
 auth.filterHandler = filterHandler;
 auth.loginHandler = loginHandler;
 auth.editHandler = editHandler;
+auth.getToken = getToken;
 auth.firstSetupUserSignupExists = firstSetupUserSignupExists;
 auth.loginWithHeader = loginWithHeader;
 auth.CLIENT = CLIENT;

@@ -14,7 +14,8 @@ const fs = require('fs');
 const auth = require('./handlers/authHandlers.js');
 const monitor = require('./handlers/monitorHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
-const iipHandler = require('./handlers/iipHandler.js');
+const iipHandlers = require('./handlers/iipHandler.js');
+const pdbIipHandlers = require('./handlers/pathdbIipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
@@ -91,7 +92,13 @@ var HANDLERS = {
   "proxyHandler": proxyHandler,
   "writeFile": fileHandlers.writeFile,
   "iipHandler": function() {
-    return iipHandler;
+    return iipHandlers.iipHandler;
+  },
+  "preIip": function() {
+    return iipHandlers.preIip;
+  },
+  "iipCheck": function() {
+    return pdbIipHandlers.iipCheck;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
