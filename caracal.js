@@ -14,20 +14,14 @@ const fs = require('fs');
 const auth = require('./handlers/authHandlers.js');
 const monitor = require('./handlers/monitorHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
-const iipHandler = require('./handlers/iipHandler.js');
+const iipHandlers = require('./handlers/iipHandler.js');
+const pdbIipHandlers = require('./handlers/pathdbIipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
+const fileHandlers = require('./handlers/fileHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
-
-// TODO -- make optional
-const DISABLE_TF = true; // DUE TO PRODUCTION STABILITY ISSUES WITH TFJS
-
-if (!DISABLE_TF) {
-  const DataSet = require('./handlers/datasetHandler.js');
-  const Model = require('./handlers/modelTrainer.js');
-}
 
 
 const {connector} = require("./service/database/connector");
@@ -74,7 +68,7 @@ var HANDLERS = {
   "loginHandler": function() {
     return auth.loginHandler(auth.PUBKEY);
   },
-  "loginWithHeader": auth.loginWithHeader,
+  "loginWithHeader": auth.loginWithHeader(auth.PRIKEY, userFunction),
   "sanitizeBody": function() {
     return sanitizeBody;
   },
@@ -88,8 +82,15 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  "writeFile": fileHandlers.writeFile,
   "iipHandler": function() {
-    return iipHandler;
+    return iipHandlers.iipHandler;
+  },
+  "preIip": function() {
+    return iipHandlers.preIip;
+  },
+  "iipCheck": function() {
+    return pdbIipHandlers.iipCheck;
   },
   "markMulti": function() {
     return dataHandlers.Mark.multi;
@@ -120,22 +121,16 @@ var HANDLERS = {
   },
 };
 
-if (!DISABLE_TF) {
-  HANDLERS["getDataset"] = DataSet.getDataset;
-  HANDLERS["trainModel"] = Model.trainModel;
-  HANDLERS["deleteDataset"] = DataSet.deleteData;
-  HANDLERS["sendTrainedModel"] = Model.sendTrainedModel;
-} else {
-  function disabledRoute() {
-    return function(req, res) {
-      res.status(500).send('{"err":"This TF route is disabled"}');
-    };
-  }
-  HANDLERS["getDataset"] = disabledRoute;
-  HANDLERS["trainModel"] = disabledRoute;
-  HANDLERS["deleteDataset"] = disabledRoute;
-  HANDLERS["sendTrainedModel"] = disabledRoute;
+// TODO! -- remove these by fully depreciating tfjs serverside
+function disabledRoute() {
+  return function(req, res) {
+    res.status(500).send('{"err":"This TF route is disabled"}');
+  };
 }
+HANDLERS["getDataset"] = disabledRoute;
+HANDLERS["trainModel"] = disabledRoute;
+HANDLERS["deleteDataset"] = disabledRoute;
+HANDLERS["sendTrainedModel"] = disabledRoute;
 
 // register configurable services
 // TODO verify all
@@ -227,10 +222,14 @@ function masterHandler() {
   }).then(()=>{
     if (RUN_INDEXER) {
       const indexer = require('./idx_mongo.js');
-      indexer.collections();
-      indexer.indexes();
-      indexer.defaults();
-      console.log("added indexes");
+      try {
+        indexer.collections();
+        indexer.indexes();
+        indexer.defaults();
+        console.log("added indexes");
+      } catch (e) {
+        console.log("error in indexer, ", e);
+      }
     }
   }).catch((e) => {
     console.error(e);
