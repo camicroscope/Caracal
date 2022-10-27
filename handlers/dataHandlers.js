@@ -570,17 +570,20 @@ Collection.addSlidesToCollection = async function(req, res, next) {
   var informativeFilter = {};
   if (postQuery.cid) {
     collectionQuery = {'_id': new ObjectID(postQuery.cid)};
+    collectionQuery2 = {'_id': new ObjectID(postQuery.cid), 'users': {'$exists': true}};
     slideUpdate = {$addToSet: {collections: postQuery.cid}};
     informativeFilter = {'cid': postQuery.cid};
   }
 
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}, $set: {'users.$.task_status': false}};
+    collectionUpdate = {$addToSet: {slides: {$each: postQuery.sids}}};
+    collectionUpdate2 = {$set: {'users.$[].task_status': false}};
   }
   try {
-    const [collectionResponse, slideResponse] = await Promise.all([
+    const [collectionResponse, collectionResponse2, slideResponse, slideInformativeness] = await Promise.all([
       mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
+      mongoDB.updateMany('camic', 'collection', collectionQuery2, collectionUpdate2),
       mongoDB.updateMany('camic', 'slide', slideQuery, slideUpdate),
       mongoDB.deleteMany('camic', 'slideInformativeness', informativeFilter),
     ]);
@@ -600,17 +603,19 @@ Collection.removeSlidesFromCollection = async function(req, res, next) {
 
   if (postQuery.cid) {
     collectionQuery = {'_id': new ObjectID(postQuery.cid)};
+    collectionQuery2 = {'_id': new ObjectID(postQuery.cid), 'users': {'$exists': true}};
     slideUpdate = {$pull: {collections: postQuery.cid}};
     informativeFilter = {'cid': postQuery.cid};
   }
-
   if (postQuery.sids) {
     slideQuery['_id'] = {'$in': postQuery.sids.map((id)=>new ObjectID(id))};
-    collectionUpdate = {$pullAll: {slides: postQuery.sids}, $set: {'users.$.task_status': false}};
+    collectionUpdate = {$pullAll: {slides: postQuery.sids}};
+    collectionUpdate2 = {$set: {'users.$[].task_status': false}};
   }
   try {
-    const [collectionResponse, slideResponse] = await Promise.all([
+    const [collectionResponse, collectionResponse2, slideResponse, slideInformativenessResponse] = await Promise.all([
       mongoDB.updateMany('camic', 'collection', collectionQuery, collectionUpdate),
+      mongoDB.updateMany('camic', 'collection', collectionQuery2, collectionUpdate2),
       mongoDB.updateMany('camic', 'slide', slideQuery, slideUpdate),
       mongoDB.deleteMany('camic', 'slideInformativeness', informativeFilter),
     ]);
