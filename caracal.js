@@ -98,6 +98,9 @@ var HANDLERS = {
   "markSpatial": function() {
     return dataHandlers.Mark.spatial;
   },
+  "markSegmentationCount": function() {
+    return dataHandlers.Mark.segmentationCountByExecid;
+  },
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;
   },

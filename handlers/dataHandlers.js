@@ -168,7 +168,42 @@ Mark.spatial = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+Mark.segmentationCountByExecid = async function(req, res, next) {
+  var query = req.query;
+  delete query.token;
 
+  // handle  x0, y0, x1, y1
+  if (req.query.x0 && req.query.x1) {
+    query.x = {
+      '$gt': parseFloat(req.query.x0),
+      '$lt': parseFloat(req.query.x1),
+    };
+  }
+  delete query.x0;
+  delete query.x1;
+  if (req.query.y0 && req.query.y1) {
+    query.y = {
+      '$gt': parseFloat(req.query.y0),
+      '$lt': parseFloat(req.query.y1),
+    };
+  }
+  delete query.y0;
+  delete query.y1;
+  try {
+    // {"$match": {"provenance.image.slide": {"$in": sids}}},
+    const data = await mongoDB.aggregate('camic', 'mark',
+        [
+          {"$match": query},
+          {"$group": {_id: "$provenance.analysis.execution_id", count: {$sum: 1}}},
+        ]);
+    console.log(data);
+    req.data = data;
+    next();
+  } catch (error) {
+    req.data = {error};
+    next();
+  }
+};
 Mark.multi = function(req, res, next) {
   var query = {};
 
@@ -211,7 +246,6 @@ Mark.multi = function(req, res, next) {
       '$gt': parseFloat(postQuery.footprint),
     };
   }
-
   mongoDB.find('camic', 'mark', query).then((x) => {
     req.data = x;
     next();
