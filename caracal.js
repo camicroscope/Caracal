@@ -20,7 +20,9 @@ const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const fileHandlers = require('./handlers/fileHandlers.js');
+const keycloakHandlers = require('./handlers/keycloakHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
+const customHandlers = require('./handlers/customHandlers.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
 
@@ -72,6 +74,8 @@ var HANDLERS = {
   "sanitizeBody": function() {
     return sanitizeBody;
   },
+  "userRegistrationFlow": customHandlers.userRegistrationFlow,
+  "dataEnforce": auth.dataEnforce,
   "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,
   "mongoAdd": dataHandlers.General.add,
@@ -83,6 +87,7 @@ var HANDLERS = {
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
   "writeFile": fileHandlers.writeFile,
+  "createKeycloakUser": keycloakHandlers.createUser,
   "iipHandler": function() {
     return iipHandlers.iipHandler;
   },
@@ -127,7 +132,7 @@ var HANDLERS = {
 // TODO! -- remove these by fully depreciating tfjs serverside
 function disabledRoute() {
   return function(req, res) {
-    res.status(500).send('{"err":"This TF route is disabled"}');
+    res.status(500).send('{"err":"This route is disabled"}');
   };
 }
 HANDLERS["getDataset"] = disabledRoute;
