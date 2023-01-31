@@ -9,9 +9,4 @@ RUN apk add --no-cache git
 RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
 EXPOSE 4010
 
-RUN chgrp -R 0 /src && \
-    chmod -R g+rwX /src
-
-USER 1001
-
 CMD node caracal.js
