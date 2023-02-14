@@ -1,6 +1,7 @@
 const sendmail = require('sendmail')({silent: true});
+const kc = require('./handlers/keycloakHandlers.js');
 
-let adminAddress = process.env.KEYCLOAK_HOST || "rbirmin@emory.edu";
+let adminAddress = process.env.ADMIN_EMAIL || "rbirmin@emory.edu";
 
 // handlers for special routes
 
@@ -15,7 +16,7 @@ function userRegistrationFlow(){
     let password = Math.random().toString(36).slice(2)
     // generate a username from email or name?
     // kc signup
-    addKcUser(firstName,lastName,email,username,password).then(()=>{
+    kc.addKcUser(firstName,lastName,email,username,password).then(()=>{
       // email to user at email with password
       let userEmail = `<p>Your account has been created with limited access, and will be given more complete access after being reviewed by the administrative team.</p>
                             <hr>
