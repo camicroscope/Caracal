@@ -171,6 +171,10 @@ for (let i in routeConfig) {
             console.error('handler named "'+ handler.function + '" not found (rule '+ i +' handler ' + j + ')');
             process.exit(1);
           }
+          if (! typeof(HANDLERS[handler.function]) == "function"){
+            console.error('handler named "'+ handler.function + '" not valid (rule '+ i +' handler ' + j + ')');
+            process.exit(1);
+          }
           let args = handler.args || [];
           // handler.function needs to be in handlers
           app[rule.method](rule.route, HANDLERS[handler.function](...args));

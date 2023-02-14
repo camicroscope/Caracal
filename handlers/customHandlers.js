@@ -1,5 +1,5 @@
 const sendmail = require('sendmail')({silent: true});
-const kc = require('./handlers/keycloakHandlers.js');
+const kc = require('./keycloakHandlers.js');
 
 let adminAddress = process.env.ADMIN_EMAIL || "rbirmin@emory.edu";
 
@@ -54,3 +54,4 @@ function userRegistrationFlow(){
 
 var customHandlers = {};
 customHandlers.userRegistrationFlow = userRegistrationFlow;
+module.exports = customHandlers;
