@@ -309,6 +309,7 @@ function dataEnforce(enforcements){
     }
     // pass through modified data
     req.body = JSON.stringify(data);
+    next();
   }
 }
 

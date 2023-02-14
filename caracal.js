@@ -127,6 +127,14 @@ var HANDLERS = {
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
   },
+  "sendData": function(){
+      return function(req, res, next) {
+      if (!req.data) {
+        res.status(404).json({});
+      }
+      res.json(req.data);
+    }
+  }
 };
 
 // TODO! -- remove these by fully depreciating tfjs serverside

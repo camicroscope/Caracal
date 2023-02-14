@@ -11,10 +11,11 @@ function userRegistrationFlow(){
     let firstName = data.firstName;
     let lastName = data.lastName;
     let email = data.email;
+    let password = data.password;
     let username = email;
     // generate a password randomly
-    let password = Math.random().toString(36).slice(2)
-    // generate a username from email or name?
+    //let password = Math.random().toString(36).slice(2)
+    //console.log(username, " - ", password)
     // kc signup
     kc.addKcUser(firstName,lastName,email,username,password).then(()=>{
       // email to user at email with password
@@ -47,6 +48,7 @@ function userRegistrationFlow(){
          console.log(err && err.stack)
          console.dir(reply)
       });
+      res.json({'username':username, 'password':password})
       next();
     }).catch(e=>next(e));
   }
