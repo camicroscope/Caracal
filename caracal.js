@@ -95,13 +95,13 @@ var HANDLERS = {
     return dataHandlers.Slide.countLabeling;
   },
   "labelingPushAnnotation": function() {
-  return dataHandlers.Labeling.pushAnnotation;
+    return dataHandlers.Labeling.pushAnnotation;
   },
   "labelingPullAnnotation": function() {
     return dataHandlers.Labeling.pullAnnotation;
   },
   "advancedFindLabelingAnnotation": function() {
-  return dataHandlers.LabelingAnnotation.advancedFind;
+    return dataHandlers.LabelingAnnotation.advancedFind;
   },
   "findByTypeOrCreator": function() {
     return dataHandlers.LabelingAnnotation.findByTypeOrCreator;
@@ -151,14 +151,14 @@ var HANDLERS = {
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
   },
-  "sendData": function(){
-      return function(req, res, next) {
+  "sendData": function() {
+    return function(req, res, next) {
       if (!req.data) {
         res.status(404).json({});
       }
       res.json(req.data);
-    }
-  }
+    };
+  },
 };
 
 // TODO! -- remove these by fully depreciating tfjs serverside
@@ -203,7 +203,7 @@ for (let i in routeConfig) {
             console.error('handler named "'+ handler.function + '" not found (rule '+ i +' handler ' + j + ')');
             process.exit(1);
           }
-          if (! typeof(HANDLERS[handler.function]) == "function"){
+          if (! typeof(HANDLERS[handler.function]) == "function") {
             console.error('handler named "'+ handler.function + '" not valid (rule '+ i +' handler ' + j + ')');
             process.exit(1);
           }

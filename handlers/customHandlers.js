@@ -5,8 +5,8 @@ let adminAddress = process.env.ADMIN_EMAIL || "rbirmin@emory.edu";
 
 // handlers for special routes
 
-function userRegistrationFlow(){
-  return function(req, res, next){
+function userRegistrationFlow() {
+  return function(req, res, next) {
     var data = JSON.parse(req.body);
     let firstName = data.firstName;
     let lastName = data.lastName;
@@ -14,10 +14,10 @@ function userRegistrationFlow(){
     let password = data.password;
     let username = data.username;
     // generate a password randomly
-    //let password = Math.random().toString(36).slice(2)
-    //console.log(username, " - ", password)
+    // let password = Math.random().toString(36).slice(2)
+    // console.log(username, " - ", password)
     // kc signup
-    kc.addKcUser(firstName,lastName,email,username,password).then(()=>{
+    kc.addKcUser(firstName, lastName, email, username, password).then(()=>{
       // email to user at email with password
       let userEmail = `<p>Your account has been created with limited access, and will be given more complete access after being reviewed by the administrative team.</p>
                             <hr>
@@ -29,29 +29,29 @@ function userRegistrationFlow(){
         from: adminAddress,
         to: email,
         subject: "Your caMicroscope login",
-        html: userEmail
-        },
-        function (err, reply) {
-          console.log(err && err.stack)
-          console.dir(reply)
+        html: userEmail,
+      },
+      function(err, reply) {
+        console.log(err && err.stack);
+        console.dir(reply);
       });
       // email to admin that new low-power user created.
       let adminEmail = `<p>A new account for ${firstName} ${lastName} with email ${email} has been created with limited access.
                            Check the user queue to assign this and other users to collections.</p>`;
       sendmail({
-       from: adminAddress,
-       to: adminAddress,
-       subject: "New caMicroscope user",
-       html: adminEmail
-       },
-       function (err, reply) {
-         console.log(err && err.stack)
-         console.dir(reply)
+        from: adminAddress,
+        to: adminAddress,
+        subject: "New caMicroscope user",
+        html: adminEmail,
+      },
+      function(err, reply) {
+        console.log(err && err.stack);
+        console.dir(reply);
       });
-      res.json({'username':username, 'password':password})
+      res.json({'username': username, 'password': password});
       next();
-    }).catch(e=>next(e));
-  }
+    }).catch((e)=>next(e));
+  };
 }
 
 var customHandlers = {};

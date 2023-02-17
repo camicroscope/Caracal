@@ -5,7 +5,7 @@ const KEYCLOAK_ADMIN_PASSWORD = process.env.KEYCLOAK_ADMIN_PASSWORD || "password
 const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST || "http://ca-key:8080";
 const KEYCLOAK_APP_REALM = process.env.KEYCLOAK_APP_REALM || "camic";
 
-async function addKcUser(firstName,lastName,email,username,password){
+async function addKcUser(firstName, lastName, email, username, password) {
   let adminInfo = {
     'username': KEYCLOAK_ADMIN,
     'password': KEYCLOAK_ADMIN_PASSWORD,
@@ -51,7 +51,7 @@ async function addKcUser(firstName,lastName,email,username,password){
           'Authorization': 'Bearer ' + adminKeys['access_token'],
         },
       }).then((x)=>x.json());
-      console.log(userInfo)
+      console.log(userInfo);
       let thisUserInfo = userInfo.filter((y)=>y['username'] == username);
       if (thisUserInfo && thisUserInfo.length && thisUserInfo[0]['id']) {
         let passwordResetBody = {
@@ -77,15 +77,15 @@ async function addKcUser(firstName,lastName,email,username,password){
 }
 
 function createUser() {
-  return function(req, res, next){
+  return function(req, res, next) {
     var data = JSON.parse(req.body);
     firstName = data.firstName;
     lastName = data.lastName;
     email = data.email;
     username = data.username;
     password = data.password;
-    addKcUser(firstName,lastName,email,username,password).then(()=>next()).catch(e=>next(e));
-  }
+    addKcUser(firstName, lastName, email, username, password).then(()=>next()).catch((e)=>next(e));
+  };
 }
 
 keycloakHandlers = {};

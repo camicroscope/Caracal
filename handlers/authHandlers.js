@@ -297,20 +297,20 @@ function loginWithHeader(signKey, userFunction) {
 
 // enforce data to be of particular values
 // intended primarily for enforcing that a user can sign themselves up without privesc
-function dataEnforce(enforcements){
-  return function(req, res, next){
+function dataEnforce(enforcements) {
+  return function(req, res, next) {
     // parse enforcements
     let enf = JSON.parse(enforcements);
     // parse body
     let data = JSON.parse(req.body);
     // replace fields with their enforcements
-    for (let i of Object.keys(enf)){
-      data[i] = enf[i]
+    for (let i of Object.keys(enf)) {
+      data[i] = enf[i];
     }
     // pass through modified data
     req.body = JSON.stringify(data);
     next();
-  }
+  };
 }
 
 auth = {};
