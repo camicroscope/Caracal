@@ -25,6 +25,7 @@ function userFunction(token) {
         newToken.email = token.email;
         newToken.name = token.name;
         newToken.picture = token.picture;
+        newToken.data = x[0];
         res(newToken);
       }
     });

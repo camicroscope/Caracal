@@ -12,7 +12,7 @@ function userRegistrationFlow(){
     let lastName = data.lastName;
     let email = data.email;
     let password = data.password;
-    let username = email;
+    let username = data.username;
     // generate a password randomly
     //let password = Math.random().toString(36).slice(2)
     //console.log(username, " - ", password)

@@ -91,8 +91,32 @@ var HANDLERS = {
   "iipHandler": function() {
     return iipHandlers.iipHandler;
   },
+  "countLabelingBySlide": function() {
+    return dataHandlers.Slide.countLabeling;
+  },
+  "labelingPushAnnotation": function() {
+  return dataHandlers.Labeling.pushAnnotation;
+  },
+  "labelingPullAnnotation": function() {
+    return dataHandlers.Labeling.pullAnnotation;
+  },
+  "advancedFindLabelingAnnotation": function() {
+  return dataHandlers.LabelingAnnotation.advancedFind;
+  },
+  "findByTypeOrCreator": function() {
+    return dataHandlers.LabelingAnnotation.findByTypeOrCreator;
+  },
   "preIip": function() {
     return iipHandlers.preIip;
+  },
+  "getCurrentUserId": function() {
+    return dataHandlers.User.getCurrentUserId;
+  },
+  "downloadSlide": function() {
+    return dataHandlers.Slide.download;
+  },
+  "findLabelingStat": function() {
+    return dataHandlers.Slide.findLabelingStat;
   },
   "iipCheck": function() {
     return pdbIipHandlers.iipCheck;
