@@ -5,7 +5,7 @@ const mongodb = require("./service/database");
 
 function quietMongoAdd(db, collection, data, x) {
   try {
-    mongodb.add(db, collection, data, x).catch(e=>console.error);
+    mongodb.add(db, collection, data, x).catch((e)=>console.error(e));
   } catch (err) {
     console.error(err);
   }
@@ -52,7 +52,7 @@ function collections() {
         },
       },
     },
-  }, true);
+  }, true).catch((e)=>console.error(e));
 
   mongodb.createCollection(db, "mark", {
     validator: {
@@ -77,7 +77,7 @@ function collections() {
         },
       },
     },
-  }, true);
+  }, true).catch((e)=>console.error(e));
 
   mongodb.createCollection(db, "heatmap", {
     validator: {
@@ -102,7 +102,7 @@ function collections() {
         },
       },
     },
-  }, true);
+  }, true).catch((e)=>console.error(e));
 
   mongodb.createCollection(db, "heatmapedit", {
     validator: {
@@ -127,7 +127,7 @@ function collections() {
         },
       },
     },
-  }, true);
+  }, true).catch((e)=>console.error(e));
 
   mongodb.createCollection(db, "template", {
     validator: {
@@ -154,7 +154,7 @@ function collections() {
         },
       },
     },
-  }, true);
+  }, true).catch((e)=>console.error(e));
 }
 
 function defaults() {
