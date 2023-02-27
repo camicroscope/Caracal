@@ -24,6 +24,7 @@ const keycloakHandlers = require('./handlers/keycloakHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const customHandlers = require('./handlers/customHandlers.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
+const envEcho = require("./handlers/envEcho.js");
 
 
 const {connector} = require("./service/database/connector");
@@ -87,6 +88,7 @@ var HANDLERS = {
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
   "writeFile": fileHandlers.writeFile,
+  "envEcho": envEcho,
   "createKeycloakUser": keycloakHandlers.createUser,
   "iipHandler": function() {
     return iipHandlers.iipHandler;
