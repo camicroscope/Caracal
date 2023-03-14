@@ -81,7 +81,7 @@ class Mongo {
         if (!Array.isArray(data)) {
             data = [data];
         }
-
+        data.forEach(transformIdToObjectId);
         try {
             const collection = getConnection(database).collection(collectionName);
             const res = await collection.insertMany(data);
