@@ -97,7 +97,7 @@ function resetPassword() {
     password = data.password;
     email = token.email;
     // set password
-    resetPassword(email, password).then(()=>next()).catch((e)=>next(e));
+    kc.resetPassword(email, password).then(()=>next()).catch((e)=>next(e));
   };
 }
 
