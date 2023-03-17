@@ -49,6 +49,12 @@ async function addKcUser(firstName, lastName, email) {
 }
 
 async function resetPassword(email, password) {
+  let adminInfo = {
+    'username': KEYCLOAK_ADMIN,
+    'password': KEYCLOAK_ADMIN_PASSWORD,
+    'grant_type': "password",
+    'client_id': "admin-cli",
+  };
   let adminKeys = await fetch(KEYCLOAK_HOST + '/realms/master/protocol/openid-connect/token', {
     method: 'POST',
     headers: {
