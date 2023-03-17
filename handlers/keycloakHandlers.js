@@ -49,6 +49,13 @@ async function addKcUser(firstName, lastName, email) {
 }
 
 async function resetPassword(email, password) {
+  let adminKeys = await fetch(KEYCLOAK_HOST + '/realms/master/protocol/openid-connect/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(adminInfo),
+  }).then((x)=>x.json());
   // get all user ids, then find the one we just made
   let userInfo = await fetch(KEYCLOAK_HOST + '/admin/realms/' + KEYCLOAK_APP_REALM + '/users', {
     method: 'GET',
