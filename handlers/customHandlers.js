@@ -71,6 +71,8 @@ function requestResetPassword() {
     let resetEmail = `<p>Go the following page to resetr your caMicroscope password. Ignore this email if this request is in error.<br/>
                         <a href="${resetURL + "?token=" + token}>Reset your password</a>"
                          </p>`;
+    // TODO remove this log for prod
+    console.log(resetEmail)
     sendmail({
       from: adminAddress,
       to: email,
@@ -80,8 +82,9 @@ function requestResetPassword() {
     function(err, reply) {
       console.log(err && err.stack);
       console.dir(reply);
+      next(err);
     });
-    return 0;
+    next();
   };
 }
 
