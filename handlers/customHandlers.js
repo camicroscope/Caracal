@@ -66,7 +66,7 @@ function requestResetPassword() {
     if (auth.ISS) {
       user.issuer = auth.ISS;
     }
-    let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY, options);
+    let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY);
     // send email to address with link with token
     let resetEmail = `<p>Go the following page to resetr your caMicroscope password. Ignore this email if this request is in error.<br/>
                         <a href="${resetURL + "?token=" + token}>Reset your password</a>"
