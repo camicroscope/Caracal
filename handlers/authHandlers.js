@@ -208,6 +208,14 @@ function loginHandler(checkKey) {
   };
 }
 
+// use carefully
+function makeJwt(data, signKey, expiry) {
+  return jwt.sign(data, signKey, {
+    algorithm: 'RS256',
+    expiresIn: expiry,
+  });
+}
+
 // use filter handler AFTER data handler
 function filterHandler(dataField, filterField, attrField) {
   return function(req, res, next) {
@@ -323,8 +331,11 @@ auth.getToken = getToken;
 auth.firstSetupUserSignupExists = firstSetupUserSignupExists;
 auth.loginWithHeader = loginWithHeader;
 auth.dataEnforce = dataEnforce;
+auth.makeJwt = makeJwt;
 auth.CLIENT = CLIENT;
 auth.PRIKEY = PRIKEY;
 auth.PUBKEY = PUBKEY;
-
+auth.EXPIRY = EXPIRY;
+auth.AUD = AUD;
+auth.ISS = ISS;
 module.exports = auth;

@@ -76,6 +76,8 @@ var HANDLERS = {
     return sanitizeBody;
   },
   "userRegistrationFlow": customHandlers.userRegistrationFlow,
+  "resetPassword": customHandlers.resetPassword,
+  "requestResetPassword": customHandlers.requestResetPassword,
   "dataEnforce": auth.dataEnforce,
   "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,
