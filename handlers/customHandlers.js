@@ -3,7 +3,7 @@ const kc = require('./keycloakHandlers.js');
 const auth = require('./authHandlers.js');
 
 let adminAddress = process.env.ADMIN_EMAIL || "rbirmin@emory.edu";
-let resetURL = process.env.RESET_URL || "https://wolf.cci.emory.edu/camic_htt/reset.html";
+let resetURL = process.env.RESET_URL || "https://wolf.cci.emory.edu/camic_htt/apps/registration/resetPassword.html";
 
 // handlers for special routes
 
@@ -84,6 +84,7 @@ function requestResetPassword() {
       console.dir(reply);
       next(err);
     });
+    res.json({'username': email});
     next();
   };
 }
@@ -97,7 +98,10 @@ function resetPassword() {
     password = data.password;
     email = token.email;
     // set password
-    kc.resetPassword(email, password).then(()=>next()).catch((e)=>next(e));
+    kc.resetPassword(email, password).then(()=>{
+      res.json({'username': email});
+      next();
+    }).catch((e)=>next(e));
   };
 }
 
