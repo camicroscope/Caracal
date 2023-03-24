@@ -1,4 +1,3 @@
-const sendmail = require('sendmail')({silent: true});
 const kc = require('./keycloakHandlers.js');
 const auth = require('./authHandlers.js');
 const sgMail = require('@sendgrid/mail');
