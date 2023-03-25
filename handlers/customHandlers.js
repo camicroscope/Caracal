@@ -61,7 +61,7 @@ function requestResetPassword() {
     }
     let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY);
     // send email to address with link with token
-    let resetMsg = `<p>Welcome to caMicroscope! Please go the following page to resetr your caMicroscope password. Ignore this email if this request is in error.<br/>
+    let resetMsg = `<p>Welcome to caMicroscope! Please go the following page to reset your caMicroscope password. Ignore this email if this request is in error.<br/>
                         <a href="${resetURL + "?token=" + token}>Reset your password</a>"
                          </p>`;
     // TODO remove this log for prod
