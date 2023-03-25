@@ -65,7 +65,7 @@ function requestResetPassword() {
                         <a href="${resetURL + "?token=" + token}>Reset your password</a>"
                          </p>`;
     // TODO remove this log for prod
-    console.log(resetEmail);
+    console.log(resetMsg);
     sendMail(email, "caMicroscope : Welcome", resetMsg);
     res.json({'username': email});
     next();
