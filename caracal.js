@@ -35,7 +35,7 @@ var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
 
-var RUN_INDEXER = process.env.RUN_INDEXER || true;
+var RUN_INDEXER = process.env.RUN_INDEXER || false;
 
 const app = express();
 app.use(cookieParser());
