@@ -1,5 +1,6 @@
 const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 const mongoDB = require("../service/database");
+const mime = require("mime-types");
 
 var General = {};
 General.find = function(db, collection) {
