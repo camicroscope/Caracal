@@ -78,6 +78,8 @@ var HANDLERS = {
   "userRegistrationFlow": customHandlers.userRegistrationFlow,
   "resetPassword": customHandlers.resetPassword,
   "requestResetPassword": customHandlers.requestResetPassword,
+  "getOwnUser": customHandlers.getOwnUser,
+  "editOwnUser": customHandlers.editOwnUser,
   "dataEnforce": auth.dataEnforce,
   "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,

@@ -1,9 +1,11 @@
 const kc = require('./keycloakHandlers.js');
 const auth = require('./authHandlers.js');
 const sgMail = require('@sendgrid/mail');
+const mongoDB = require("../service/database");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-let adminAddress = process.env.ADMIN_EMAIL || "rbirmin@emory.edu";
+let defaultAddresses = ["rbirmin@emory.edu", "brandon.gallas@fda.hhs.gov", "Emma.Gardecki@fda.hhs.gov"];
+let adminAddress = JSON.parse(process.env.ADMIN_EMAILS) || defaultAddresses;
 let resetURL = process.env.RESET_URL || "https://wolf.cci.emory.edu/camic_htt/apps/registration/resetPassword.html";
 
 // handlers for special routes
@@ -85,6 +87,29 @@ function resetPassword() {
       res.json({'username': email});
       next();
     }).catch((e)=>next(e));
+  };
+}
+
+function getOwnUser(db, collection) {
+  return function(req, res, next) {
+    let token = auth.tokenVerify(req, auth.PRIKEY);
+    mongoDB.find(db, collection, {email: token.email}).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  };
+}
+
+function editOwnUser(db, collection) {
+  return function(req, res, next) {
+    let token = auth.tokenVerify(req, auth.PRIKEY);
+    var newVals = {
+      $set: JSON.parse(req.body),
+    };
+    mongoDB.update(db, collection, {email: token.email}, newVals).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
   };
 }
 

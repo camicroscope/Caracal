@@ -208,6 +208,10 @@ function loginHandler(checkKey) {
   };
 }
 
+function tokenVerify(req, key) {
+  return jwt.verify(getToken(req), key, jwtOptions);
+}
+
 // use carefully
 function makeJwt(data, signKey, expiry) {
   return jwt.sign(data, signKey, {
