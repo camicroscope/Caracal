@@ -7,6 +7,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 let defaultAddresses = '["rbirmin@emory.edu", "brandon.gallas@fda.hhs.gov", "Emma.Gardecki@fda.hhs.gov"]';
 let adminAddressRaw = process.env.ADMIN_EMAILS || defaultAddresses;
 let adminAddress = JSON.parse(adminAddressRaw);
+let fromAddress = process.env.FROM_ADDRESS || "rbirmin@emory.edu";
 let resetURL = process.env.RESET_URL || "https://wolf.cci.emory.edu/camic_htt/apps/registration/resetPassword.html";
 
 // handlers for special routes
@@ -14,7 +15,7 @@ let resetURL = process.env.RESET_URL || "https://wolf.cci.emory.edu/camic_htt/ap
 function sendMail(to, subject, message) {
   const msg = {
     to: to, // Change to your recipient
-    from: adminAddress, // Must be a "verified sender"
+    from: fromAddress, // Must be a "verified sender"
     subject: subject,
     html: message,
   };
