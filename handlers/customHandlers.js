@@ -4,8 +4,9 @@ const sgMail = require('@sendgrid/mail');
 const mongoDB = require("../service/database");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-let defaultAddresses = ["rbirmin@emory.edu", "brandon.gallas@fda.hhs.gov", "Emma.Gardecki@fda.hhs.gov"];
-let adminAddress = JSON.parse(process.env.ADMIN_EMAILS) || defaultAddresses;
+let defaultAddresses = '["rbirmin@emory.edu", "brandon.gallas@fda.hhs.gov", "Emma.Gardecki@fda.hhs.gov"]';
+let adminAddressRaw = process.env.ADMIN_EMAILS || defaultAddresses;
+let adminAddress = JSON.parse(adminAddressRaw);
 let resetURL = process.env.RESET_URL || "https://wolf.cci.emory.edu/camic_htt/apps/registration/resetPassword.html";
 
 // handlers for special routes
@@ -103,6 +104,14 @@ function getOwnUser(db, collection) {
 function editOwnUser(db, collection) {
   return function(req, res, next) {
     let token = auth.tokenVerify(req, auth.PRIKEY);
+    let updates = req.body;
+    // don't let users update some fields.
+    delete update.email;
+    delete update.collections;
+    delete update.userFilter;
+    delete update.userType;
+    delete update.create_date;
+    delete update['_id'];
     var newVals = {
       $set: JSON.parse(req.body),
     };
