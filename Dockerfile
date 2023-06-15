@@ -5,7 +5,7 @@ WORKDIR /src
 RUN npm install
 ARG viewer
 ARG fork
-RUN apk add --no-cache git
+RUN apk add --no-cache git openssl
 RUN git clone https://github.com/${fork:-camicroscope}/camicroscope.git --branch=${viewer:-master}
 EXPOSE 4010
 
