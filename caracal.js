@@ -21,6 +21,7 @@ const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const fileHandlers = require('./handlers/fileHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
+const envEcho = require("./handlers/envEcho.js");
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
 
@@ -34,7 +35,7 @@ var MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
 
 var DISABLE_CSP = process.env.DISABLE_CSP || false;
 
-var RUN_INDEXER = process.env.RUN_INDEXER || true;
+var RUN_INDEXER = process.env.RUN_INDEXER || false;
 
 const app = express();
 app.use(cookieParser());
@@ -82,6 +83,7 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
+  "envEcho": envEcho,
   "writeFile": fileHandlers.writeFile,
   "iipHandler": function() {
     return iipHandlers.iipHandler;
@@ -97,6 +99,9 @@ var HANDLERS = {
   },
   "markSpatial": function() {
     return dataHandlers.Mark.spatial;
+  },
+  "markSegmentationCount": function() {
+    return dataHandlers.Mark.segmentationCountByExecid;
   },
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;

@@ -149,7 +149,7 @@ function tokenTrade(checkKey, signKey, userFunction) {
                 'err': 'User Unauthorized',
               });
             } else {
-              data = x;
+              let data = x;
               delete data['exp'];
               // sign using the mounted key
               var token = jwt.sign(data, signKey, {

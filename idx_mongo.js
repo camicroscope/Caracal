@@ -5,7 +5,7 @@ const mongodb = require("./service/database");
 
 function quietMongoAdd(db, collection, data, x) {
   try {
-    mongodb.add(db, collection, data, x);
+    mongodb.add(db, collection, data, x).catch((e)=>console.error(e));
   } catch (err) {
     console.error(err);
   }
