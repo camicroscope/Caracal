@@ -41,8 +41,12 @@ function userRegistrationFlow() {
     // kc signup
     kc.addKcUser(firstName, lastName, email).then(()=>{
       // email to admin that new low-power user created.
-      let adminMsg = `<p>A new account for ${firstName} ${lastName} with email ${email} has been created with limited access.
-                           Check the user queue to assign this and other users to collections.</p>`;
+      let adminMsg = `<p>This email was auto-generated to alert you to a new user account created on caMicroscope.
+      The account has limited access. Please check the User Management
+      page and update the user type and assigned collections as appropriate.</p>
+      <br/>
+      <p>User name: <b>${firstName} ${lastName}</b></p>
+      <p>User email: <b>${email}</b></p>`;
       sendMail(adminAddress, "caMicroscope : New User Sign up", adminMsg);
       res.json({'username': email});
       next();
