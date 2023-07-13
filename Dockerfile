@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:20-alpine
 RUN apk add --no-cache git
 RUN apk add --no-cache openssl
 RUN mkdir /src
