@@ -15,8 +15,10 @@ General.find = function(db, collection) {
 General.findWithRegex = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
-    for (let i in query){
-      query[i] = new RegExp(query[i], 'i') // case insensitive search
+    for (let i in query) {
+      if (query.hasOwnProperty(i)) {
+        query[i] = new RegExp(query[i], 'i'); // case insensitive search
+      }
     }
     mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
