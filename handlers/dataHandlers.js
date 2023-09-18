@@ -403,58 +403,63 @@ FSChanged.added = function(db, collection, loader) {
       res.send({error: "filepath not canonical or invalid"});
       return;
     }
-    mongoDB.find(db, collection).then((slides) => {
-      // If contains any file from the parent path, do nothing.
-      // otherwise, add it as a new entry
-      var parentDir = path.dirname(query.filepath);
 
-      var identifier;
-      if (parentDir == '.') {
-        // This is a single file not in any subfolder, and does not have companion files
-        identifier = query.filepath;
-      } else {
-        // This is a file in a subdirectory.
-        // caMicroscope design decision: every subdir in the images directory is one image
-        // so traverse up if needed.
-        do {
-          identifier = parentDir;
-          parentDir = path.dirname(parentDir);
-        } while (parentDir != '.');
-      }
+    // If contains any other file from the subfolder, do nothing.
+    // otherwise, add it as a new entry.
+    // Likewise for single files in the flat images directory.
+    var parentDir = path.dirname(query.filepath);
 
-      // Here, we can be more fault tolerant and handle the case that despite still being an entry,
-      // it was somehow deleted from the filesystem.
-      // It may be replaced with any other file in the folder or the user requested path
-      // given that we verify that it exists.
-      // but that's the purpose of FSChanged.removed
-      if (slides.some((s) => s["filepath"] && s["filepath"].includes(identifier))) {
-        // Success, to allow the client to notify for every new file, even if that won't make a new series.
-        res.send({success: "another file from the same subdirectory is already in database"});
+    var identifier;
+    if (parentDir == '.') {
+      // This is a single file not in any subfolder, and does not have companion files
+      identifier = query.filepath;
+    } else {
+      // This is a file in a subdirectory.
+      // caMicroscope design decision: every subdir in the images directory is one image
+      // so traverse up if needed.
+      do {
+        identifier = parentDir;
+        parentDir = path.dirname(parentDir);
+      } while (parentDir != '.');
+    }
+
+    var filepath = query.filepath;
+    var name = path.basename(filepath);
+
+    fetch(loader + "/data/one/" + filepath).then((r) => {
+      if (!r.ok) {
+        res.send({error: "SlideLoader error: perhaps the filepath points to an inexistant file?"});
         return;
       }
-      var filepath = query.filepath;
-      var name = path.basename(filepath);
-      fetch(loader + "/data/one/" + filepath).then((r) => {
-        if (!r.ok) {
-          res.send({error: "SlideLoader error: perhaps the filepath points to an inexistant file?"});
+      r.json().then((data) => {
+        if (data.error) {
+          res.send({error: "SlideLoader error: the filepath points to an inexistant file?"});
           return;
         }
-        r.json().then((data) => {
-          if (data.error) {
-            res.send({error: "SlideLoader error: the filepath points to an inexistant file?"});
+        data.name = name;
+
+        mongoDB.find(db, collection).then((slides) => {
+          // Here, we can be more fault tolerant and handle the case that despite still being an entry,
+          // it was somehow deleted from the filesystem.
+          // It may be replaced with any other file in the folder or the user requested path
+          // given that we verify that it exists.
+          // but that's the purpose of FSChanged.removed
+          if (slides.findLast((s) => s["filepath"] && s["filepath"].includes(identifier))) {
+            // Success, to allow the client to notify for every new file, even if that won't make a new series.
+            res.send({success: "another file from the same subdirectory is already in database"});
             return;
           }
-          data.name = name;
           mongoDB.add(db, collection, data).then(() => {
             res.send({success: "added successfully"});
           }).catch((e) => {
             res.send({error: "mongo failure"});
             console.log(e);
           });
+        }).catch((e) => {
+          res.send({error: "mongo failure"});
+          print(e)
         });
       });
-    }).catch((e) => {
-      res.send({error: ""});
     });
   };
 };
