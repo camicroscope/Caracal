@@ -457,7 +457,7 @@ FSChanged.added = function(db, collection, loader) {
           });
         }).catch((e) => {
           res.send({error: "mongo failure"});
-          print(e)
+          console.log(e);
         });
       });
     });
