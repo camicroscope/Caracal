@@ -902,7 +902,7 @@ SeerService.getCollectionsData = async function(cids, user) {
     });
 
     // get all evaluation info
-    const evalQuery = {'slide_id': {'$in': slideIds}, 'creator': user};
+    const evalQuery = {'slide_id': {'$in': slideIds}, 'creator': user, 'is_draft': false};
     // if (uid) evalQuery.creator = uid;
     const evalData = await mongoDB.find('camic', 'evaluation', evalQuery, false);
 
