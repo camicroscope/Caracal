@@ -725,7 +725,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
       const {collectionMap, slideMap} = await SeerService.getCollectionsData(Array.from(collectionIds), user);
       // create user dir
       fs.mkdirSync(`${tmpDir}/${user}`);
-      //
+
       slideMap.forEach((data, slideId)=>{
         const {slide, evaluation, marks} = data;
         const locPath = slide.location.split('/'); // TODO
@@ -740,17 +740,17 @@ SeerService.collectionDataExports = async function(req, res, next) {
         // create slide info
         data.csvData = {
           wsiFileName,
-          tokenId: slide.name, // TODO change later
+          tokenId: slide.token_id,
           imageId: slide.name,
           tumorSiteCodeAndLabel: '',
           slideQualitySatisfactory: +evaluation.slide_quality,
-          tumorPresent: +evaluation.tumor_present,
-          tumorHistologyAccurate: +evaluation.tumor_histology,
-          informativenessYN: +evaluation.informativeness,
-          // TODO Relative Informativeness need to add
+          tumorPresent: evaluation.tumor_present==undefined?'':+evaluation.tumor_present,
+          tumorHistologyAccurate: evaluation.tumor_histology==undefined?'':+evaluation.tumor_histology,
+          informativenessYN: evaluation.informativeness==undefined?'':+evaluation.informativeness,
           absoluteInformativeness: evaluation.absolute_informativeness?+evaluation.absolute_informativeness: 0,
           tumorHistologyCorrected: evaluation.comments?evaluation.comments.trim(): '',
-          // Tumor ROI Filename TODO
+          level: evaluation.level? 1:0,
+
           creator: evaluation.creator,
           tumorROIFilename: `${slide.name}.json`,
           annotatingPathologist: evaluation.creator,
@@ -776,6 +776,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
             {id: 'relativeInformativeness', title: 'Relative Informativeness'},
             {id: 'absoluteInformativeness', title: 'Absolute Informativeness'},
             {id: 'tumorHistologyCorrected', title: 'Tumor Histology Corrected'},
+            {id: 'level', title: 'Level'},
             {id: 'tumorROIFilename', title: 'Tumor ROI Filename'},
             {id: 'annotatingPathologist', title: 'Annotating Pathologist'},
             {id: 'exportDate', title: 'Export Date'},
@@ -787,8 +788,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
 
         data.slides.forEach((sid)=>{
           const slideData = slideMap.get(sid);
-          // set relative informative
-
+          // Relative Informativeness need to add
           if (sid == first) {
             slideData.csvData.relativeInformativeness = '1';
           } else if (sid == second) {
@@ -796,7 +796,7 @@ SeerService.collectionDataExports = async function(req, res, next) {
           } else if (sid == third) {
             slideData.csvData.relativeInformativeness = '3';
           } else {
-            slideData.csvData.relativeInformativeness = 'L';
+            slideData.csvData.relativeInformativeness = '';
           }
           csvData.push(slideData.csvData);
         });
@@ -910,9 +910,9 @@ SeerService.getCollectionsData = async function(cids, user) {
       const eData = slideMap.get(eval.slide_id);
 
       eval.evaluation.creator = eval.creator;
+      eval.evaluation.level = eval.level;
       if (eData) eData.evaluation = eval.evaluation;
     });
-
     // get all human annotaions
     const annotQuery = {
       "provenance.analysis.source": "human",
