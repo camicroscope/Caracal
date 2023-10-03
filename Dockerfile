@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 camicroscope/caracal:nci-dccps-srp-5
+FROM --platform=linux/amd64 camicroscope/caracal:nci-dccps-srp-6
 EXPOSE 8010
 WORKDIR /src
 
