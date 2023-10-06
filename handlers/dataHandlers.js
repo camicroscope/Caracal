@@ -786,12 +786,22 @@ SeerService.collectionDataExports = async function(req, res, next) {
         const csvData = [];
 
         // first?, second?, third?
-        const {first, second, third} = data.relativeInformative;
+        // const {first, second, third} = data.relativeInformative;
 
         data.slides.forEach((sid)=>{
           const slideData = slideMap.get(sid);
           // Relative Informativeness need to add
           const tumorPresent = slideData.csvData.tumorPresent;
+
+          // get the ranked slide id
+          let first = null;
+          let second = null;
+          let third = null;
+          if (data.relativeInformative) {
+            first = data.relativeInformative.first;
+            second = data.relativeInformative.second;
+            third = data.relativeInformative.third;
+          }
           if (tumorPresent == 1 && sid == first) {
             slideData.csvData.relativeInformativeness = '1';
           } else if (tumorPresent == 1 && sid == second) {
