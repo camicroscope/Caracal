@@ -31,7 +31,7 @@
     "http-proxy-middleware": "^0.20.0",
     "inkjet": "^2.1.2",
     "jsonwebtoken": "^9.0.1",
-    "jwks-rsa": "^3.0.1",
+    "jwks-rsa": "^3.1.0",
     "mongodb": "^3.6.6",
     "throng": "^5.0.0",
     "uuid": "^8.3.2"
