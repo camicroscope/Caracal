@@ -75,6 +75,7 @@ var HANDLERS = {
   },
   "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,
+  "mongoFindWithRegex": dataHandlers.General.findWithRegex,
   "mongoAdd": dataHandlers.General.add,
   "mongoUpdate": dataHandlers.General.update,
   "mongoDelete": dataHandlers.General.delete,
@@ -124,6 +125,8 @@ var HANDLERS = {
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
   },
+  "addedFileToFS": dataHandlers.FSChanged.added,
+  "removedFileFromFS": dataHandlers.FSChanged.removed,
 };
 
 // TODO! -- remove these by fully depreciating tfjs serverside

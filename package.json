@@ -30,8 +30,8 @@
     "helmet": "^4.6.0",
     "http-proxy-middleware": "^0.20.0",
     "inkjet": "^2.1.2",
-    "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.12.3",
+    "jsonwebtoken": "^9.0.1",
+    "jwks-rsa": "^3.0.1",
     "mongodb": "^3.6.6",
     "throng": "^5.0.0",
     "uuid": "^8.3.2"
@@ -40,9 +40,9 @@
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
     "cookie-parser": "^1.4.4",
-    "eslint": "^6.8.0",
+    "eslint": "^8.44.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-security": "^1.4.0",
-    "mocha": "^8.4.0"
+    "mocha": "^10.2.0"
   }
 }

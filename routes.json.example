@@ -1102,5 +1102,17 @@
         "args": []
       }
     ]
+  },{
+    "route":"/fs/addedFile",
+    "method":"get",
+    "handlers":[
+      {"function":"addedFileToFS", "args": ["camic", "slide", "http://ca-load:4000"]}
+    ]
+  },{
+    "route":"/fs/deletedFile",
+    "method":"get",
+    "handlers":[
+      {"function":"removedFileFromFS", "args": ["camic", "slide", "http://ca-load:4000"]}
+    ]
   }
 ]
