@@ -10,7 +10,8 @@ function customLogin(usernameField, usertypeField) {
     username = process.env[usernameField] || "unknown user";
     token['sub'] = username;
     token['email'] = username;
-    token['name ']= username;
+    token['name']= username;
+    token['data'] = {'collections':["precisionfda collections are not managed here"]}
     usertype = process.env[usertypeField];
     token['userType'] = usertype || "Participant";
     // generate token with this info
