@@ -22,6 +22,7 @@ const fileHandlers = require('./handlers/fileHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 const envEcho = require("./handlers/envEcho.js");
+const customLogin = require("./handlers/customLogin.js");
 
 const mongoDB = require('./service/database');
 const nodemailer = require('nodemailer');
@@ -86,6 +87,7 @@ var HANDLERS = {
   "proxyHandler": proxyHandler,
   "writeFile": fileHandlers.writeFile,
   "envEcho": envEcho,
+  "customLogin": customLogin,
   "iipHandler": function() {
     return iipHandler;
   },
