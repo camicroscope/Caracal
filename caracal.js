@@ -29,14 +29,6 @@ const Agenda = require("agenda");
 
 const {generateTableBody} = require("./service/database/util");
 
-// TODO -- make optional
-const DISABLE_TF = true; // DUE TO PRODUCTION STABILITY ISSUES WITH TFJS
-
-if (!DISABLE_TF) {
-  const DataSet = require('./handlers/datasetHandler.js');
-  const Model = require('./handlers/modelTrainer.js');
-}
-
 const {connector} = require("./service/database/connector");
 
 var WORKERS = process.env.NUM_THREADS || 4;
@@ -153,22 +145,17 @@ var HANDLERS = {
   },
 };
 
-if (!DISABLE_TF) {
-  HANDLERS["getDataset"] = DataSet.getDataset;
-  HANDLERS["trainModel"] = Model.trainModel;
-  HANDLERS["deleteDataset"] = DataSet.deleteData;
-  HANDLERS["sendTrainedModel"] = Model.sendTrainedModel;
-} else {
-  function disabledRoute() {
-    return function(req, res) {
-      res.status(500).send('{"err":"This TF route is disabled"}');
-    };
-  }
-  HANDLERS["getDataset"] = disabledRoute;
-  HANDLERS["trainModel"] = disabledRoute;
-  HANDLERS["deleteDataset"] = disabledRoute;
-  HANDLERS["sendTrainedModel"] = disabledRoute;
+
+function disabledRoute() {
+  return function(req, res) {
+    res.status(500).send('{"err":"This TF route is disabled"}');
+  };
 }
+HANDLERS["getDataset"] = disabledRoute;
+HANDLERS["trainModel"] = disabledRoute;
+HANDLERS["deleteDataset"] = disabledRoute;
+HANDLERS["sendTrainedModel"] = disabledRoute;
+
 
 // register configurable services
 // TODO verify all
