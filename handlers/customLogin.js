@@ -23,4 +23,4 @@ function customLogin(usernameField, usertypeField) {
   };
 }
 
-module.expoers = customLogin;
+module.exports = customLogin;
