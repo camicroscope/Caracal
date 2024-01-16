@@ -15,7 +15,7 @@ function customLogin(usernameField, usertypeField) {
     token.userType = usertype || "Participant";
     // generate token with this info
     // return the token
-    signedToken = jwt.sign(data, "precision-fda-not-secure-token", {
+    signedToken = jwt.sign(token, "precision-fda-not-secure-token", {
       algorithm: 'RS256',
       expiresIn: EXPIRY,
     });
