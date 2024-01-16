@@ -8,15 +8,14 @@ function customLogin(usernameField, usertypeField) {
     let token = {};
     // get user id from env
     username = process.env[usernameField] || "unknown user";
-    token.sub = username;
-    token.email = username;
-    token.name = username;
+    token['sub'] = username;
+    token['email'] = username;
+    token['name ']= username;
     usertype = process.env[usertypeField];
-    token.userType = usertype || "Participant";
+    token['userType'] = usertype || "Participant";
     // generate token with this info
     // return the token
     signedToken = jwt.sign(token, "precision-fda-not-secure-token", {
-      algorithm: 'RS256',
       expiresIn: EXPIRY,
     });
     res.json({"token": signedToken});
