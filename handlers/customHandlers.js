@@ -69,9 +69,21 @@ function requestResetPassword() {
     }
     let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY);
     // send email to address with link with token
-    let resetMsg = `<p>Welcome to caMicroscope! Please go the following page to reset your caMicroscope password. Ignore this email if this request is in error.<br/>
-                        <a href="${resetURL + "?token=" + token}">Reset your password</a>
-                         </p>`;
+    let resetMsg = `<h1>Welcome to caMicroscope!</h1>
+                  <p>You are receiving this email because you have requested either a new account or a password reset.</p>
+                  <p>Your username is the email address entered during registration: ${email}</p>
+                  
+                  <p>Please click this link to reset your caMicroscope password: <a href="${resetURL + "?token=" + token}">Reset your password</a>
+                  
+                  <p>The password reset link lasts for 24 hours.
+                  
+                  <p>If the password reset link has expired, the login page has a "Forgot Password" button, or you can follow <a href="https://wolf.cci.emory.edu/camic/htt/apps/registration/resetPassword.html">this direct link</a> to get another email to reset your password. Please give the system a few minutes to send the email.</p>
+                  
+                  <p>Please let us know if you are still unable to log in after trying this. We can set a temporary password for you if needed.</p>
+                  
+                  <p>Thank you for your time,<br/>
+                  <a href="https://didsr.github.io/HTT.home/assets/pages/team">The HTT project management team</a>
+                  </p>`;
     // TODO remove this log for prod
     console.log(resetMsg);
     sendMail(email, "caMicroscope : Welcome", resetMsg);
