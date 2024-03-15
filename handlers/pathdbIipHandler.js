@@ -28,7 +28,10 @@ iipCheck = function(req, res, next) {
         console.log(x);
         // get path
         if (x && x['field_iip_path'] && x['field_iip_path'].length && x['field_iip_path'][0]['value']) {
-          req.newFilepath = x['field_iip_path'][0]['value'];
+          newFilepath = x['field_iip_path'][0]['value'];
+          newFilepath = encodeURIComponent(newFilepath);
+          newFilepath = newFilepath.replaceAll("%2F", "/");
+          req.newFilepath = newFilepath;
           console.log(req.newFilepath);
           next();
         } else {

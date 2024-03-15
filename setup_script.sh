@@ -24,9 +24,12 @@ fi
 ###
 ## check if the system has required services installed
 ###
-if ! command -v "mongo" &>/dev/null; then
-    echo "mongo could not be found on path. Please ensure that mongo is installed and is on PATH"
-    exit
+if command -v "mongo" &>/dev/null; then
+    MONGO="mongo"
+elif command -v "mongosh" &>/dev/null; then
+    MONGO="mongosh"
+else
+    echo "mongo or mongo could not be found on path. Please ensure that mongo is installed and is on PATH"
 fi
 
 if ! command -v "node" &>/dev/null; then
@@ -109,7 +112,7 @@ echo "Copying files complete!"
 ###
 ## try connecting to mongodb instance
 ###
-until mongo --host "${HOST}" --eval "print(\"Connected!\")" >/dev/null; do
+until $MONGO --host "${HOST}" --eval "print(\"Connected!\")" >/dev/null; do
     sleep 2
 done
 echo "[ database ] : connection established"
@@ -118,8 +121,8 @@ echo "[ database ] : connection established"
 ## check if database exists
 ###
 QUERY="db.getMongo().getDBNames().indexOf(\"${DB_NAME}\")"
-COMMAND="mongo ${HOST} --eval '${QUERY}' --quiet"
-if [ $(mongo ${HOST} --eval ${QUERY} --quiet) -lt 0 ]; then
+COMMAND="${MONGO} ${HOST} --eval '${QUERY}' --quiet"
+if [ $(${MONGO} ${HOST} --eval ${QUERY} --quiet) -lt 0 ]; then
     echo "[ database ] : does not exist"
     exit 1
 else
@@ -149,11 +152,11 @@ case $yn in
 
     echo "[ resource ] : clearing old configurations"
     echo "[ resource ] : seeding collections"
-    mongo --quiet --host $HOST $DB_NAME .seeder.collection.js
+    $MONGO --quiet --host $HOST $DB_NAME .seeder.collection.js
     echo "[ resource ] : seeding indexes"
-    mongo --quiet --host $HOST $DB_NAME .seeder.idx.js
+    $MONGO --quiet --host $HOST $DB_NAME .seeder.idx.js
     echo "[ resource ] : seeding configurations"
-    mongo --quiet --host $HOST $DB_NAME .seeder.default.js
+    $MONGO --quiet --host $HOST $DB_NAME .seeder.default.js
 
     ###
     ## ask the user if they want to remove the seeding files
