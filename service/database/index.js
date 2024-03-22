@@ -87,7 +87,10 @@ class Mongo {
             const res = await collection.insertMany(data);
             return res;
         } catch (e) {
-            if (silent) {
+            if (e.code === 11000) { 
+                console.warn(`Duplicate key error in collection '${collectionName}': ${e.keyValue}`);
+                return;
+            } else if (silent) {
                 console.warn('insert into ' + collectionName + ' did not occur, continuing because silent set')
             } else {
                 console.error(e);
