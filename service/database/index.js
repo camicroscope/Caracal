@@ -19,14 +19,22 @@ class Mongo {
      *
      * {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/ Read MongoDB Reference}
      */
-    static async find(database, collectionName, query, transform = true) {
+    // Add caching logic to find method
+    static async find(database, collectionName, query, transform = true, cache = true) {
         try {
+            if (cache) {
+                // Check cache first
+                const cacheKey = `${database}:${collectionName}:${JSON.stringify(query)}`;
+                const cachedData = cache.get(cacheKey);
+                if (cachedData) {
+                    return cachedData;
+                }
+            }
+    
             query = transformIdToObjectId(query);
-
             const collection = getConnection(database).collection(collectionName);
             const data = await collection.find(query).toArray();
-
-            /** allow caller method to toggle response transformation */
+    
             if (transform) {
                 data.forEach((x) => {
                     x["_id"] = {
@@ -34,13 +42,19 @@ class Mongo {
                     };
                 });
             }
-
+    
+            if (cache) {
+                // Cache the data
+                cache.set(cacheKey, data);
+            }
+    
             return data;
         } catch (e) {
             console.error(e);
             throw e;
         }
     }
+    
 
     /**
      * Runs a distinct find operation based on given query
