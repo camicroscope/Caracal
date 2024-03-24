@@ -13,7 +13,7 @@ check_command() {
 }
 
 # Check for required commands
-check_command "mongosh"
+check_command "mongoshsh"
 check_command "node.exe"
 check_command "wget"
 
@@ -50,14 +50,14 @@ cp -r ../caMicroscope/* ./camicroscope
 
 echo "Copying files complete!"
 
-# Try connecting to MongoDB instance
-until mongo --host "$HOST" --eval "print(\"Connected!\")" >/dev/null; do
+# Try connecting to mongoDB instance
+until mongosh --host "$HOST" --eval "print(\"Connected!\")" >/dev/null; do
     sleep 2
 done
 echo "[ database ] : connection established"
 
 # Check if database exists
-if ! mongo "$HOST" --eval "db.getMongo().getDBNames().indexOf(\"$DB_NAME\")" --quiet; then
+if ! mongosh "$HOST" --eval "db.getmongosh().getDBNames().indexOf(\"$DB_NAME\")" --quiet; then
     echo "[ database ] : $DB_NAME does not exist"
     exit 1
 else
@@ -82,11 +82,11 @@ case $yn in
 
     echo "[ resource ] : clearing old configurations"
     echo "[ resource ] : seeding collections"
-    mongo --quiet --host "$HOST" "$DB_NAME" .seeder.collection.js
+    mongosh --quiet --host "$HOST" "$DB_NAME" .seeder.collection.js
     echo "[ resource ] : seeding indexes"
-    mongo --quiet --host "$HOST" "$DB_NAME" .seeder.idx.js
+    mongosh --quiet --host "$HOST" "$DB_NAME" .seeder.idx.js
     echo "[ resource ] : seeding configurations"
-    mongo --quiet --host "$HOST" "$DB_NAME" .seeder.default.js
+    mongosh --quiet --host "$HOST" "$DB_NAME" .seeder.default.js
 
     # Ask the user if they want to remove the seeding files
     read -p "[ resource ] : Do you wish to keep the seeding files generated ? (y/n) :" yn
