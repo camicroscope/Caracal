@@ -1,210 +1,126 @@
 #!/bin/bash
 
-###
-## ensure that required params are passed into script
-###
-if [ -n "$1" ]; then
-    HOST=$1
-else
-    echo "[ database ] : name not passed, set to default value (127.0.0.1)"
-    HOST="127.0.0.1"
-fi
+# Ensure required params are passed into the script
+HOST="${1:-127.0.0.1}"
+DB_NAME="${2:-camic}"
 
-###
-## specify which database to operate on, if not specified, set default to camic
-###
-if [ -n "$2" ]; then
-    DB_NAME=$2
-    echo "[ database ] : name set as ${DB_NAME}"
-else
-    echo "[ database ] : name not passed, set to default value (camic)"
-    DB_NAME="camic"
-fi
+# Function to check if a command exists
+check_command() {
+    if ! command -v "$1" &>/dev/null; then
+        echo "$1 could not be found on path. Please ensure that $1 is installed and is on PATH"
+        exit 1
+    fi
+}
 
-###
-## check if the system has required services installed
-###
-if ! command -v "mongo" &>/dev/null; then
-    echo "mongo could not be found on path. Please ensure that mongo is installed and is on PATH"
-    exit
-fi
+# Check for required commands
+check_command "mongoshsh"
+check_command "node.exe"
+check_command "wget"
 
-if ! command -v "node" &>/dev/null; then
-    echo "node could not be found on path. Please ensure that node is installed and is on PATH"
-    exit
-fi
+# Function to check if a directory exists
+check_directory() {
+    if [ ! -d "$1" ]; then
+        echo "$1 does not exist"
+        exit 1
+    fi
+}
 
-###
-# check for the existence of required files in the Distro and camicroscope repository
-###
-echo "Checking for required files"
-
-#if [[ ! -d ../Distro/db ]]
-#then echo "../Distro/db does not exist"
-#     exit
-#fi
-
-if [[ ! -d ../Distro/config ]]
-then echo "../Distro/config does not exist"
-     exit
-fi
-
-if [[ ! -d ../Distro/jwt_keys ]]
-then echo "../Distro/jwt_keys does not exist"
-     exit
-fi
-
-if [[ ! -d ../caMicroscope ]]
-then echo "../caMicroscope does not exist"
-     exit
-fi
+# Check for required directories
+check_directory "../Distro/config"
+check_directory "../Distro/jwt_keys"
+check_directory "../caMicroscope"
 
 echo "Required files exist."
-
 echo "Copying files..." 
 
-#if [[ ! -d ../data ]]
-#then 
-#    mkdir ../data
-#    cp -r ../Distro/db ../data/
-#fi
+# Copy required files
+mkdir -p ../config
+cp -r ../Distro/config/* ../config/
 
-if [[ ! -d ../config ]]
-then 
-    mkdir ../config
-    cp -r ../Distro/config ../config/
-fi
+mkdir -p ./static
+cp ../Distro/config/login.html ./static/login.html
 
-if [[ ! -d ./static ]]
-then
-    mkdir ./static
-    cp ../Distro/config/login.html ./static/login.html
-fi
+mkdir -p ./keys/jwt_keys
+cp -r ../Distro/jwt_keys/* ./keys/jwt_keys/
 
-if [[ ! -d ./keys/jwt_keys ]]
-then
-    cp -r ../Distro/jwt_keys ./keys/
-fi
+cp ../Distro/config/contentSecurityPolicy.json ./contentSecurityPolicy.json
+cp ../Distro/config/additional_links.json ./static/additional_links.json
 
-if [[ ! -f ./contentSecurityPolicy.json ]]
-then
-    cp ../Distro/config/contentSecurityPolicy.json ./contentSecurityPolicy.json
-fi
-
-if [[ ! -f ./static/additional_links.json ]]
-then
-    cp ../Distro/config/additional_links.json ./static/additional_links.json
-fi
-
-if [[ ! -d ./camicroscope ]]
-then 
-    cp -r ../caMicroscope ./camicroscope
-fi
+cp -r ../caMicroscope/* ./camicroscope
 
 echo "Copying files complete!"
 
-
-
-
-###
-## try connecting to mongodb instance
-###
-until mongo --host "${HOST}" --eval "print(\"Connected!\")" >/dev/null; do
+# Try connecting to mongoDB instance
+until mongosh --host "$HOST" --eval "print(\"Connected!\")" >/dev/null; do
     sleep 2
 done
 echo "[ database ] : connection established"
 
-###
-## check if database exists
-###
-QUERY="db.getMongo().getDBNames().indexOf(\"${DB_NAME}\")"
-COMMAND="mongo ${HOST} --eval '${QUERY}' --quiet"
-if [ $(mongo ${HOST} --eval ${QUERY} --quiet) -lt 0 ]; then
-    echo "[ database ] : does not exist"
+# Check if database exists
+if ! mongosh "$HOST" --eval "db.getmongosh().getDBNames().indexOf(\"$DB_NAME\")" --quiet; then
+    echo "[ database ] : $DB_NAME does not exist"
     exit 1
 else
-    echo "[ database ] : database named ${DB_NAME} found"
+    echo "[ database ] : database named $DB_NAME found"
 fi
 
-###
-## ask developer if they wish to seed the database
-###
+# Ask user if they wish to seed the database
 read -p "[ resource ] : Do you wish to initialize the database with indexes and configs? (y/n) : " yn
 case $yn in
 [Yy]*)
-    ###
-    ## Download the files from github and save to local directory
-    ###
     echo "[ resource ] : downloading seeding files"
 
-    # resource targets
+    # Resource URLs
     RESOURCE_IDX="https://raw.githubusercontent.com/camicroscope/Distro/master/config/mongo_idx.js"
     RESOURCE_COLLECTION="https://raw.githubusercontent.com/camicroscope/Distro/master/config/mongo_collections.js"
     RESOURCE_DEFAULT_DATA="https://raw.githubusercontent.com/camicroscope/Distro/master/config/default_data.js"
 
-    # get data from resource targets
-    wget -q RESOURCE_IDX -O .seeder.idx.js
-    wget -q RESOURCE_DEFAULT_DATA -O .seeder.default.js
-    wget -q RESOURCE_COLLECTION -O .seeder.collection.js
+    # Download files
+    wget -q "$RESOURCE_IDX" -O .seeder.idx.js
+    wget -q "$RESOURCE_DEFAULT_DATA" -O .seeder.default.js
+    wget -q "$RESOURCE_COLLECTION" -O .seeder.collection.js
 
     echo "[ resource ] : clearing old configurations"
     echo "[ resource ] : seeding collections"
-    mongo --quiet --host $HOST $DB_NAME .seeder.collection.js
+    mongosh --quiet --host "$HOST" "$DB_NAME" .seeder.collection.js
     echo "[ resource ] : seeding indexes"
-    mongo --quiet --host $HOST $DB_NAME .seeder.idx.js
+    mongosh --quiet --host "$HOST" "$DB_NAME" .seeder.idx.js
     echo "[ resource ] : seeding configurations"
-    mongo --quiet --host $HOST $DB_NAME .seeder.default.js
+    mongosh --quiet --host "$HOST" "$DB_NAME" .seeder.default.js
 
-    ###
-    ## ask the user if they want to remove the seeding files
-    ###
+    # Ask the user if they want to remove the seeding files
     read -p "[ resource ] : Do you wish to keep the seeding files generated ? (y/n) :" yn
     case $yn in
-    [Yy]*) echo "[ resource ] : The seeder files are present in current directory with name : .seeder.*.js" ;;
+    [Yy]*) echo "[ resource ] : The seeder files are present in the current directory with names: .seeder.*.js" ;;
     [Nn]*) rm .seeder.* ;;
     *) echo "[ resource ] : Please answer y/n." ;;
     esac
     ;;
-    ### seeder file cleanup ends here
-
 [Nn]*) echo "[ resource ] : database initialization skipped" ;;
 *) echo "[ resource ] : skipped" ;;
 esac
-### seeder prompt ends here
 
-###
-## load the default routes.json file if it does not exist in the file system
-###
-if [ -f "routes.json" ]; then
-    echo "[ routes   ] : routes.json file already exists"
-else
+# Additional setup
+if [ ! -f "routes.json" ]; then
     cp routes.json.example routes.json
     echo "[ routes   ] : routes.json file generated from routes.json.example"
 fi
 
-if [ -f "keys/key" ] && [ -f "keys/key.pub" ]; then
-    echo "[ keys     ] : public and private keys already exist"
-else
+if [ ! -f "keys/key" ] && [ ! -f "keys/key.pub" ]; then
     bash ./keys/make_key.sh
-    echo "[ routes   ] : routes.json file generated from routes.json.example"
+    echo "[ keys     ] : public and private keys generated"
 fi
 
-###
-## install the packages if not done already
-###
 if [ ! -d "node_modules" ]; then
     echo "[ modules  ] : packages not installed, running : npm install"
     npm install
 else
-    echo "[ modules  ] : packages directory already exist, to reinstall, delete the node_modules folder and run npm install"
+    echo "[ modules  ] : packages directory already exists. To reinstall, delete the node_modules folder and run npm install"
 fi
 
-###
-## initialize the environment variable configs
-###
 if [ ! -f ".env" ]; then
-    echo "[ env      ] : .env file not found"
     cp .env.example .env
+    echo "[ env      ] : .env file generated from .env.example"
 else
     echo "[ env      ] : .env file already exists"
 fi
