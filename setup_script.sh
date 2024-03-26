@@ -13,8 +13,8 @@ check_command() {
 }
 
 # Check for required commands
-check_command "mongoshsh"
-check_command "node.exe"
+check_command "mongod"
+check_command "node"
 check_command "wget"
 
 # Function to check if a directory exists
@@ -57,7 +57,7 @@ done
 echo "[ database ] : connection established"
 
 # Check if database exists
-if ! mongosh "$HOST" --eval "db.getmongosh().getDBNames().indexOf(\"$DB_NAME\")" --quiet; then
+if ! mongosh "$HOST" --eval "db.getMongo().getDBNames().indexOf(\"$DB_NAME\")" --quiet; then
     echo "[ database ] : $DB_NAME does not exist"
     exit 1
 else
