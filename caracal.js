@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 
+
 var proxy = require('http-proxy-middleware');
 const https = require('https');
 var cookieParser = require('cookie-parser');
@@ -39,6 +40,13 @@ var RUN_INDEXER = process.env.RUN_INDEXER || false;
 
 const app = express();
 app.use(cookieParser());
+
+// caching
+
+const maxAge = 365 * 24 * 60 * 60 * 1000;
+// Serve static files from the "public" directory with caching enabled
+app.use(express.static('public', {maxAge: maxAge}));
+
 
 if (!DISABLE_CSP) {
   app.use(helmet.contentSecurityPolicy({
