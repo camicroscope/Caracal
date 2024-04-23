@@ -234,5 +234,6 @@ module.exports = {
     aggregate: Mongo.aggregate,
     distinct: Mongo.distinct,
     createIndex: Mongo.createIndex,
-    createCollection: Mongo.createCollection
+    createCollection: Mongo.createCollection,
+    count: Mongo.count,
 };
