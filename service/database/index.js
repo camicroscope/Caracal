@@ -43,6 +43,34 @@ class Mongo {
     }
 
     /**
+     * Runs the MongoDB count() method to count documents.
+     *
+     * @async
+     * @param {string} database Name of the database
+     * @param {string} collectionName Name of the collection to run operation on
+     * @param {document} query Specifies selection filter using query operators.
+     * To return all documents in a collection, omit this parameter or pass an empty document ({}).
+     * @param {boolean} [transform=false] check to transform the IDs to ObjectID in response
+     *
+     * {@link https://docs.mongodb.com/manual/reference/method/db.collection.count/ Read MongoDB Reference}
+     */
+        static async count(database, collectionName, query, transform = true) {
+            try {
+                query = transformIdToObjectId(query);
+    
+                const collection = getConnection(database).collection(collectionName);
+                const count = await collection.count(query);
+    
+                data =[{"count": count}];
+    
+                return data;
+            } catch (e) {
+                console.error(e);
+                throw e;
+            }
+        }
+
+    /**
      * Runs a distinct find operation based on given query
      *
      * @async

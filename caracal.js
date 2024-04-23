@@ -80,6 +80,7 @@ var HANDLERS = {
   "mongoUpdate": dataHandlers.General.update,
   "mongoDelete": dataHandlers.General.delete,
   "mongoDistinct": dataHandlers.General.distinct,
+  "mongoCount": dataHandlers.General.count,
   "filterHandler": auth.filterHandler,
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
