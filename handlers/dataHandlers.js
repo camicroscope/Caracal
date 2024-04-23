@@ -13,6 +13,16 @@ General.find = function(db, collection) {
   };
 };
 
+General.count = function(db, collection) {
+  return function(req, res, next) {
+    var query = req.query;
+    mongoDB.count(db, collection, query).then((x) => {
+      req.data = x;
+      next();
+    }).catch((e) => next(e));
+  };
+};
+
 General.findWithRegex = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
