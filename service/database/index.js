@@ -61,7 +61,7 @@ class Mongo {
                 const collection = getConnection(database).collection(collectionName);
                 const count = await collection.count(query);
     
-                data =[{"count": count}];
+                let data =[{"count": count}];
     
                 return data;
             } catch (e) {
