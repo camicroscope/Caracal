@@ -75,6 +75,7 @@ var HANDLERS = {
   },
   "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,
+  "mongoPaginatedFind": dataHandlers.General.paginatedFind,
   "mongoFindWithRegex": dataHandlers.General.findWithRegex,
   "mongoAdd": dataHandlers.General.add,
   "mongoUpdate": dataHandlers.General.update,
