@@ -26,6 +26,7 @@ class Mongo {
             const collection = getConnection(database).collection(collectionName);
             let { _page = 0, _pageSize = 1000, ...filterQuery } = query;
             const _skip = _page * _pageSize;
+            _pageSize = parseInt(_pageSize, 10);
             const data = await collection.find(filterQuery).skip(_skip).limit(_pageSize).toArray();
 
             /** allow caller method to toggle response transformation */
