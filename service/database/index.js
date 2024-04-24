@@ -24,7 +24,9 @@ class Mongo {
             query = transformIdToObjectId(query);
 
             const collection = getConnection(database).collection(collectionName);
-            const data = await collection.find(query).toArray();
+            let { _page = 0, _pageSize = 1000, ...filterQuery } = query;
+            const _skip = _page * _pageSize;
+            const data = await collection.find(filterQuery).skip(_skip).limit(_pageSize).toArray();
 
             /** allow caller method to toggle response transformation */
             if (transform) {
