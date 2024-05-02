@@ -42,6 +42,72 @@ class Mongo {
         }
     }
 
+        /**
+     * Runs the MongoDB find() method to fetch documents with pagination.
+     *
+     * @async
+     * @param {string} database Name of the database
+     * @param {string} collectionName Name of the collection to run operation on
+     * @param {document} query Specifies selection filter using query operators.
+     * To return all documents in a collection, omit this parameter or pass an empty document ({}).
+     * @param {boolean} [transform=false] check to transform the IDs to ObjectID in response
+     *
+     * {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/ Read MongoDB Reference}
+     */
+        static async paginatedFind(database, collectionName, query, transform = true) {
+            try {
+                query = transformIdToObjectId(query);
+    
+                const collection = getConnection(database).collection(collectionName);
+                let { _page = 0, _pageSize = 1000, ...filterQuery } = query;
+                const _skip = _page * _pageSize;
+                _pageSize = parseInt(_pageSize, 10);
+                const data = await collection.find(filterQuery).skip(_skip).limit(_pageSize).toArray();
+    
+                /** allow caller method to toggle response transformation */
+                if (transform) {
+                    data.forEach((x) => {
+                        x["_id"] = {
+                            $oid: x["_id"],
+                        };
+                    });
+                }
+    
+                return data;
+            } catch (e) {
+                console.error(e);
+                throw e;
+            }
+        }
+
+    /**
+     * Runs the MongoDB count() method to count documents.
+     *
+     * @async
+     * @param {string} database Name of the database
+     * @param {string} collectionName Name of the collection to run operation on
+     * @param {document} query Specifies selection filter using query operators.
+     * To return all documents in a collection, omit this parameter or pass an empty document ({}).
+     * @param {boolean} [transform=false] check to transform the IDs to ObjectID in response
+     *
+     * {@link https://docs.mongodb.com/manual/reference/method/db.collection.count/ Read MongoDB Reference}
+     */
+        static async count(database, collectionName, query, transform = true) {
+            try {
+                query = transformIdToObjectId(query);
+    
+                const collection = getConnection(database).collection(collectionName);
+                const count = await collection.count(query);
+    
+                let data =[{"count": count}];
+    
+                return data;
+            } catch (e) {
+                console.error(e);
+                throw e;
+            }
+        }
+
     /**
      * Runs a distinct find operation based on given query
      *
@@ -201,10 +267,12 @@ class Mongo {
 module.exports = {
     add: Mongo.add,
     find: Mongo.find,
+    paginatedFind: Mongo.paginatedFind,
     update: Mongo.update,
     delete: Mongo.delete,
     aggregate: Mongo.aggregate,
     distinct: Mongo.distinct,
     createIndex: Mongo.createIndex,
-    createCollection: Mongo.createCollection
+    createCollection: Mongo.createCollection,
+    count: Mongo.count,
 };
