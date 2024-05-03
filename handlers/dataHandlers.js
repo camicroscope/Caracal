@@ -354,7 +354,7 @@ Mark.pointList = function(req, res, next) {
   var points = [];
 
   mongoDB.find("camic", 'mark', query,  false ,{ x: 1, y: 1, _id: 0 }).then((points) => {
-    req.data = { points: points.map(point => [point.x, point.y]) };
+    req.data = { points: points.map(point => [Math.round(point.x* 10000), Math.round(point.y* 10000)]) };
     next();
   }).catch((e) => next(e));
 };
