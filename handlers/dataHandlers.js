@@ -6,6 +6,7 @@ var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    delete query.token;
     mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -16,6 +17,7 @@ General.find = function(db, collection) {
 General.paginatedFind = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    delete query.token;
     mongoDB.paginatedFind(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -348,6 +350,7 @@ Mark.updateMarksLabel = function(req, res, next) {
 
 Mark.pointList = function(req, res, next) {
     var query = req.query;
+    delete query.token;
     mongoDB.find("camic", 'mark', query, { x: 1, y: 1, _id: 0 }).toArray().then((points) => {
       req.data = { points: points.map(point => [point.x, point.y]) };
       next();
