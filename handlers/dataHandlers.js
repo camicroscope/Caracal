@@ -353,7 +353,7 @@ Mark.pointList = function(req, res, next) {
   delete query.token;
   var points = [];
 
-  mongoDB.forEach("camic", 'mark', query,  false ,{ x: 1, y: 1, _id: 0 }).then((points) => {
+  mongoDB.find("camic", 'mark', query,  false ,{ x: 1, y: 1, _id: 0 }).then((points) => {
     req.data = { points: points.map(point => [point.x, point.y]) };
     next();
   }).catch((e) => next(e));
