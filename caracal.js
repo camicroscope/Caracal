@@ -106,6 +106,9 @@ var HANDLERS = {
   "markSegmentationCount": function() {
     return dataHandlers.Mark.segmentationCountByExecid;
   },
+  "markPointList": function(){
+    return Mark.pointList;
+  },
   "findMarkTypes": function() {
     return dataHandlers.Mark.findMarkTypes;
   },

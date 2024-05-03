@@ -345,6 +345,16 @@ Mark.updateMarksLabel = function(req, res, next) {
     next();
   }).catch((e) => next(e));
 };
+
+Mark.pointList = function(req, res, next) {
+    var query = req.query;
+    mongoDB.find(db, 'mark', query, { x: 1, y: 1, _id: 0 }).toArray().then((points) => {
+      req.data = { points: points.map(point => [point.x, point.y]) };
+      next();
+    }).catch((e) => next(e));
+  };
+
+
 var Heatmap = {};
 Heatmap.types = function(req, res, next) {
   var query = req.query;
