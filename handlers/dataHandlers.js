@@ -349,13 +349,18 @@ Mark.updateMarksLabel = function(req, res, next) {
 };
 
 Mark.pointList = function(req, res, next) {
-    var query = req.query;
-    delete query.token;
-    mongoDB.find("camic", 'mark', query, { x: 1, y: 1, _id: 0 }).toArray().then((points) => {
-      req.data = { points: points.map(point => [point.x, point.y]) };
+  var query = req.query;
+  delete query.token;
+  var points = [];
+  
+  mongoDB.find("camic", 'mark', query, { x: 1, y: 1, _id: 0 }).forEach((doc) => {
+      points.push([doc.x, doc.y]);
+  }).then(() => {
+      req.data = { points: points };
       next();
-    }).catch((e) => next(e));
+  }).catch((e) => next(e));
 };
+
 
 
 var Heatmap = {};
