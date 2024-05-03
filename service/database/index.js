@@ -19,13 +19,13 @@ class Mongo {
      *
      * {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/ Read MongoDB Reference}
      */
-    static async find(database, collectionName, query, transform = true) {
+    static async find(database, collectionName, query, transform = true, filter = {}) {
         try {
             query = transformIdToObjectId(query);
-
+    
             const collection = getConnection(database).collection(collectionName);
-            const data = await collection.find(query).toArray();
-
+            const data = await collection.find(query, filter).toArray();
+    
             /** allow caller method to toggle response transformation */
             if (transform) {
                 data.forEach((x) => {
@@ -34,13 +34,14 @@ class Mongo {
                     };
                 });
             }
-
+    
             return data;
         } catch (e) {
             console.error(e);
             throw e;
         }
     }
+    
 
         /**
      * Runs the MongoDB find() method to fetch documents with pagination.
