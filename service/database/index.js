@@ -19,12 +19,12 @@ class Mongo {
      *
      * {@link https://docs.mongodb.com/manual/reference/method/db.collection.find/ Read MongoDB Reference}
      */
-    static async find(database, collectionName, query, transform = true, filter = {}) {
+    static async find(database, collectionName, query, transform = true, projection = {}) {
         try {
             query = transformIdToObjectId(query);
     
             const collection = getConnection(database).collection(collectionName);
-            const data = await collection.find(query, filter).toArray();
+            const data = await collection.find(query).project(projection).toArray();
     
             /** allow caller method to toggle response transformation */
             if (transform) {
