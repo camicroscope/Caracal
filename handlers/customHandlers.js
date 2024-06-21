@@ -145,7 +145,7 @@ function impersonate() {
   return function(req, res, next) {
     let body = JSON.parse(req.body);
     let email = body.email;
-    dataHandlers.User.forLogin(]email).then((x)=>{
+    dataHandlers.User.forLogin(email).then((x)=>{
         console.log("here");
         console.log(email);
         console.log(x);
