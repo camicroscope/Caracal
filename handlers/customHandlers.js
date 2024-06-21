@@ -143,7 +143,9 @@ function editOwnUser(db, collection) {
 
 function impersonate() {
   return function(req, res, next) {
+    console.log(req.body.email);
     dataHandlers.User.forLogin(req.body.email).then((x)=>{
+        console.log(x);
         const newToken = {};
         newToken.userType = x[0].userType || 'Null';
         newToken.userFilter = x[0].userFilter || ['Public'];
