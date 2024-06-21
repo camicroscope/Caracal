@@ -156,7 +156,7 @@ function impersonate() {
         newToken.email = email;
         newToken.name = email;
         newToken.data = x[0];
-        let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY);
+        let token = auth.makeJwt(newToken, auth.PRIKEY, auth.EXPIRY);
         req.data = {"token": token, "sub": email};
         next()
     }).catch((e) => next(e));
