@@ -143,8 +143,9 @@ function editOwnUser(db, collection) {
 
 function impersonate() {
   return function(req, res, next) {
-    console.log(req.body.email);
     dataHandlers.User.forLogin(req.body.email).then((x)=>{
+        console.log("here");
+        console.log(req.body.email);
         console.log(x);
         const newToken = {};
         newToken.userType = x[0].userType || 'Null';
@@ -155,7 +156,7 @@ function impersonate() {
         newToken.data = x[0];
         req.data = newToken;
         next()
-    });
+    }).catch((e) => next(e));
   };
 }
 
