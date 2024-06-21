@@ -3,6 +3,8 @@ const auth = require('./authHandlers.js');
 const sgMail = require('@sendgrid/mail');
 const mongoDB = require("../service/database");
 
+var dataHandlers = require('./dataHandlers.js');
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 let defaultAddresses = '["rbirmin@emory.edu", "brandon.gallas@fda.hhs.gov", "Emma.Gardecki@fda.hhs.gov"]';
 let adminAddressRaw = process.env.ADMIN_EMAILS || defaultAddresses;
@@ -139,13 +141,19 @@ function editOwnUser(db, collection) {
   };
 }
 
-function impersonate(userFunction) {
+function impersonate() {
   return function(req, res, next) {
-    let fakeToken = {'email': req.body.email};
-    let user = userFunction(fakeToken);
-    let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY);
-    req.data = token;
-    next();
+    dataHandlers.User.forLogin(req.body.email).then((x)=>{
+        const newToken = {};
+        newToken.userType = x[0].userType || 'Null';
+        newToken.userFilter = x[0].userFilter || ['Public'];
+        newToken.sub = req.body.email;
+        newToken.email = req.body.email;
+        newToken.name = req.body.email;
+        newToken.data = x[0];
+        req.data = newToken;
+        next()
+    });
   };
 }
 
