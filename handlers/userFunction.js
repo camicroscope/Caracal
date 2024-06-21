@@ -5,6 +5,8 @@ var dataHandlers = require('./dataHandlers.js');
 function userFunction(token) {
   return new Promise(function(res, rej) {
     dataHandlers.User.forLogin(token.email).then((x)=>{
+      console.log(token)
+      console.log(x)
       if (x.length <= 0) {
         if (ALLOW_PUBLIC) {
           const publicToken = {};
