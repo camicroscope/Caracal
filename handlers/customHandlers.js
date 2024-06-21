@@ -123,12 +123,12 @@ function editOwnUser(db, collection) {
     let token = auth.tokenVerify(req, auth.PRIKEY);
     let updates = req.body;
     // don't let users update some fields.
-    delete update.email;
-    delete update.collections;
-    delete update.userFilter;
-    delete update.userType;
-    delete update.create_date;
-    delete update['_id'];
+    delete updates.email;
+    delete updates.collections;
+    delete updates.userFilter;
+    delete updates.userType;
+    delete updates.create_date;
+    delete updates['_id'];
     var newVals = {
       $set: JSON.parse(req.body),
     };
@@ -139,8 +139,19 @@ function editOwnUser(db, collection) {
   };
 }
 
+function impersonate(userFunction) {
+  return function(req, res, next) {
+    let fakeToken = {'email': req.body.email};
+    let user = userFunction(fakeToken);
+    let token = auth.makeJwt(user, auth.PRIKEY, auth.EXPIRY);
+    req.data = token;
+    next();
+  };
+}
+
 var customHandlers = {};
 customHandlers.userRegistrationFlow = userRegistrationFlow;
 customHandlers.resetPassword = resetPassword;
 customHandlers.requestResetPassword = requestResetPassword;
+customHandlers.impersonate = impersonate;
 module.exports = customHandlers;

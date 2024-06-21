@@ -80,6 +80,9 @@ var HANDLERS = {
   "requestResetPassword": customHandlers.requestResetPassword,
   "getOwnUser": customHandlers.getOwnUser,
   "editOwnUser": customHandlers.editOwnUser,
+  "impersonate": function() {
+    return customHandlers.impersonate(userFunction);
+  },
   "dataEnforce": auth.dataEnforce,
   "monitorCheck": monitor.check,
   "mongoFind": dataHandlers.General.find,
