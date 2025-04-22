@@ -7,6 +7,7 @@ let maxDocsInput = process.env.MAX_NUM_FIND_DOCS;
 let MAX_NUM_FIND_DOCS = parseInt(maxDocsInput, 10);
 if (isNaN(MAX_NUM_FIND_DOCS) || MAX_NUM_FIND_DOCS <= 0) {
   MAX_NUM_FIND_DOCS = Number.MAX_SAFE_INTEGER;
+}
 
 /**
  * @class Mongo
