@@ -1,6 +1,10 @@
 const { getConnection } = require("./connector");
 const { transformIdToObjectId } = require("./util");
 
+MAX_NUM_FIND_DOCS = 10000;
+
+var MAX_NUM_FIND_DOCS = process.env.MAX_NUM_FIND_DOCS || Number.MAX_SAFE_INTEGER;
+
 /**
  * @class Mongo
  * @description Handles database operations, called via handler. This is like a generic that
@@ -24,7 +28,7 @@ class Mongo {
             query = transformIdToObjectId(query);
 
             const collection = getConnection(database).collection(collectionName);
-            const data = await collection.find(query).toArray();
+            const data = await collection.find(query).limit(MAX_NUM_FIND_DOCS).toArray();
 
             /** allow caller method to toggle response transformation */
             if (transform) {
