@@ -1,8 +1,6 @@
 const { getConnection } = require("./connector");
 const { transformIdToObjectId } = require("./util");
 
-MAX_NUM_FIND_DOCS = 10000;
-
 let maxDocsInput = process.env.MAX_NUM_FIND_DOCS;
 let MAX_NUM_FIND_DOCS = parseInt(maxDocsInput, 10);
 if (isNaN(MAX_NUM_FIND_DOCS) || MAX_NUM_FIND_DOCS <= 0) {
