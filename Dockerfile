@@ -1,6 +1,7 @@
 FROM node:20-alpine
 RUN apk add --no-cache git
 RUN apk add --no-cache openssl
+RUN apk add bash
 RUN mkdir /src
 COPY . /src
 WORKDIR /src
