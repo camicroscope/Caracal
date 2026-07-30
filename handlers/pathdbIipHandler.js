@@ -1,5 +1,4 @@
 // EXTENDS authHandlers
-const proxy = require('http-proxy-middleware');
 var jwt = require('jsonwebtoken');
 var EXPIRY = process.env.EXPIRY || '1d';
 var BYPASS_IIP_CHECK = process.env.BYPASS_IIP_CHECK == "Y";

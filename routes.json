@@ -44,6 +44,34 @@
   },
 
   {
+    "method":"use",
+    "route": "/img/MCT/composited/",
+    "handlers":[
+      {"function": "loginHandler", "args":[]},
+      {"function": "preMct", "args":[]},
+      {"function":"mctileHandler", "args": []}
+    ]
+  },
+
+  {
+    "method":"use",
+    "route": "/img/MCT/meta/",
+    "handlers":[
+      {"function": "loginHandler", "args":[]},
+      {"function":"proxyHandler", "args": ["http://ca-mctile:8008/", 3]}
+    ]
+  },
+
+  {
+    "method":"use",
+    "route": "/img/MCT/raw/",
+    "handlers":[
+      {"function": "loginHandler", "args":[]},
+      {"function":"proxyHandler", "args": ["http://ca-mctile:8008/", 3]}
+    ]
+  },
+
+  {
     "route":"/data",
     "method":"use",
     "handlers":[
@@ -169,24 +197,28 @@
     "route":"/data/Mark/updateMarksLabel",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"updateMarksLabel", "args": []}
     ]
   },{
     "route":"/data/Presetlabels/add",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"addPresetlabels", "args": []}
     ]
   },{
     "route":"/data/Presetlabels/update",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"updatePresetlabels", "args": []}
     ]
   },{
     "route":"/data/Presetlabels/remove",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"removePresetlabels", "args": []}
     ]
   },
@@ -301,6 +333,7 @@
     "route":"/data/Log/post",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"mongoAdd", "args": ["camic", "log"]}
     ]
   },{
@@ -329,6 +362,7 @@
     "route":"/data/Evaluation/post",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"mongoAdd", "args": ["camic", "evaluation"]}
     ]
   },{
@@ -342,6 +376,7 @@
     "route":"/data/Evaluation/update",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"mongoUpdate", "args": ["camic", "evaluation"]}
     ]
   },
@@ -356,6 +391,7 @@
     "route":"/data/Freeform/post",
     "method":"post",
     "handlers":[
+      {"function":"permissionHandler", "args": [["Admin", "Editor"]]},
       {"function":"mongoAdd", "args": ["camic", "freeform"]}
     ]
   },{

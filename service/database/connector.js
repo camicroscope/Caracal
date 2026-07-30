@@ -20,14 +20,8 @@ class MongoDBConnector {
     const databaseName = process.env.MONGO_DB || "camic";
     const url = `${connectionString}/${databaseName}`;
 
-    /** connection configurations */
-    const configs = {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    };
-
     this.name = databaseName;
-    this.client = new MongoClient(url, configs);
+    this.client = new MongoClient(url);
   }
 
   /**
