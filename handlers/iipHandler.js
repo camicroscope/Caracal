@@ -30,6 +30,24 @@ function removeParameterFromUrl(url, parameter) {
       .replace(new RegExp('([?&])' + parameter + '=[^&]*&'), '$1');
 }
 
+// Use req.originalUrl (never mutated by Express's own mount-path stripping),
+// not the possibly-already-stripped req.url -- http-proxy-middleware v3 no
+// longer restores req.originalUrl into req.url the way older versions
+// implicitly did, and this slicing is calibrated against the full original
+// path. Exported standalone (rather than inlined in the proxy config) so
+// it's unit-testable without going through http-proxy-middleware/a real
+// network call.
+function rewritePath(req) {
+  var fullPath = req.originalUrl;
+  if (req.newFilepath) {
+    fullPath = fullPath.replace(req.iipFileRequested, req.newFilepath);
+  }
+  // remove token if present
+  fullPath = removeParameterFromUrl(fullPath, "token");
+  var splitPath = fullPath.split('/');
+  return '/' + splitPath.slice(2, splitPath.length).join('/');
+}
+
 iipHandler = function(req, res, next) {
   createProxyMiddleware({
     secure: false,
@@ -49,15 +67,7 @@ iipHandler = function(req, res, next) {
     changeOrigin: true,
     target: IIP_PATH,
     pathRewrite: function(path, req) {
-      if (req.newFilepath) {
-        path = path.replace(req.iipFileRequested, req.newFilepath);
-      }
-      // remove token if present
-      path = removeParameterFromUrl(path, "token");
-      // NOTE -- this may need to change if the original url has more subdirs or so added
-      var splitPath = path.split('/');
-      console.log(path);
-      return '/' + splitPath.slice(2, splitPath.length).join('/');
+      return rewritePath(req);
     },
   })(req, res, next);
 };
@@ -65,6 +75,7 @@ iipHandler = function(req, res, next) {
 iipHandlers = {};
 iipHandlers.preIip = preIip;
 iipHandlers.iipHandler = iipHandler;
+iipHandlers.rewritePath = rewritePath;
 
 
 module.exports = iipHandlers;
