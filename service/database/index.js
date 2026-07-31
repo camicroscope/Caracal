@@ -103,7 +103,7 @@ class Mongo {
                 query = transformIdToObjectId(query);
     
                 const collection = getConnection(database).collection(collectionName);
-                const count = await collection.count(query);
+                const count = await collection.countDocuments(query);
     
                 let data =[{"count": count}];
     
@@ -183,7 +183,7 @@ class Mongo {
             filter = transformIdToObjectId(filter);
 
             const collection = getConnection(database).collection(collectionName);
-            const result = await collection.deleteMany(filter);
+            const result = await collection.deleteOne(filter);
             delete result.connection;
 
             return result;
@@ -233,6 +233,37 @@ class Mongo {
             const collection = await getConnection(database).collection(
                 collectionName
             );
+            const result = await collection.updateOne(filter, updates);
+            delete result.connection;
+            return result;
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    }
+
+    /**
+     * Runs updateMany operation on every document that satisfies the filter
+     * condition. Only use this for filters that are deliberately intended to
+     * match more than one document (e.g. propagating a label rename to every
+     * mark tagged with it) -- everywhere else, use update() (updateOne).
+     *
+     * @async
+     * @param {string} database Name of the database
+     * @param {string} collectionName name of collection to run operation on
+     * @param {document} filter selection criteria for the update
+     * @param {document|pipeline} updates modifications to apply to filtered documents,
+     * can be a document or a aggregation pipeline
+     *
+     * {@link https://docs.mongodb.com/manual/reference/method/db.collection.updateMany/ Read MongoDB Reference}
+     */
+    static async updateMany(database, collectionName, filter, updates) {
+        try {
+            filter = transformIdToObjectId(filter);
+
+            const collection = await getConnection(database).collection(
+                collectionName
+            );
             const result = await collection.updateMany(filter, updates);
             delete result.connection;
             return result;
@@ -275,6 +306,7 @@ module.exports = {
     find: Mongo.find,
     paginatedFind: Mongo.paginatedFind,
     update: Mongo.update,
+    updateMany: Mongo.updateMany,
     delete: Mongo.delete,
     aggregate: Mongo.aggregate,
     distinct: Mongo.distinct,

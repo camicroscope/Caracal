@@ -52,7 +52,7 @@ describe('Slide Lifecycle Step 3', function() {
         .end(function(err, res) {
           (res).should.have.status(200);
           (res.body).should.be.a('object');
-          (res.body.result.n).should.be.eql(1);
+          (res.body.deletedCount).should.be.eql(1);
           done();
         });
   });

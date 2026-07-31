@@ -4,6 +4,10 @@
 
 # Caracal
 
+[![Node.js CI](https://github.com/caMicroscope/caracal/actions/workflows/node.js.yml/badge.svg)](https://github.com/caMicroscope/caracal/actions/workflows/node.js.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/caMicroscope/caracal/badge)](https://scorecard.dev/viewer/?uri=github.com/caMicroscope/caracal)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+
 Conslidated Attribute Registry, Access Control, and Loader proxy
 
 ## routes

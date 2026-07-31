@@ -1,4 +1,4 @@
-var proxy = require('http-proxy-middleware');
+var {createProxyMiddleware} = require('http-proxy-middleware');
 
 var IIP_PATH = process.env.IIP_PATH || 'http://ca-iip/';
 
@@ -31,12 +31,20 @@ function removeParameterFromUrl(url, parameter) {
 }
 
 iipHandler = function(req, res, next) {
-  proxy({
+  createProxyMiddleware({
     secure: false,
-    onError(err, req, res) {
-      console.log(err);
-      err.statusCode = 500;
-      next(err);
+    on: {
+      error(err, req, res) {
+        console.log(err);
+        err.statusCode = 500;
+        next(err);
+      },
+      proxyReq: function(proxyReq, req, res) {
+        if (req.method == 'POST') {
+          proxyReq.write(req.body);
+          proxyReq.end();
+        }
+      },
     },
     changeOrigin: true,
     target: IIP_PATH,
@@ -50,12 +58,6 @@ iipHandler = function(req, res, next) {
       var splitPath = path.split('/');
       console.log(path);
       return '/' + splitPath.slice(2, splitPath.length).join('/');
-    },
-    onProxyReq: function(proxyReq, req, res) {
-      if (req.method == 'POST') {
-        proxyReq.write(req.body);
-        proxyReq.end();
-      }
     },
   })(req, res, next);
 };
