@@ -1,4 +1,4 @@
-const {MongoClient, ObjectID} = require("mongodb");
+const {MongoClient, ObjectId} = require("mongodb");
 
 function randomId() {
   // Math.random should be unique because of its seeding algorithm.
@@ -110,7 +110,7 @@ class FixAnnotationLabelIDPatch {
         this.labelMap.set(labelType, {id: labelId});
       }
       // update annotation
-      const rs = await collection.updateOne({_id: new ObjectID(mark._id)}, {
+      const rs = await collection.updateOne({_id: new ObjectId(mark._id)}, {
         '$set': {
           'provenance.analysis.execution_id': executionId,
           'provenance.analysis.labelId': labelId,
@@ -120,7 +120,7 @@ class FixAnnotationLabelIDPatch {
           'properties.annotations.name': labelType,
         },
       });
-      if (rs.result.ok&&rs.result.nModified) {
+      if (rs.acknowledged && rs.modifiedCount) {
         console.log('update success');
       } else {
         console.error('update fail');

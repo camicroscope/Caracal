@@ -1,11 +1,22 @@
 const DISABLE_SEC = (process.env.DISABLE_SEC === 'true') || false;
 const mongoDB = require("../service/database");
 const path = require('node:path');
+const {badPath} = require('./pathUtil.js');
+const {hasQueryInjection} = require('./queryUtil.js');
+
+function rejectIfQueryInjection(query, res) {
+  if (hasQueryInjection(query)) {
+    res.status(400).json({error: 'invalid query parameter'});
+    return true;
+  }
+  return false;
+}
 
 var General = {};
 General.find = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    if (rejectIfQueryInjection(query, res)) return;
     mongoDB.find(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -16,6 +27,7 @@ General.find = function(db, collection) {
 General.paginatedFind = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    if (rejectIfQueryInjection(query, res)) return;
     mongoDB.paginatedFind(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -26,6 +38,7 @@ General.paginatedFind = function(db, collection) {
 General.count = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    if (rejectIfQueryInjection(query, res)) return;
     mongoDB.count(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -33,11 +46,20 @@ General.count = function(db, collection) {
   };
 };
 
+// caps regex input length in General.findWithRegex to bound the cost of a
+// user-supplied pattern (ReDoS mitigation) -- not a correctness limit.
+var MAX_REGEX_PARAM_LENGTH = 200;
+
 General.findWithRegex = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
+    if (rejectIfQueryInjection(query, res)) return;
     for (let i in query) {
       if (query.hasOwnProperty(i)) {
+        if (query[i].length > MAX_REGEX_PARAM_LENGTH) {
+          res.status(400).json({error: 'query parameter too long'});
+          return;
+        }
         query[i] = new RegExp(query[i], 'i'); // case insensitive search
       }
     }
@@ -52,6 +74,7 @@ General.get = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
+    if (rejectIfQueryInjection(query, res)) return;
     mongoDB.find(db, collection, {_id: req.query.id}).then((x) => {
       req.data = x;
       next();
@@ -63,6 +86,7 @@ General.distinct = function(db, collection, upon) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
+    if (rejectIfQueryInjection(query, res)) return;
     mongoDB.distinct(db, collection, upon, query).then((x) => {
       req.data = x;
       next();
@@ -84,6 +108,7 @@ General.update = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
+    if (rejectIfQueryInjection(query, res)) return;
     var newVals = {
       $set: JSON.parse(req.body),
     };
@@ -98,6 +123,7 @@ General.delete = function(db, collection) {
   return function(req, res, next) {
     var query = req.query;
     delete query.token;
+    if (rejectIfQueryInjection(query, res)) return;
     mongoDB.delete(db, collection, query).then((x) => {
       req.data = x;
       next();
@@ -121,6 +147,7 @@ Presetlabels.add = function(req, res, next) {
 Presetlabels.update = function(req, res, next) {
   var query = req.query;
   delete query.token;
+  if (rejectIfQueryInjection(query, res)) return;
   var labels = JSON.parse(req.body);
 
   // initial data
@@ -163,6 +190,7 @@ Presetlabels.update = function(req, res, next) {
 Presetlabels.remove = function(req, res, next) {
   var query = req.query;
   delete query.token;
+  if (rejectIfQueryInjection(query, res)) return;
   mongoDB.update('camic', 'configuration',
       {
         'config_name': 'preset_label',
@@ -177,6 +205,7 @@ var Mark = {};
 Mark.spatial = function(req, res, next) {
   var query = req.query;
   delete query.token;
+  if (rejectIfQueryInjection(query, res)) return;
   // handle  x0, y0, x1, y1, footprint
   if (req.query.x0 && req.query.x1) {
     query.x = {
@@ -207,6 +236,7 @@ Mark.spatial = function(req, res, next) {
 Mark.segmentationCountByExecid = async function(req, res, next) {
   var query = req.query;
   delete query.token;
+  if (rejectIfQueryInjection(query, res)) return;
 
   // handle  x0, y0, x1, y1
   if (req.query.x0 && req.query.x1) {
@@ -290,6 +320,7 @@ Mark.multi = function(req, res, next) {
 
 Mark.findMarkTypes = function(req, res, next) {
   var query = req.query;
+  if (rejectIfQueryInjection(query, res)) return;
   if (query.slide) {
     query['provenance.image.slide'] = query.slide;
     delete query.slide;
@@ -328,6 +359,7 @@ Mark.findMarkTypes = function(req, res, next) {
 Mark.updateMarksLabel = function(req, res, next) {
   var query = req.query;
   delete query.token;
+  if (rejectIfQueryInjection(query, res)) return;
   // initial data
 
   var newVals = {
@@ -337,7 +369,9 @@ Mark.updateMarksLabel = function(req, res, next) {
       'properties.annotations.notes': query.name,
     },
   };
-  mongoDB.update('camic', 'mark',
+  // deliberately bulk: renaming a label should propagate to every mark
+  // tagged with it, not just the first one.
+  mongoDB.updateMany('camic', 'mark',
       {
         'provenance.analysis.labelId': query.id,
       }, newVals).then((x) => {
@@ -349,6 +383,7 @@ var Heatmap = {};
 Heatmap.types = function(req, res, next) {
   var query = req.query;
   delete query.token;
+  if (rejectIfQueryInjection(query, res)) return;
   mongoDB.find('camic', 'heatmap', query, {
     'data': 0,
   }).then((x) => {
@@ -399,14 +434,6 @@ User.wcido = function(req, res, next) {
 };
 
 var FSChanged = {};
-
-function badPath(path) {
-  if (path.includes("..")) return true;
-  if (path.includes("/./")) return true;
-  if (path.includes("//")) return true;
-  if (path.startsWith(".")) return true;
-  return false;
-}
 
 FSChanged.added = function(db, collection, loader) {
   return function(req, res) {

@@ -15,6 +15,15 @@ jobs:
         node-version: [18.x, 20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+
+    env:
+      DISABLE_SEC: 'true'
+
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -27,3 +36,4 @@ jobs:
     - run: npm install eslint-config-google
     - run: npm run build --if-present
     - run: npm run lint
+    - run: npm test

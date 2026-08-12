@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 
-var proxy = require('http-proxy-middleware');
 const https = require('https');
 var cookieParser = require('cookie-parser');
 var throng = require('throng');
@@ -15,13 +14,13 @@ const auth = require('./handlers/authHandlers.js');
 const monitor = require('./handlers/monitorHandlers.js');
 const userFunction = require('./handlers/userFunction.js');
 const iipHandlers = require('./handlers/iipHandler.js');
+const mctileHandlers = require('./handlers/mctileHandler.js');
 const pdbIipHandlers = require('./handlers/pathdbIipHandler.js');
 const proxyHandler = require('./handlers/proxyHandler.js');
 const permissionHandler = require('./handlers/permssionHandler.js');
 const dataHandlers = require('./handlers/dataHandlers.js');
 const fileHandlers = require('./handlers/fileHandlers.js');
 const sanitizeBody = require('./handlers/sanitizeHandler.js');
-const envEcho = require("./handlers/envEcho.js");
 const DataTransformationHandler = require('./handlers/dataTransformationHandler.js');
 
 
@@ -69,7 +68,6 @@ var HANDLERS = {
   "loginHandler": function() {
     return auth.loginHandler(auth.PUBKEY);
   },
-  "loginWithHeader": auth.loginWithHeader(auth.PRIKEY, userFunction),
   "sanitizeBody": function() {
     return sanitizeBody;
   },
@@ -86,7 +84,6 @@ var HANDLERS = {
   "permissionHandler": permissionHandler,
   "editHandler": auth.editHandler,
   "proxyHandler": proxyHandler,
-  "envEcho": envEcho,
   "writeFile": fileHandlers.writeFile,
   "iipHandler": function() {
     return iipHandlers.iipHandler;
@@ -126,6 +123,12 @@ var HANDLERS = {
   },
   "removePresetlabels": function() {
     return dataHandlers.Presetlabels.remove;
+  },
+  "mctileHandler": function() {
+    return mctileHandlers.mctileHandler;
+  },
+  "preMct": function() {
+    return mctileHandlers.preMct;
   },
   "addedFileToFS": dataHandlers.FSChanged.added,
   "removedFileFromFS": dataHandlers.FSChanged.removed,

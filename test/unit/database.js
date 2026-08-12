@@ -1,5 +1,5 @@
 const chai = require("chai");
-const {ObjectID} = require("mongodb");
+const {ObjectId} = require("mongodb");
 var should = chai.should();
 
 const {
@@ -54,12 +54,7 @@ describe("service/database", () => {
     it("should return a valid connection when database name provided", () => {
       const connection = getConnection("camic");
       connection.should.not.be.undefined;
-      connection.serverConfig.should.not.be.undefined;
-    });
-
-    it("should inject configuration objects", () => {
-      const connection = getConnection("camic");
-      connection.serverConfig.s.options.useUnifiedTopology.should.be.true;
+      connection.databaseName.should.equal("camic");
     });
   });
 
@@ -108,7 +103,7 @@ describe("service/database", () => {
       (typeof processed._id).should.be.equal("object");
     });
 
-    it("should not break if datatype of id not a valid ObjectID", () => {
+    it("should not break if datatype of id not a valid ObjectId", () => {
       const original = {
         foo: "bar",
         number: 1,
@@ -126,7 +121,7 @@ describe("service/database", () => {
     /** dummy payload for unit tests */
     const USERS = [
       {
-        _id: new ObjectID(),
+        _id: new ObjectId(),
         name: "user 1",
         age: 20,
         config: {
@@ -134,7 +129,7 @@ describe("service/database", () => {
         },
       },
       {
-        _id: new ObjectID(),
+        _id: new ObjectId(),
         name: "user 2",
         age: 20,
         config: {
@@ -177,7 +172,7 @@ describe("service/database", () => {
       /** normal insert operations for single document */
       it("should insert single document into collection", async () => {
         const user = {
-          _id: new ObjectID(),
+          _id: new ObjectId(),
           name: "testUser1",
           age: 20,
           config: {
@@ -186,15 +181,15 @@ describe("service/database", () => {
         };
 
         const res = await MongoDB.add(DB.NAME, DB.COLLECTION, user);
+        res.acknowledged.should.be.true;
         res.insertedCount.should.be.equal(1);
-        res.result.n.should.be.equal(1);
       });
 
       /** should  */
       it("should insert multiple document into collection", async () => {
         const users = [
           {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             name: "testUser1",
             age: 20,
             config: {
@@ -202,7 +197,7 @@ describe("service/database", () => {
             },
           },
           {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             name: "testUser2",
             age: 20,
             config: {
@@ -212,8 +207,8 @@ describe("service/database", () => {
         ];
 
         const res = await MongoDB.add(DB.NAME, DB.COLLECTION, users);
+        res.acknowledged.should.be.true;
         res.insertedCount.should.be.equal(2);
-        res.result.n.should.be.equal(2);
       });
     });
 
@@ -231,7 +226,7 @@ describe("service/database", () => {
         const res = await MongoDB.delete(DB.NAME, DB.COLLECTION, {
           _id: USERS[0]._id,
         });
-        res.result.ok.should.be.equal(1);
+        res.acknowledged.should.be.true;
         res.deletedCount.should.be.equal(1);
       });
 
@@ -239,7 +234,7 @@ describe("service/database", () => {
         const res = await MongoDB.delete(DB.NAME, DB.COLLECTION, {
           age: 20,
         });
-        res.result.ok.should.be.equal(1);
+        res.acknowledged.should.be.true;
         res.deletedCount.should.be.equal(1);
       });
 
@@ -247,7 +242,7 @@ describe("service/database", () => {
         const res = await MongoDB.delete(DB.NAME, DB.COLLECTION, {
           age: 50,
         });
-        res.result.ok.should.be.equal(1);
+        res.acknowledged.should.be.true;
         res.deletedCount.should.be.equal(0);
       });
     });
@@ -339,7 +334,7 @@ describe("service/database", () => {
       it("should run a function pipeline on data", async () => {
         await MongoDB.add(DB.NAME, DB.COLLECTION, [
           {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             name: "user 1",
             type: "a",
             by: "bot",
@@ -347,7 +342,7 @@ describe("service/database", () => {
             for: "aggregate",
           },
           {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             name: "user 2",
             type: "a",
             by: "bot",
@@ -355,7 +350,7 @@ describe("service/database", () => {
             for: "aggregate",
           },
           {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             name: "user 3",
             type: "b",
             by: "human",
@@ -363,7 +358,7 @@ describe("service/database", () => {
             for: "aggregate",
           },
           {
-            _id: new ObjectID(),
+            _id: new ObjectId(),
             name: "user 4",
             type: "b",
             by: "human",
