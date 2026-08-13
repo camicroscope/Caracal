@@ -42,5 +42,8 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-security": "^1.4.0",
     "mocha": "^10.2.0"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.1.0"
   }
 }
